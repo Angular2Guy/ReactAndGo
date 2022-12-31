@@ -1,1 +1,1 @@
-CompileDaemon -command="./github.com/angular-and-go"
+CompileDaemon -command="./angular-and-go"
