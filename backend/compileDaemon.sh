@@ -1,0 +1,1 @@
+CompileDaemon -command="./github.com/angular-and-go"
