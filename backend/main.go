@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	adapter_config "github.com/angular-and-go/pkd/adapter/config"
+	config "github.com/angular-and-go/pkd/config"
 )
 
 func init() {
-	adapter_config.LoadEnvVariables()
+	config.LoadEnvVariables()
 }
 
 func main() {

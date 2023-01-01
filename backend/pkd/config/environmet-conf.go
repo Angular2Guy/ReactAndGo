@@ -1,4 +1,4 @@
-package adapter_config
+package config
 
 import (
 	"log"
