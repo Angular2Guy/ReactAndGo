@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
-
-	config "github.com/angular-and-go/pkd/config"
+	"angular-and-go/pkd/config"
+	contr "angular-and-go/pkd/contr"
+	repo "angular-and-go/pkd/gas-stations"
 )
 
 func init() {
@@ -11,5 +11,6 @@ func init() {
 }
 
 func main() {
-	fmt.Println("Hello World.")
+	repo.Start()
+	contr.Start()
 }
