@@ -16,4 +16,5 @@ func init() {
 func main() {
 	gasstation.Start()
 	contr.Start()
+	//gasstation.FindById("123")
 }
