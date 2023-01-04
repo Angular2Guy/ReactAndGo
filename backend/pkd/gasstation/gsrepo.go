@@ -1,16 +1,12 @@
 package gasstation
 
 import (
+	gsbody "angular-and-go/pkd/contr/model"
 	"angular-and-go/pkd/database"
 	"angular-and-go/pkd/gasstation/gsmodel"
-	"fmt"
 
 	"gorm.io/gorm"
 )
-
-func Start() {
-	fmt.Println("Hello repo")
-}
 
 func FindById(id string) gsmodel.GasStation {
 	var myGasStation gsmodel.GasStation
@@ -24,4 +20,14 @@ func FindPricesByStid(stid string) []gsmodel.GasPrice {
 	var myGasPrice []gsmodel.GasPrice
 	database.DB.Where("stid = ?", stid).Order("date desc").First(&myGasPrice)
 	return myGasPrice
+}
+
+func FindBySearchPlace(searchPlace gsbody.SearchPlaceBody) []gsmodel.GasStation {
+	var gasStations []gsmodel.GasStation
+	return gasStations
+}
+
+func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasStation {
+	var gasStations []gsmodel.GasStation
+	return gasStations
 }

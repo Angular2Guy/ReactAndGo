@@ -4,7 +4,6 @@ import (
 	"angular-and-go/pkd/config"
 	"angular-and-go/pkd/contr"
 	"angular-and-go/pkd/database"
-	"angular-and-go/pkd/gasstation"
 )
 
 func init() {
@@ -14,7 +13,5 @@ func init() {
 }
 
 func main() {
-	gasstation.Start()
 	contr.Start()
-	//gasstation.FindById("123")
 }
