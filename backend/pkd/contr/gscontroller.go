@@ -1,6 +1,8 @@
 package contr
 
 import (
+	"angular-and-go/pkd/gasstation"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +25,9 @@ func postsIndex(c *gin.Context) {
 }
 
 func postsShow(c *gin.Context) {
-
+	gasstationId := c.Params.ByName("gsid")
+	gsEntity := gasstation.FindById(gasstationId)
+	c.JSON(200, gsEntity)
 }
 
 func postsUpdate(c *gin.Context) {
