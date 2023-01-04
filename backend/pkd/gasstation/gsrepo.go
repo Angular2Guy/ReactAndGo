@@ -4,6 +4,8 @@ import (
 	"angular-and-go/pkd/database"
 	"angular-and-go/pkd/gasstation/gsmodel"
 	"fmt"
+
+	"gorm.io/gorm"
 )
 
 func Start() {
@@ -12,9 +14,9 @@ func Start() {
 
 func FindById(id string) gsmodel.GasStation {
 	var myGasStation gsmodel.GasStation
-	database.DB.Where("id = ?", id).First(&myGasStation)
-	//.Preload("GasPrices")
-	//.Joins("left join (select * from gas_station_information_history order by date desc) as gsih on gsih.stid")
+	database.DB.Where("id = ?", id).Preload("GasPrices", func(db *gorm.DB) *gorm.DB {
+		return db.Order("date DESC").Limit(20)
+	}).First(&myGasStation)
 	return myGasStation
 }
 

@@ -16,12 +16,12 @@ type GasStation struct {
 	PostCode                string
 	Latitude                float64 `gorm:"column:lat"`
 	Longitude               float64 `gorm:"column:lng"`
-	PublicHolydayIdentifier string
+	PublicHolidayIdentifier string
 	PriceInImport           time.Time
 	PriceChanged            time.Time
 	OpenTs                  int
 	OtJson                  string
 	StationInImport         time.Time
 	FirstActive             time.Time
-	//GasPrices               []GasPrice
+	GasPrices               []GasPrice
 }
