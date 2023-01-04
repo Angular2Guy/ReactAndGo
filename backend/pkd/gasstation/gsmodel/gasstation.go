@@ -8,14 +8,14 @@ type GasStation struct {
 	ID                      string `gorm:"primaryKey"`
 	Version                 int
 	VersionTime             time.Time
-	StationName             string `gorm:"name"`
+	StationName             string `gorm:"column:name"`
 	Brand                   string
 	Street                  string
 	Place                   string
 	HouseNumber             string
 	PostCode                string
-	Latitude                float64
-	Longitude               float64
+	Latitude                float64 `gorm:"column:lat"`
+	Longitude               float64 `gorm:"column:lng"`
 	PublicHolydayIdentifier string
 	PriceInImport           time.Time
 	PriceChanged            time.Time
@@ -23,4 +23,5 @@ type GasStation struct {
 	OtJson                  string
 	StationInImport         time.Time
 	FirstActive             time.Time
+	//GasPrices               []GasPrice
 }

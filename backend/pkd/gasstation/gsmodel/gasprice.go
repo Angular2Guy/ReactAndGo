@@ -7,13 +7,13 @@ type Tabler interface {
 }
 
 type GasPrice struct {
-	ID      int64 `gorm:"primaryKey"`
-	Stid    string
-	E5      int
-	E10     int
-	Diesel  int
-	date    time.Time
-	changed int
+	ID           int64  `gorm:"primaryKey"`
+	GasStationID string `gorm:"column:stid"`
+	E5           int
+	E10          int
+	Diesel       int
+	Date         time.Time
+	Changed      int
 }
 
 func (GasPrice) TableName() string {

@@ -12,6 +12,14 @@ func Start() {
 
 func FindById(id string) gsmodel.GasStation {
 	var myGasStation gsmodel.GasStation
-	database.DB.First(&myGasStation, id)
+	database.DB.Where("id = ?", id).First(&myGasStation)
+	//.Preload("GasPrices")
+	//.Joins("left join (select * from gas_station_information_history order by date desc) as gsih on gsih.stid")
 	return myGasStation
+}
+
+func FindPricesByStid(stid string) []gsmodel.GasPrice {
+	var myGasPrice []gsmodel.GasPrice
+	database.DB.Where("stid = ?", stid).Order("date desc").First(&myGasPrice)
+	return myGasPrice
 }
