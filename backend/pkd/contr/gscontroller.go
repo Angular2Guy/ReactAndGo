@@ -12,7 +12,7 @@ func Start() {
 	r.POST("/posts", postsCreate)
 	r.GET("/gasprice/:id", getGasPriceByGasStationId)
 	r.GET("/gasstation/:id", getGasStationById)
-	r.POST("/gasstation/search/place/", searchGasStationPlace)
+	r.POST("/gasstation/search/place", searchGasStationPlace)
 	r.POST("/gasstation/search/location", searchGasStationLocation)
 	r.PUT("/posts/:id", postsUpdate)
 	r.DELETE("posts/:id", postsDelete)
@@ -43,8 +43,11 @@ func searchGasStationPlace(c *gin.Context) {
 }
 
 func searchGasStationLocation(c *gin.Context) {
+	//jsonData, err := ioutil.ReadAll(c.Request.Body)
+	//fmt.Printf("Json: %v, Err: %v", string(jsonData), err)
 	var searchLocationBody gsbody.SearchLocation
 	c.Bind(&searchLocationBody)
+	//fmt.Printf("Lat: %v, Lng: %v\n", searchLocationBody.Latitude, searchLocationBody.Longitude)
 	gsEntity := gasstation.FindBySearchLocation(searchLocationBody)
 	c.JSON(200, gsEntity)
 }

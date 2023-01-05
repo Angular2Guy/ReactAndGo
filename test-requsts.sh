@@ -2,4 +2,6 @@ curl -X GET http://localhost:3000/gasstation/33d6adbc-e6f5-4c4e-f7a5-a132626d373
 
 curl -X POST http://localhost:3000/gasstation/search/place/ -H 'Content-Type: application/json' -d '{"StationName": "Berlin"}'
 
-curl -X POST http://localhost:3000/gasstation/search/place/ -H 'Content-Type: application/json' -d '{"StationName": "Berlin", "PostCode": "13088"}'
+curl -X POST http://localhost:3000/gasstation/search/place -H 'Content-Type: application/json' -d '{"StationName": "Berlin", "PostCode": "13088"}'
+
+curl -X POST http://localhost:3000/gasstation/search/location -H 'Content-Type: application/json' -d '{"Longitude": 13.467082, "Latitude": 52.560806}'
