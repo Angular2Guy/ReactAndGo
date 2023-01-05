@@ -6,7 +6,7 @@ import (
 
 type GasStation struct {
 	ID                      string `gorm:"primaryKey"`
-	Version                 int
+	Version                 string
 	VersionTime             time.Time
 	StationName             string `gorm:"column:name"`
 	Brand                   string
