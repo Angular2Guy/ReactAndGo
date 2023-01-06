@@ -8,15 +8,17 @@ import (
 )
 
 func Start() {
-	r := gin.Default()
-	r.POST("/posts", postsCreate)
-	r.GET("/gasprice/:id", getGasPriceByGasStationId)
-	r.GET("/gasstation/:id", getGasStationById)
-	r.POST("/gasstation/search/place", searchGasStationPlace)
-	r.POST("/gasstation/search/location", searchGasStationLocation)
-	r.PUT("/posts/:id", postsUpdate)
-	r.DELETE("posts/:id", postsDelete)
-	r.Run() // listen and serve on 0.0.0.0:8080
+	router := gin.Default()
+	router.POST("/posts", postsCreate)
+	router.GET("/gasprice/:id", getGasPriceByGasStationId)
+	router.GET("/gasstation/:id", getGasStationById)
+	router.POST("/gasstation/search/place", searchGasStationPlace)
+	router.POST("/gasstation/search/location", searchGasStationLocation)
+	router.PUT("/posts/:id", postsUpdate)
+	router.DELETE("/posts/:id", postsDelete)
+	router.Static("/static", "./static")
+	router.NoRoute(func(c *gin.Context) { c.Redirect(302, "/static") })
+	router.Run() // listen and serve on 0.0.0.0:3000
 }
 
 func postsCreate(c *gin.Context) {
