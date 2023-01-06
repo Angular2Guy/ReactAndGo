@@ -99,12 +99,12 @@ func calcDistance(startLat float64, startLng float64, destLat float64, destLng f
 	return distance, bearing
 }
 
-func calcLocation(startLat float64, startLng float64, distanceKm float64, directionAngle float64) (float64, float64) {
-	var radDirection = toRad(directionAngle)
+func calcLocation(startLat float64, startLng float64, distanceKm float64, bearing float64) (float64, float64) {
+	var radBearing = toRad(bearing)
 	var radStartLat = toRad(startLat)
 	var radStartLng = toRad(startLng)
-	var radDestLat = math.Asin(math.Sin(radStartLat)*math.Cos(distanceKm/earthRadius) + math.Cos(radStartLat)*math.Sin(distanceKm/earthRadius)*math.Cos(radDirection))
-	var radDestLng = radStartLng + math.Atan2(math.Sin(radDirection)*math.Sin(distanceKm/earthRadius)*math.Cos(radStartLat), math.Cos(distanceKm/earthRadius)-math.Sin(radStartLat)*math.Sin(radDestLat))
+	var radDestLat = math.Asin(math.Sin(radStartLat)*math.Cos(distanceKm/earthRadius) + math.Cos(radStartLat)*math.Sin(distanceKm/earthRadius)*math.Cos(radBearing))
+	var radDestLng = radStartLng + math.Atan2(math.Sin(radBearing)*math.Sin(distanceKm/earthRadius)*math.Cos(radStartLat), math.Cos(distanceKm/earthRadius)-math.Sin(radStartLat)*math.Sin(radDestLat))
 	destLat := toDeg(radDestLat)
 	destLng := toDeg(radDestLng)
 	return destLat, destLng
