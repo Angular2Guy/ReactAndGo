@@ -4,7 +4,6 @@ import (
 	gsbody "angular-and-go/pkd/contr/model"
 	"angular-and-go/pkd/database"
 	"angular-and-go/pkd/gasstation/gsmodel"
-	"fmt"
 	"math"
 	"strings"
 
@@ -76,7 +75,7 @@ func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasSta
 	filteredGasStations := []gsmodel.GasStation{}
 	for _, myGasStation := range gasStations {
 		distance, bearing := calcDistance(searchLocation.Latitude, searchLocation.Longitude, myGasStation.Latitude, myGasStation.Longitude)
-		fmt.Printf("Distance: %v, Bearing: %v\n", distance, bearing)
+		//fmt.Printf("Distance: %v, Bearing: %v\n", distance, bearing)
 		if distance < 20.1 && bearing > -1.0 {
 			filteredGasStations = append(filteredGasStations, myGasStation)
 		}
@@ -94,10 +93,8 @@ func calcDistance(startLat float64, startLng float64, destLat float64, destLng f
 	var c = 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
 	var distance = earthRadius * c
 	//bearing
-	var radStartLng = toRad(startLng)
-	var radDestLng = toRad(destLng)
-	var y = math.Sin(radDeltaLng-radStartLng) * math.Cos(radDestLat)
-	var x = math.Cos(radStartLat)*math.Sin(radDestLat) - math.Sin(radStartLat)*math.Cos(radDestLat)*math.Cos(radDestLng-radStartLng)
+	var y = math.Sin(radDeltaLng) * math.Cos(radDestLat)
+	var x = math.Cos(radStartLat)*math.Sin(radDestLat) - math.Sin(radStartLat)*math.Cos(radDestLat)*math.Cos(radDeltaLng)
 	var bearing = math.Mod((toDeg(math.Atan2(y, x)) + 360.0), 360.0)
 	return distance, bearing
 }
