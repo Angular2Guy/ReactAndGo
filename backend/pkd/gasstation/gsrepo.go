@@ -4,11 +4,14 @@ import (
 	gsbody "angular-and-go/pkd/contr/model"
 	"angular-and-go/pkd/database"
 	"angular-and-go/pkd/gasstation/gsmodel"
+	"fmt"
 	"math"
 	"strings"
 
 	"gorm.io/gorm"
 )
+
+const earthRadius = 6371.0
 
 type minMaxSquare struct {
 	MinLat float64
@@ -69,11 +72,37 @@ func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasSta
 	database.DB.Where("lat >= ? and lat <= ? and lng >= ? and lng <= ?", minMax.MinLat, minMax.MaxLat, minMax.MinLng, minMax.MaxLng).Limit(200).Preload("GasPrices", func(db *gorm.DB) *gorm.DB {
 		return db.Order("date DESC").Limit(20)
 	}).Find(&gasStations)
-	return gasStations
+	//filter for stations in circle
+	filteredGasStations := []gsmodel.GasStation{}
+	for _, myGasStation := range gasStations {
+		distance, bearing := calcDistance(searchLocation.Latitude, searchLocation.Longitude, myGasStation.Latitude, myGasStation.Longitude)
+		fmt.Printf("Distance: %v, Bearing: %v\n", distance, bearing)
+		if distance < 20.1 && bearing > -1.0 {
+			filteredGasStations = append(filteredGasStations, myGasStation)
+		}
+	}
+	return filteredGasStations
+}
+
+func calcDistance(startLat float64, startLng float64, destLat float64, destLng float64) (float64, float64) {
+	var radStartLat = toRad(startLat)
+	var radDestLat = toRad(destLat)
+	var radDeltaLat = toRad(destLat - startLat)
+	var radDeltaLng = toRad(destLng - startLng)
+	//distance
+	var a = math.Sin(radDeltaLat/2)*math.Sin(radDeltaLat/2) + math.Cos(radStartLat)*math.Cos(radDestLat)*math.Sin(radDeltaLng/2)*math.Sin(radDeltaLng/2)
+	var c = 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+	var distance = earthRadius * c
+	//bearing
+	var radStartLng = toRad(startLng)
+	var radDestLng = toRad(destLng)
+	var y = math.Sin(radDeltaLng-radStartLng) * math.Cos(radDestLat)
+	var x = math.Cos(radStartLat)*math.Sin(radDestLat) - math.Sin(radStartLat)*math.Cos(radDestLat)*math.Cos(radDestLng-radStartLng)
+	var bearing = math.Mod((toDeg(math.Atan2(y, x)) + 360.0), 360.0)
+	return distance, bearing
 }
 
 func calcLocation(startLat float64, startLng float64, distanceKm float64, directionAngle float64) (float64, float64) {
-	const earthRadius = 6371.0
 	var radDirection = toRad(directionAngle)
 	var radStartLat = toRad(startLat)
 	var radStartLng = toRad(startLng)
