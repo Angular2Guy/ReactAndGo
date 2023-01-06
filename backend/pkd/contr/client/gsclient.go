@@ -3,7 +3,6 @@ package gsclient
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -45,17 +44,22 @@ func UpdateGsPrices(c *gin.Context) {
 	if err != nil {
 		log.Fatalf("Request failed: %v\n", err.Error())
 	}
-	body, err := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
-	if err != nil {
-		log.Fatalf("Read body failed: %v\n", body)
-	}
-	//fmt.Printf("Body received: %v", string(body))
 	var myGsResponse gsResponse
-	err1 := json.Unmarshal(body, &myGsResponse)
-	if err1 != nil {
-		log.Fatalf("Error: %v\n", err1.Error())
+	if err := json.NewDecoder(response.Body).Decode(&myGsResponse); err != nil {
+		log.Fatalf("Json decode failed: %v", err.Error())
 	}
+	/*
+		body, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Fatalf("Read body failed: %v\n", body)
+		}
+		//fmt.Printf("Body received: %v", string(body))
+		err1 := json.Unmarshal(body, &myGsResponse)
+		if err1 != nil {
+			log.Fatalf("Error: %v\n", err1.Error())
+		}
+	*/
 	result, _ := json.Marshal(myGsResponse)
 	fmt.Printf("Json: %v\n", string(result))
 }
