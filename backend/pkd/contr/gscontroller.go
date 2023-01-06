@@ -1,6 +1,7 @@
 package contr
 
 import (
+	gsclient "angular-and-go/pkd/contr/client"
 	gsbody "angular-and-go/pkd/contr/model"
 	"angular-and-go/pkd/gasstation"
 
@@ -10,6 +11,7 @@ import (
 func Start() {
 	router := gin.Default()
 	router.POST("/posts", postsCreate)
+	router.GET("/clienttest", gsclient.UpdateGsPrices)
 	router.GET("/gasprice/:id", getGasPriceByGasStationId)
 	router.GET("/gasstation/:id", getGasStationById)
 	router.POST("/gasstation/search/place", searchGasStationPlace)
