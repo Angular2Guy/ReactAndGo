@@ -1,10 +1,12 @@
 package gsclient
 
 import (
+	"angular-and-go/pkd/gasstation"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,6 +51,15 @@ func UpdateGsPrices(c *gin.Context) {
 	if err := json.NewDecoder(response.Body).Decode(&myGsResponse); err != nil {
 		log.Fatalf("Json decode failed: %v", err.Error())
 	}
+	stationPricesMap := make(map[string]gasstation.GasStationPrices)
+	for _, value := range myGsResponse.Stations {
+		stationPricesMap[value.Id] = gasstation.GasStationPrices{GasStationID: value.Id, E5: int(value.E5 * 1000), E10: int(value.E10 * 1000), Diesel: int(value.Diesel * 1000), Date: time.Now()}
+	}
+	var gasPriceUpdates []gasstation.GasStationPrices
+	for _, value := range stationPricesMap {
+		gasPriceUpdates = append(gasPriceUpdates, value)
+	}
+	gasstation.UpdatePrice(gasPriceUpdates)
 	/*
 		body, err := ioutil.ReadAll(response.Body)
 		if err != nil {

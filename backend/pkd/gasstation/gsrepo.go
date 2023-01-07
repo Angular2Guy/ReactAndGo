@@ -4,8 +4,10 @@ import (
 	gsbody "angular-and-go/pkd/contr/model"
 	"angular-and-go/pkd/database"
 	"angular-and-go/pkd/gasstation/gsmodel"
+	"log"
 	"math"
 	"strings"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -19,12 +21,66 @@ type minMaxSquare struct {
 	MaxLng float64
 }
 
+type GasStationPrices struct {
+	GasStationID string `gorm:"column:stid"`
+	E5           int
+	E10          int
+	Diesel       int
+	Date         time.Time
+}
+
+func UpdatePrice(gasStationPrices []GasStationPrices) {
+	stationPricesMap := make(map[string]GasStationPrices)
+	for _, value := range gasStationPrices {
+		stationPricesMap[value.GasStationID] = GasStationPrices{GasStationID: value.GasStationID, E5: int(value.E5 * 1000), E10: int(value.E10 * 1000), Diesel: int(value.Diesel * 1000), Date: time.Now()}
+	}
+	stationPricesKeys := make([]string, 0, len(stationPricesMap))
+	for k := range stationPricesMap {
+		stationPricesKeys = append(stationPricesKeys, k)
+	}
+	gasPriceUpdateMap := make(map[string]gsmodel.GasPrice)
+	stationPricesDb := FindPricesByStids(stationPricesKeys)
+	for _, value := range stationPricesDb {
+		if _, found := gasPriceUpdateMap[value.GasStationID]; !found {
+			var myChanges = 0
+			if stationPricesMap[value.GasStationID].Diesel != value.Diesel {
+				myChanges = myChanges + 1
+			}
+			if stationPricesMap[value.GasStationID].E10 != value.E10 {
+				myChanges = myChanges + 16
+			}
+			if stationPricesMap[value.GasStationID].E5 != value.E5 {
+				myChanges = myChanges + 4
+			}
+			if myChanges > 0 {
+				gasPriceUpdateMap[value.GasStationID] = gsmodel.GasPrice{GasStationID: value.GasStationID, E5: value.E5, E10: value.E10, Diesel: value.Diesel, Date: value.Date, Changed: myChanges}
+				delete(stationPricesMap, value.GasStationID)
+			}
+		}
+	}
+	for _, value := range gasPriceUpdateMap {
+		database.DB.Save(&value)
+	}
+	if len(stationPricesMap) > 0 {
+		//create new gas stations
+		log.Default().Printf("New GasStations: %v\n", len(stationPricesMap))
+	}
+
+}
+
 func FindById(id string) gsmodel.GasStation {
 	var myGasStation gsmodel.GasStation
 	database.DB.Where("id = ?", id).Preload("GasPrices", func(db *gorm.DB) *gorm.DB {
 		return db.Order("date DESC").Limit(20)
 	}).First(&myGasStation)
 	return myGasStation
+}
+
+func FindPricesByStids(stids []string) []gsmodel.GasPrice {
+	var myGasPrice []gsmodel.GasPrice
+	//limit needs to be higher for multiple price changes a day
+	database.DB.Where("stid IN ?", stids).Order("date desc").Limit(len(stids) * 5).Find(&myGasPrice)
+	return myGasPrice
 }
 
 func FindPricesByStid(stid string) []gsmodel.GasPrice {
