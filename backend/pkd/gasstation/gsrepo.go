@@ -4,6 +4,8 @@ import (
 	gsbody "angular-and-go/pkd/contr/model"
 	"angular-and-go/pkd/database"
 	"angular-and-go/pkd/gasstation/gsmodel"
+	"encoding/json"
+	"fmt"
 	"log"
 	"math"
 	"strings"
@@ -31,12 +33,10 @@ type GasStationPrices struct {
 
 func UpdatePrice(gasStationPrices []GasStationPrices) {
 	stationPricesMap := make(map[string]GasStationPrices)
+	var stationPricesKeys []string
 	for _, value := range gasStationPrices {
-		stationPricesMap[value.GasStationID] = GasStationPrices{GasStationID: value.GasStationID, E5: int(value.E5 * 1000), E10: int(value.E10 * 1000), Diesel: int(value.Diesel * 1000), Date: time.Now()}
-	}
-	stationPricesKeys := make([]string, 0, len(stationPricesMap))
-	for k := range stationPricesMap {
-		stationPricesKeys = append(stationPricesKeys, k)
+		stationPricesMap[value.GasStationID] = GasStationPrices{GasStationID: value.GasStationID, E5: int(value.E5), E10: int(value.E10), Diesel: int(value.Diesel), Date: time.Now()}
+		stationPricesKeys = append(stationPricesKeys, value.GasStationID)
 	}
 	gasPriceUpdateMap := make(map[string]gsmodel.GasPrice)
 	stationPricesDb := FindPricesByStids(stationPricesKeys)
@@ -52,10 +52,18 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 			if stationPricesMap[value.GasStationID].E5 != value.E5 {
 				myChanges = myChanges + 4
 			}
-			if myChanges > 0 {
-				gasPriceUpdateMap[value.GasStationID] = gsmodel.GasPrice{GasStationID: value.GasStationID, E5: value.E5, E10: value.E10, Diesel: value.Diesel, Date: value.Date, Changed: myChanges}
-				delete(stationPricesMap, value.GasStationID)
+			// validation checks
+			if stationPricesMap[value.GasStationID].Date.After(time.Now().AddDate(0, -1, 0)) || stationPricesMap[value.GasStationID].Diesel < 10 ||
+				stationPricesMap[value.GasStationID].E10 < 10 || stationPricesMap[value.GasStationID].E5 < 10 {
+				myChanges = 0
 			}
+			if myChanges > 0 {
+				gasPriceUpdateMap[value.GasStationID] = gsmodel.GasPrice{GasStationID: value.GasStationID, E5: stationPricesMap[value.GasStationID].E5, E10: stationPricesMap[value.GasStationID].E10,
+					Diesel: stationPricesMap[value.GasStationID].Diesel, Date: stationPricesMap[value.GasStationID].Date, Changed: myChanges}
+				value, _ := json.Marshal(gasPriceUpdateMap[value.GasStationID])
+				log.Default().Printf("Update: %v\n", string(value))
+			}
+			delete(stationPricesMap, value.GasStationID)
 		}
 	}
 	for _, value := range gasPriceUpdateMap {
@@ -78,8 +86,8 @@ func FindById(id string) gsmodel.GasStation {
 
 func FindPricesByStids(stids []string) []gsmodel.GasPrice {
 	var myGasPrice []gsmodel.GasPrice
-	//limit needs to be higher for multiple price changes a day
-	database.DB.Where("stid IN ?", stids).Order("date desc").Limit(len(stids) * 5).Find(&myGasPrice)
+	dateStr := fmt.Sprintf("%04d-%02d-%02d", time.Now().Year(), time.Now().Month(), time.Now().Day())
+	database.DB.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").Find(&myGasPrice)
 	return myGasPrice
 }
 

@@ -71,6 +71,7 @@ func UpdateGsPrices(c *gin.Context) {
 	for _, value := range stationPricesMap {
 		gasPriceUpdates = append(gasPriceUpdates, value)
 	}
+	log.Default().Printf("Number of Price updates: %v\n", len(gasPriceUpdates))
 	gasstation.UpdatePrice(gasPriceUpdates)
 	/*
 		body, err := ioutil.ReadAll(response.Body)
@@ -83,6 +84,8 @@ func UpdateGsPrices(c *gin.Context) {
 			log.Fatalf("Error: %v\n", err1.Error())
 		}
 	*/
-	result, _ := json.Marshal(myGsResponse)
-	fmt.Printf("Json: %v\n", string(result))
+	/*
+		result, _ := json.Marshal(myGsResponse)
+		fmt.Printf("Json: %v\n", string(result))
+	*/
 }
