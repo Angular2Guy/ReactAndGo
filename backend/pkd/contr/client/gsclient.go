@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,12 +38,22 @@ type gsStations struct {
 	PostCode    int     `json:"postCode"`
 }
 
+func UpdateGasStations(c *gin.Context) {
+	year := 2023
+	month := 1
+	day := 7
+	url := fmt.Sprintf("https://dev.azure.com/tankerkoenig/362e70d1-bafa-4cf7-a346-1f3613304973/_apis/git/repositories/0d6e7286-91e4-402c-af56-fa75be1f223d/Items?path=/stations/%04d/%02d/%04d-%02d-%02d-stations.csv"+
+		"&recursionLevel=0&includeContentMetadata=true&versionDescriptor.version=master&versionDescriptor.versionOptions=0&versionDescriptor.versionType=0&includeContent=true&resolveLfs=true", year, month, year, month, day)
+	fmt.Printf("Url: %v\n", url)
+}
+
 func UpdateGsPrices(c *gin.Context) {
 	//func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64) {
+	apikey := os.Getenv("APIKEY")
 	var latitude = 52.521
 	var longitude = 13.438
 	var radiusKM = 10.0
-	var queryUrl = fmt.Sprintf("https://creativecommons.tankerkoenig.de/json/list.php?lat=%f&lng=%f&rad=%f&sort=dist&type=all&apikey=00000000-0000-0000-0000-000000000002", latitude, longitude, radiusKM)
+	var queryUrl = fmt.Sprintf("https://creativecommons.tankerkoenig.de/json/list.php?lat=%f&lng=%f&rad=%f&sort=dist&type=all&apikey=%v", latitude, longitude, radiusKM, strings.TrimSpace(apikey))
 	response, err := http.Get(queryUrl)
 	if err != nil {
 		log.Fatalf("Request failed: %v\n", err.Error())
