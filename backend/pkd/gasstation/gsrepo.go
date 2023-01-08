@@ -4,7 +4,6 @@ import (
 	gsbody "angular-and-go/pkd/contr/model"
 	"angular-and-go/pkd/database"
 	"angular-and-go/pkd/gasstation/gsmodel"
-	"encoding/json"
 	"fmt"
 	"log"
 	"math"
@@ -60,8 +59,8 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 			if myChanges > 0 {
 				gasPriceUpdateMap[value.GasStationID] = gsmodel.GasPrice{GasStationID: value.GasStationID, E5: stationPricesMap[value.GasStationID].E5, E10: stationPricesMap[value.GasStationID].E10,
 					Diesel: stationPricesMap[value.GasStationID].Diesel, Date: stationPricesMap[value.GasStationID].Date, Changed: myChanges}
-				value, _ := json.Marshal(gasPriceUpdateMap[value.GasStationID])
-				log.Default().Printf("Update: %v\n", string(value))
+				//value, _ := json.Marshal(gasPriceUpdateMap[value.GasStationID])
+				//log.Default().Printf("Update: %v\n", string(value))
 			}
 			delete(stationPricesMap, value.GasStationID)
 		}
