@@ -11,7 +11,7 @@ import (
 func Start() {
 	router := gin.Default()
 	router.POST("/posts", postsCreate)
-	router.GET("/clienttest", gsclient.UpdateGsPrices)
+	router.GET("/clienttest", gsclient.UpdateGasStations)
 	router.GET("/gasprice/:id", getGasPriceByGasStationId)
 	router.GET("/gasstation/:id", getGasStationById)
 	router.POST("/gasstation/search/place", searchGasStationPlace)
