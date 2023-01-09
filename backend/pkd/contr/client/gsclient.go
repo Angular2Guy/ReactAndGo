@@ -59,9 +59,10 @@ func UpdateGasStations(c *gin.Context) {
 	}
 	gasStationImports := convertCsvToGasStationImports(rows)
 	log.Default().Printf("Result: %v\n", len(gasStationImports))
-	log.Default().Fatalf("Result: GasStationImport {\nUuid: %v\nStationName: %v\nBrand: %v\nStreet: %v\nHouseNumber: %v\nPostCode: %v\nCity: %v\nLatitude: %v\nLongitude: %v\nFirstActive: %v\nOpeningTimesJson: %v\n",
-		gasStationImports[0].Uuid, gasStationImports[0].StationName, gasStationImports[0].Brand, gasStationImports[0].Street, gasStationImports[0].HouseNumber, gasStationImports[0].PostCode, gasStationImports[0].City,
-		gasStationImports[0].Latitude, gasStationImports[0].Longitude, gasStationImports[0].FirstActive, gasStationImports[0].OpeningTimesJson)
+	//log.Default().Fatalf("Result: GasStationImport {\nUuid: %v\nStationName: %v\nBrand: %v\nStreet: %v\nHouseNumber: %v\nPostCode: %v\nCity: %v\nLatitude: %v\nLongitude: %v\nFirstActive: %v\nOpeningTimesJson: %v\n",
+	//	gasStationImports[0].Uuid, gasStationImports[0].StationName, gasStationImports[0].Brand, gasStationImports[0].Street, gasStationImports[0].HouseNumber, gasStationImports[0].PostCode, gasStationImports[0].City,
+	//	gasStationImports[0].Latitude, gasStationImports[0].Longitude, gasStationImports[0].FirstActive, gasStationImports[0].OpeningTimesJson)
+	gasstation.UpdateGasStations(gasStationImports)
 }
 
 func convertCsvToGasStationImports(rows [][]string) []gasstation.GasStationImport {

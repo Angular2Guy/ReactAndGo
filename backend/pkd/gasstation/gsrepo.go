@@ -49,18 +49,23 @@ func UpdateGasStations(gasStations []GasStationImport) {
 	for _, value := range gasStations {
 		gasStationImportMap[value.Uuid] = value
 	}
-	var results []gsmodel.GasStation
+	fmt.Printf("GasStations found: %v\n", len(gasStationImportMap))
+	gasStationsUpdated := 0
+	var values []gsmodel.GasStation
 	database.DB.Transaction(func(tx *gorm.DB) error {
-		tx.FindInBatches(&results, 1000, func(tx *gorm.DB, batch int) error {
-			for _, result := range results {
+		tx.FindInBatches(&values, 1000, func(tx *gorm.DB, batch int) error {
+			var newResults []gsmodel.GasStation
+			for _, result := range values {
 				if strings.TrimSpace(result.OtJson) != strings.TrimSpace(gasStationImportMap[result.ID].OpeningTimesJson) {
 					result.OtJson = gasStationImportMap[result.ID].OpeningTimesJson
-					results = append(results, result)
+					newResults = append(newResults, result)
 				}
 				delete(gasStationImportMap, result.ID)
 			}
-
-			tx.Save(&results)
+			if len(newResults) > 0 {
+				tx.Save(&newResults)
+			}
+			gasStationsUpdated = gasStationsUpdated + len(newResults)
 			//tx.RowsAffected // number of records in this batch
 
 			//batch // Batch 1, 2, 3
@@ -68,16 +73,19 @@ func UpdateGasStations(gasStations []GasStationImport) {
 			// returns error will stop future batches
 			return nil
 		})
+		fmt.Printf("GasStations updated: %v\n", gasStationsUpdated)
 		for _, value := range gasStationImportMap {
 			resultGs := createNewGasStation(value)
 			tx.Save(resultGs)
 		}
+		fmt.Printf("GasStations new: %v\n", len(gasStationImportMap))
 		return nil
 	})
 }
 
 func createNewGasStation(value GasStationImport) gsmodel.GasStation {
 	var resultGs gsmodel.GasStation
+	resultGs.ID = value.Uuid
 	resultGs.Brand = value.Brand
 	resultGs.FirstActive = value.FirstActive
 	resultGs.HouseNumber = value.HouseNumber
