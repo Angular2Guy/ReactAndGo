@@ -44,6 +44,60 @@ type GasStationImport struct {
 	OpeningTimesJson string
 }
 
+func UpdateGasStations(gasStations []GasStationImport) {
+	gasStationImportMap := make(map[string]GasStationImport)
+	for _, value := range gasStations {
+		gasStationImportMap[value.Uuid] = value
+	}
+	var results []gsmodel.GasStation
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		tx.FindInBatches(&results, 1000, func(tx *gorm.DB, batch int) error {
+			for _, result := range results {
+				if strings.TrimSpace(result.OtJson) != strings.TrimSpace(gasStationImportMap[result.ID].OpeningTimesJson) {
+					result.OtJson = gasStationImportMap[result.ID].OpeningTimesJson
+					results = append(results, result)
+				}
+				delete(gasStationImportMap, result.ID)
+			}
+
+			tx.Save(&results)
+			//tx.RowsAffected // number of records in this batch
+
+			//batch // Batch 1, 2, 3
+
+			// returns error will stop future batches
+			return nil
+		})
+		for _, value := range gasStationImportMap {
+			resultGs := createNewGasStation(value)
+			tx.Save(resultGs)
+		}
+		return nil
+	})
+}
+
+func createNewGasStation(value GasStationImport) gsmodel.GasStation {
+	var resultGs gsmodel.GasStation
+	resultGs.Brand = value.Brand
+	resultGs.FirstActive = value.FirstActive
+	resultGs.HouseNumber = value.HouseNumber
+	resultGs.Latitude = value.Latitude
+	resultGs.Longitude = value.Longitude
+	resultGs.OpenTs = 0
+	resultGs.OtJson = value.OpeningTimesJson
+	resultGs.Place = value.City
+	resultGs.PostCode = value.PostCode
+	resultGs.PriceChanged = time.Now()
+	resultGs.PriceInImport = time.Now()
+	//resultGs.PublicHolidayIdentifier = ""
+	resultGs.StationInImport = time.Now()
+	resultGs.StationName = value.StationName
+	resultGs.Street = value.Street
+	resultGs.Version = "1"
+	resultGs.VersionTime = time.Now()
+	return resultGs
+}
+
 func UpdatePrice(gasStationPrices []GasStationPrices) {
 	stationPricesMap := make(map[string]GasStationPrices)
 	var stationPricesKeys []string
