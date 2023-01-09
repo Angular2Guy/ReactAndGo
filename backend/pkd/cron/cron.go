@@ -1,7 +1,7 @@
 package cron
 
 import (
-	"log"
+	gsclient "angular-and-go/pkd/contr/client"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -9,8 +9,8 @@ import (
 
 func Start() {
 	scheduler := gocron.NewScheduler(time.UTC)
-	scheduler.Every(5).Minutes().Do(func() {
-		log.Default().Printf("Import Prices:")
+	scheduler.Every(1).Day().At("01:07").Do(func() {
+		gsclient.UpdateGasStations(nil)
 	})
 	scheduler.StartAsync()
 }

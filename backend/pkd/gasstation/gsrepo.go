@@ -30,6 +30,20 @@ type GasStationPrices struct {
 	Date         time.Time
 }
 
+type GasStationImport struct {
+	Uuid             string
+	StationName      string
+	Brand            string
+	Street           string
+	HouseNumber      string
+	PostCode         string
+	City             string
+	Latitude         float64
+	Longitude        float64
+	FirstActive      time.Time
+	OpeningTimesJson string
+}
+
 func UpdatePrice(gasStationPrices []GasStationPrices) {
 	stationPricesMap := make(map[string]GasStationPrices)
 	var stationPricesKeys []string

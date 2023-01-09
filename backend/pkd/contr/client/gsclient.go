@@ -40,20 +40,6 @@ type gsStations struct {
 	PostCode    int     `json:"postCode"`
 }
 
-type GasStationImport struct {
-	Uuid             string
-	StationName      string
-	Brand            string
-	Street           string
-	HouseNumber      string
-	PostCode         string
-	City             string
-	Latitude         float64
-	Longitude        float64
-	FirstActive      time.Time
-	OpeningTimesJson string
-}
-
 func UpdateGasStations(c *gin.Context) {
 	year := 2023
 	month := 1
@@ -78,8 +64,8 @@ func UpdateGasStations(c *gin.Context) {
 		gasStationImports[0].Latitude, gasStationImports[0].Longitude, gasStationImports[0].FirstActive, gasStationImports[0].OpeningTimesJson)
 }
 
-func convertCsvToGasStationImports(rows [][]string) []GasStationImport {
-	var result []GasStationImport
+func convertCsvToGasStationImports(rows [][]string) []gasstation.GasStationImport {
+	var result []gasstation.GasStationImport
 	for _, row := range rows {
 		//ignore header
 		if strings.ToLower(row[0]) == "uuid" {
@@ -90,7 +76,7 @@ func convertCsvToGasStationImports(rows [][]string) []GasStationImport {
 		//log.Default().Printf("Date: %v", strings.TrimSpace(row[9]))
 		firstActive, _ := time.Parse("2006-02-01 15:04:05-07", strings.TrimSpace(row[9]))
 		//log.Default().Printf("GoDate: %v", firstActive.UTC())
-		gsImport := GasStationImport{Uuid: row[0],
+		gsImport := gasstation.GasStationImport{Uuid: row[0],
 			StationName:      row[1],
 			Brand:            row[2],
 			Street:           row[3],
