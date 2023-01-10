@@ -94,12 +94,16 @@ func convertCsvToGasStationImports(rows [][]string) []gasstation.GasStationImpor
 	return result
 }
 
-func UpdateGsPrices(c *gin.Context) {
-	//func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64) {
-	apikey := os.Getenv("APIKEY")
+func UpdateGsPrices1(c *gin.Context) {
 	var latitude = 52.521
 	var longitude = 13.438
 	var radiusKM = 10.0
+	UpdateGsPrices(latitude, longitude, radiusKM)
+}
+
+func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64) {
+	fmt.Printf("Price requested Latitude: %f Longitude: %f radiusKM:: %f\n", latitude, longitude, radiusKM)
+	apikey := os.Getenv("APIKEY")
 	var queryUrl = fmt.Sprintf("https://creativecommons.tankerkoenig.de/json/list.php?lat=%f&lng=%f&rad=%f&sort=dist&type=all&apikey=%v", latitude, longitude, radiusKM, strings.TrimSpace(apikey))
 	response, err := http.Get(queryUrl)
 	if err != nil {
@@ -118,7 +122,7 @@ func UpdateGsPrices(c *gin.Context) {
 	for _, value := range stationPricesMap {
 		gasPriceUpdates = append(gasPriceUpdates, value)
 	}
-	log.Default().Printf("Number of Price updates: %v\n", len(gasPriceUpdates))
+	fmt.Printf("Number of Price updates: %v\n", len(gasPriceUpdates))
 	gasstation.UpdatePrice(gasPriceUpdates)
 	/*
 		body, err := ioutil.ReadAll(response.Body)

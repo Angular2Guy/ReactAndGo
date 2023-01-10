@@ -2,6 +2,7 @@ package cron
 
 import (
 	gsclient "angular-and-go/pkd/contr/client"
+	"fmt"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -84,5 +85,13 @@ func Start() {
 	scheduler.Every(1).Day().At("01:07").Do(func() {
 		gsclient.UpdateGasStations(nil)
 	})
+	for index, value := range HamburgAndSH {
+		scheduler.Every(2).Minutes().Tag(fmt.Sprintf("tag%v", index)).Do(func() {
+			gsclient.UpdateGsPrices(value.Latitude, value.Longitude, 25.0)
+		})
+	}
 	scheduler.StartAsync()
+	for index, _ := range HamburgAndSH {
+		scheduler.RunByTagWithDelay(fmt.Sprintf("tag%v", index), time.Duration(index*6)*time.Second)
+	}
 }
