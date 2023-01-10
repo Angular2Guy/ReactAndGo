@@ -2,7 +2,6 @@ package cron
 
 import (
 	gsclient "angular-and-go/pkd/contr/client"
-	"fmt"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -13,7 +12,7 @@ type CircleCenter struct {
 	Longitude float64
 }
 
-var HamburgAndSH = []CircleCenter{
+var HamburgAndSH = [...]CircleCenter{
 	{
 		Latitude:  54.824158,
 		Longitude: 8.346131,
@@ -85,13 +84,20 @@ func Start() {
 	scheduler.Every(1).Day().At("01:07").Do(func() {
 		gsclient.UpdateGasStations(nil)
 	})
-	for index, value := range HamburgAndSH {
-		scheduler.Every(2).Minutes().Tag(fmt.Sprintf("tag%v", index)).Do(func() {
-			gsclient.UpdateGsPrices(value.Latitude, value.Longitude, 25.0)
-		})
-	}
+	scheduler.Every(2).Minutes().Tag("prices").Do(updatePriceRegion, HamburgAndSH)
+	/*
+		for _, value := range HamburgAndSH {
+			fmt.Printf("Lag: %f Lng: %f Rad: %f\n", value.Latitude, value.Longitude, 25.0)
+			scheduler.Every(2).Minutes().Tag("prices").Do(gsclient.UpdateGsPrices, value.Latitude, value.Longitude, 25.0)
+		}
+	*/
 	scheduler.StartAsync()
-	for index, _ := range HamburgAndSH {
-		scheduler.RunByTagWithDelay(fmt.Sprintf("tag%v", index), time.Duration(index*6)*time.Second)
+}
+
+func updatePriceRegion(regionCircleCenters [16]CircleCenter) {
+	for _, value := range HamburgAndSH {
+		time.Sleep(6 * time.Second)
+		gsclient.UpdateGsPrices(value.Latitude, value.Longitude, 25.0)
+		//fmt.Println("Done.")
 	}
 }

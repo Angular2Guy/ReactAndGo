@@ -49,7 +49,7 @@ func UpdateGasStations(c *gin.Context) {
 	//fmt.Printf("Url: %v\n", url)
 	response, err := http.Get(url)
 	if err != nil {
-		log.Fatalf("Request failed: %v\n", url)
+		log.Printf("Request failed: %v\n", url)
 	}
 	defer response.Body.Close()
 	reader := csv.NewReader(response.Body)
@@ -105,14 +105,19 @@ func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64) {
 	fmt.Printf("Price requested Latitude: %f Longitude: %f radiusKM:: %f\n", latitude, longitude, radiusKM)
 	apikey := os.Getenv("APIKEY")
 	var queryUrl = fmt.Sprintf("https://creativecommons.tankerkoenig.de/json/list.php?lat=%f&lng=%f&rad=%f&sort=dist&type=all&apikey=%v", latitude, longitude, radiusKM, strings.TrimSpace(apikey))
-	response, err := http.Get(queryUrl)
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	response, err := client.Get(queryUrl)
 	if err != nil {
-		log.Fatalf("Request failed: %v\n", err.Error())
+		log.Printf("Request failed: %v\n", err.Error())
+		return
 	}
 	defer response.Body.Close()
 	var myGsResponse gsResponse
 	if err := json.NewDecoder(response.Body).Decode(&myGsResponse); err != nil {
-		log.Fatalf("Json decode failed: %v", err.Error())
+		log.Printf("Json decode failed: %v", err.Error())
+		return
 	}
 	stationPricesMap := make(map[string]gasstation.GasStationPrices)
 	for _, value := range myGsResponse.Stations {
