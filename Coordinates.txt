@@ -1,0 +1,16 @@
+Position: 54.824158,8.346131 Radius: 25000.00 Meters
+Position: 54.715297,8.775641 Radius: 25000.00 Meters
+Position: 54.661861,9.180214 Radius: 25000.00 Meters
+Position: 54.677340,9.743868 Radius: 25000.00 Meters
+Position: 54.298884,8.743990 Radius: 25000.00 Meters
+Position: 54.308298,9.317139 Radius: 25000.00 Meters
+Position: 54.306721,9.792173 Radius: 25000.00 Meters
+Position: 54.280894,10.247840 Radius: 25000.00 Meters
+Position: 54.333907,10.987011 Radius: 25000.00 Meters
+Position: 54.019711,10.643870 Radius: 25000.00 Meters
+Position: 53.889138,10.020025 Radius: 25000.00 Meters
+Position: 53.913517,9.572239 Radius: 25000.00 Meters
+Position: 53.928135,9.042212 Radius: 25000.00 Meters
+Position: 53.648308,10.580193 Radius: 25000.00 Meters
+Position: 53.473590,10.277897 Radius: 25000.00 Meters
+Position: 53.522599,9.800100 Radius: 25000.00 Meters
