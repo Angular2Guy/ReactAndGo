@@ -2,6 +2,9 @@ package cron
 
 import (
 	gsclient "angular-and-go/pkd/contr/client"
+	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -79,7 +82,13 @@ var HamburgAndSH = [...]CircleCenter{
 	},
 }
 
+var requestCounter int64 = 0
+
 func Start() {
+	var apikeys [3]string
+	for index, _ := range apikeys {
+		apikeys[index] = os.Getenv(fmt.Sprintf("APIKEY%v", index))
+	}
 	scheduler := gocron.NewScheduler(time.UTC)
 	scheduler.Every(1).Day().At("01:07").Do(func() {
 		gsclient.UpdateGasStations(nil)
@@ -94,10 +103,19 @@ func Start() {
 	scheduler.StartAsync()
 }
 
-func updatePriceRegion(regionCircleCenters [16]CircleCenter) {
+func updatePriceRegion(regionCircleCenters [16]CircleCenter, apikeys [3]string) {
+	apikeyIndex := 0
 	for _, value := range HamburgAndSH {
 		time.Sleep(6 * time.Second)
-		gsclient.UpdateGsPrices(value.Latitude, value.Longitude, 25.0)
-		//fmt.Println("Done.")
+		gsclient.UpdateGsPrices(value.Latitude, value.Longitude, 25.0, apikeys[apikeyIndex])
+		requestCounter += 1
+		if requestCounter%45 == 0 {
+			if apikeyIndex < 2 {
+				apikeyIndex += 1
+			} else {
+				apikeyIndex = 0
+			}
+		}
+		log.Printf("Request %v, ApikeyIndex: %v", requestCounter, apikeyIndex)
 	}
 }

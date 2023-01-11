@@ -98,14 +98,14 @@ func UpdateGsPrices1(c *gin.Context) {
 	var latitude = 52.521
 	var longitude = 13.438
 	var radiusKM = 10.0
-	UpdateGsPrices(latitude, longitude, radiusKM)
+	apikey := os.Getenv("APIKEY1")
+	UpdateGsPrices(latitude, longitude, radiusKM, apikey)
 }
 
-func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64) {
+func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64, apikey string) {
 	fmt.Printf("Price requested Latitude: %f Longitude: %f radiusKM:: %f\n", latitude, longitude, radiusKM)
-	apikey := os.Getenv("APIKEY")
 	var queryUrl = fmt.Sprintf("https://creativecommons.tankerkoenig.de/json/list.php?lat=%f&lng=%f&rad=%f&sort=dist&type=all&apikey=%v", latitude, longitude, radiusKM, strings.TrimSpace(apikey))
-	log.Printf("Url: %v", queryUrl)
+	//log.Printf("Url: %v", queryUrl)
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
