@@ -4,6 +4,7 @@ import (
 	gsbody "angular-and-go/pkd/contr/model"
 	"angular-and-go/pkd/database"
 	"angular-and-go/pkd/gasstation/gsmodel"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math"
@@ -115,6 +116,7 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 	}
 	gasPriceUpdateMap := make(map[string]gsmodel.GasPrice)
 	stationPricesDb := FindPricesByStids(stationPricesKeys)
+	log.Printf("StationPricesKeys: %v StationPricesDb: %v", len(stationPricesKeys), len(stationPricesDb))
 	for _, value := range stationPricesDb {
 		if _, found := gasPriceUpdateMap[value.GasStationID]; !found {
 			var myChanges = 0
@@ -128,15 +130,16 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 				myChanges = myChanges + 4
 			}
 			// validation checks
-			if stationPricesMap[value.GasStationID].Date.After(time.Now().AddDate(0, -1, 0)) || stationPricesMap[value.GasStationID].Diesel < 10 ||
+			if stationPricesMap[value.GasStationID].Date.Before(time.Now().Add(time.Hour*-720)) || stationPricesMap[value.GasStationID].Diesel < 10 ||
 				stationPricesMap[value.GasStationID].E10 < 10 || stationPricesMap[value.GasStationID].E5 < 10 {
 				myChanges = 0
 			}
+			//log.Printf("GasStation: %v Changes: %v", value.GasStationID, myChanges)
 			if myChanges > 0 {
 				gasPriceUpdateMap[value.GasStationID] = gsmodel.GasPrice{GasStationID: value.GasStationID, E5: stationPricesMap[value.GasStationID].E5, E10: stationPricesMap[value.GasStationID].E10,
 					Diesel: stationPricesMap[value.GasStationID].Diesel, Date: stationPricesMap[value.GasStationID].Date, Changed: myChanges}
-				//value, _ := json.Marshal(gasPriceUpdateMap[value.GasStationID])
-				//log.Default().Printf("Update: %v\n", string(value))
+				value, _ := json.Marshal(gasPriceUpdateMap[value.GasStationID])
+				fmt.Printf("Update: %v\n", string(value))
 			}
 			delete(stationPricesMap, value.GasStationID)
 		}
@@ -161,7 +164,9 @@ func FindById(id string) gsmodel.GasStation {
 
 func FindPricesByStids(stids []string) []gsmodel.GasPrice {
 	var myGasPrice []gsmodel.GasPrice
-	dateStr := fmt.Sprintf("%04d-%02d-%02d", time.Now().Year(), time.Now().Month(), time.Now().Day())
+	threeMonthsAgo := time.Now().Add(time.Hour * -2160)
+	dateStr := fmt.Sprintf("%04d-%02d-%02d", threeMonthsAgo.Year(), threeMonthsAgo.Month(), threeMonthsAgo.Day())
+	//log.Printf("Cut off date: %v", dateStr)
 	database.DB.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").Find(&myGasPrice)
 	return myGasPrice
 }

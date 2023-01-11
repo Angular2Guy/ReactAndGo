@@ -105,6 +105,7 @@ func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64) {
 	fmt.Printf("Price requested Latitude: %f Longitude: %f radiusKM:: %f\n", latitude, longitude, radiusKM)
 	apikey := os.Getenv("APIKEY")
 	var queryUrl = fmt.Sprintf("https://creativecommons.tankerkoenig.de/json/list.php?lat=%f&lng=%f&rad=%f&sort=dist&type=all&apikey=%v", latitude, longitude, radiusKM, strings.TrimSpace(apikey))
+	log.Printf("Url: %v", queryUrl)
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
@@ -116,7 +117,7 @@ func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64) {
 	defer response.Body.Close()
 	var myGsResponse gsResponse
 	if err := json.NewDecoder(response.Body).Decode(&myGsResponse); err != nil {
-		log.Printf("Json decode failed: %v", err.Error())
+		log.Printf("Json decode failed: %v\n", err.Error())
 		return
 	}
 	stationPricesMap := make(map[string]gasstation.GasStationPrices)
