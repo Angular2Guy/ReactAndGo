@@ -110,7 +110,7 @@ func updatePriceRegion(regionCircleCenters [16]CircleCenter, apikeys [3]string) 
 		gsclient.UpdateGsPrices(value.Latitude, value.Longitude, 25.0, apikeys[apikeyIndex])
 		requestCounter += 1
 		if requestCounter%45 == 0 {
-			if apikeyIndex <= 2 {
+			if apikeyIndex < 2 {
 				apikeyIndex += 1
 			} else {
 				apikeyIndex = 0
