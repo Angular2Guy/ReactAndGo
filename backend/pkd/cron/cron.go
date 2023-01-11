@@ -112,6 +112,7 @@ func updatePriceRegion(regionCircleCenters [16]CircleCenter, apikeys [3]string) 
 		err := gsclient.UpdateGsPrices(value.Latitude, value.Longitude, 25.0, apikeys[apikeyIndex])
 		if err != nil {
 			log.Printf("Region Canceled index: %v\n", index)
+			break
 		}
 		requestCounter += 1
 		if requestCounter%45 == 0 {
