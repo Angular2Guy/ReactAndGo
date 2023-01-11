@@ -87,13 +87,13 @@ var requestCounter int64 = 0
 func Start() {
 	var apikeys [3]string
 	for index, _ := range apikeys {
-		apikeys[index] = os.Getenv(fmt.Sprintf("APIKEY%v", index))
+		apikeys[index] = os.Getenv(fmt.Sprintf("APIKEY%v", index+1))
 	}
 	scheduler := gocron.NewScheduler(time.UTC)
 	scheduler.Every(1).Day().At("01:07").Do(func() {
 		gsclient.UpdateGasStations(nil)
 	})
-	scheduler.Every(2).Minutes().Tag("prices").Do(updatePriceRegion, HamburgAndSH)
+	scheduler.Every(2).Minutes().Tag("prices").Do(updatePriceRegion, HamburgAndSH, apikeys)
 	/*
 		for _, value := range HamburgAndSH {
 			fmt.Printf("Lag: %f Lng: %f Rad: %f\n", value.Latitude, value.Longitude, 25.0)
