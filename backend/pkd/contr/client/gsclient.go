@@ -102,7 +102,7 @@ func UpdateGsPrices1(c *gin.Context) {
 	UpdateGsPrices(latitude, longitude, radiusKM, apikey)
 }
 
-func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64, apikey string) {
+func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64, apikey string) error {
 	fmt.Printf("Price requested Latitude: %f Longitude: %f radiusKM:: %f\n", latitude, longitude, radiusKM)
 	var queryUrl = fmt.Sprintf("https://creativecommons.tankerkoenig.de/json/list.php?lat=%f&lng=%f&rad=%f&sort=dist&type=all&apikey=%v", latitude, longitude, radiusKM, strings.TrimSpace(apikey))
 	//log.Printf("Url: %v", queryUrl)
@@ -112,13 +112,18 @@ func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64, apike
 	response, err := client.Get(queryUrl)
 	if err != nil {
 		log.Printf("Request failed: %v\n", err.Error())
-		return
+		return err
 	}
 	defer response.Body.Close()
+	if response.StatusCode > 300 {
+		log.Printf("Response status: %v\n", response.Status)
+		err := fmt.Errorf("response status: %v", response.Status)
+		return err
+	}
 	var myGsResponse gsResponse
 	if err := json.NewDecoder(response.Body).Decode(&myGsResponse); err != nil {
 		log.Printf("Json decode failed: %v\n", err.Error())
-		return
+		return err
 	}
 	stationPricesMap := make(map[string]gasstation.GasStationPrices)
 	for _, value := range myGsResponse.Stations {
@@ -145,4 +150,5 @@ func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64, apike
 		result, _ := json.Marshal(myGsResponse)
 		fmt.Printf("Json: %v\n", string(result))
 	*/
+	return nil
 }

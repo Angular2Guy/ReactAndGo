@@ -83,6 +83,7 @@ var HamburgAndSH = [...]CircleCenter{
 }
 
 var requestCounter int64 = 0
+var apikeyIndex = 0
 
 func Start() {
 	var apikeys [3]string
@@ -93,7 +94,8 @@ func Start() {
 	scheduler.Every(1).Day().At("01:07").Do(func() {
 		gsclient.UpdateGasStations(nil)
 	})
-	scheduler.Every(2).Minutes().Tag("prices").Do(updatePriceRegion, HamburgAndSH, apikeys)
+	//scheduler.Every(2).Minutes().Tag("prices").Do(updatePriceRegion, HamburgAndSH, apikeys)
+	scheduler.Every(5).Minutes().Tag("prices").Do(updatePriceRegion, HamburgAndSH, apikeys)
 	/*
 		for _, value := range HamburgAndSH {
 			fmt.Printf("Lag: %f Lng: %f Rad: %f\n", value.Latitude, value.Longitude, 25.0)
@@ -104,10 +106,13 @@ func Start() {
 }
 
 func updatePriceRegion(regionCircleCenters [16]CircleCenter, apikeys [3]string) {
-	apikeyIndex := 0
-	for _, value := range HamburgAndSH {
-		time.Sleep(6 * time.Second)
-		gsclient.UpdateGsPrices(value.Latitude, value.Longitude, 25.0, apikeys[apikeyIndex])
+	for index, value := range HamburgAndSH {
+		//time.Sleep(6 * time.Second)
+		time.Sleep(15 * time.Second)
+		err := gsclient.UpdateGsPrices(value.Latitude, value.Longitude, 25.0, apikeys[apikeyIndex])
+		if err != nil {
+			log.Printf("Region Canceled index: %v\n", index)
+		}
 		requestCounter += 1
 		if requestCounter%45 == 0 {
 			if apikeyIndex < 2 {
@@ -116,6 +121,6 @@ func updatePriceRegion(regionCircleCenters [16]CircleCenter, apikeys [3]string) 
 				apikeyIndex = 0
 			}
 		}
-		log.Printf("Request %v, ApikeyIndex: %v", requestCounter, apikeyIndex)
+		log.Printf("Request %v, ApikeyIndex: %v\n", requestCounter, apikeyIndex)
 	}
 }
