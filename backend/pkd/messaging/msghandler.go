@@ -8,6 +8,12 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+var client mqtt.Client
+
+var gasPriceMsgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
+	fmt.Printf("Message %s received on topic %s\n", msg.Payload(), msg.Topic())
+}
+
 var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	fmt.Printf("Message %s received on topic %s\n", msg.Payload(), msg.Topic())
 }
@@ -34,11 +40,28 @@ func Start() {
 	options.OnConnect = connectHandler
 	options.OnConnectionLost = connectionLostHandler
 
-	client := mqtt.NewClient(options)
+	client = mqtt.NewClient(options)
 	token := client.Connect()
 	if token.Wait() && token.Error() != nil {
-		log.Printf("Connection failed: %v", token.Error())
+		log.Printf("Connection failed: %v\n", token.Error())
 	} else {
-		log.Printf("Connected to: %v id: %v", msgServerUrl, msgClientId)
+		log.Printf("Connected to: %v id: %v\n", msgServerUrl, msgClientId)
 	}
+
+	msgGasPriceTopic := os.Getenv("MSG_GAS_PRICE_TOPIC")
+	token = client.Subscribe(msgGasPriceTopic, 1, gasPriceMsgHandler)
+	if token.Wait() && token.Error() != nil {
+		log.Printf("Topic subription to topic: %v failed: %v", msgGasPriceTopic, token.Error().Error())
+	} else {
+		log.Printf("Subscribed to topic %s\n", msgGasPriceTopic)
+	}
+}
+
+func Stop() {
+	client.Disconnect(1000)
+}
+
+func SendMsg(msg string) {
+	msgGasPriceTopic := os.Getenv("MSG_GAS_PRICE_TOPIC")
+	client.Publish(msgGasPriceTopic, 1, false, msg)
 }
