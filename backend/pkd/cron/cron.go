@@ -109,19 +109,27 @@ func updatePriceRegion(regionCircleCenters [16]CircleCenter, apikeys [3]string) 
 	for index, value := range HamburgAndSH {
 		//time.Sleep(6 * time.Second)
 		time.Sleep(15 * time.Second)
-		err := gsclient.UpdateGsPrices(value.Latitude, value.Longitude, 25.0, apikeys[apikeyIndex])
-		if err != nil {
-			log.Printf("Region Canceled index: %v\n", index)
-			break
-		}
+		log.Printf("index: %v value: %v", index, value)
+		/*
+			err := gsclient.UpdateGsPrices(value.Latitude, value.Longitude, 25.0, apikeys[apikeyIndex])
+			if err != nil {
+				log.Printf("Region Canceled index: %v\n", index)
+				updateApiKeyIndex()
+				break
+			}
+		*/
 		requestCounter += 1
 		if requestCounter%45 == 0 {
-			if apikeyIndex < 2 {
-				apikeyIndex += 1
-			} else {
-				apikeyIndex = 0
-			}
+			updateApiKeyIndex()
 		}
 		log.Printf("Request %v, ApikeyIndex: %v\n", requestCounter, apikeyIndex)
+	}
+}
+
+func updateApiKeyIndex() {
+	if apikeyIndex < 2 {
+		apikeyIndex += 1
+	} else {
+		apikeyIndex = 0
 	}
 }
