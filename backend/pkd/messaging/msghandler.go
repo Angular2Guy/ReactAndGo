@@ -29,37 +29,7 @@ var randSource = rand.NewSource(time.Now().UnixNano())
 
 var gasPriceMsgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	//fmt.Printf("Message: %s received on topic: %s size: %d\n", msg.Payload(), msg.Topic(), len(msg.Payload()))
-	var priceUpdateRawMap map[string]json.RawMessage
-	if err := json.Unmarshal(msg.Payload(), &priceUpdateRawMap); err != nil {
-		log.Printf("Message: %s received on topic: %s size: %d\n", msg.Payload(), msg.Topic(), len(msg.Payload()))
-		log.Fatalf("Unmarshal failed: %v\n", err.Error())
-	}
-	priceUpdateMap := make(map[string]PriceUpdates)
-	for key, value := range priceUpdateRawMap {
-		myPriceUpdates := PriceUpdates{Useconds: 0, Diesel: "0", E5: "0", E10: "0", Diesel_delta: 0, E5_delta: 0, E10_delta: 0}
-		if err := json.Unmarshal(value, &myPriceUpdates); err != nil {
-			log.Printf("PriceUpdate: %v\n", string(value))
-			log.Printf("Unmarshal failed: %v\n", err)
-		} else {
-			myPriceUpdates.Diesel = json.Number(strings.TrimSpace(strings.ReplaceAll(myPriceUpdates.Diesel.String(), ".", "")))
-			myPriceUpdates.E5 = json.Number(strings.TrimSpace(strings.ReplaceAll(myPriceUpdates.E5.String(), ".", "")))
-			myPriceUpdates.E10 = json.Number(strings.TrimSpace(strings.ReplaceAll(myPriceUpdates.E10.String(), ".", "")))
-			priceUpdateMap[key] = myPriceUpdates
-		}
-	}
-	//log.Default().Printf("PriceUpdateMap: %v", priceUpdateMap)
-	msgFileStr := os.Getenv("MSG_MESSAGES")
-	var myGasStationPrices []gasstation.GasStationPrices
-	for key, value := range priceUpdateMap {
-		myGasStationPrice := gasstation.GasStationPrices{GasStationID: key, E5: int(convertJsonNumberToInt(value.E5)), E10: int(convertJsonNumberToInt(value.E10)),
-			Diesel: int(convertJsonNumberToInt(value.Diesel)), Timestamp: time.Unix(value.Useconds, 0)}
-		if len(strings.TrimSpace(msgFileStr)) > 3 {
-			myGasStationPrice = scramblePrices(myGasStationPrice)
-		}
-		myGasStationPrices = append(myGasStationPrices, myGasStationPrice)
-	}
-	log.Default().Printf("GasStationPrices: %v", myGasStationPrices)
-	//gasstation.UpdatePrice(myGasStationPrices)
+	HandlePriceUpdate(msg.Payload(), msg.Topic())
 }
 
 var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -112,6 +82,40 @@ func Stop() {
 func SendMsg(msg string) {
 	msgGasPriceTopic := os.Getenv("MSG_GAS_PRICE_TOPIC")
 	client.Publish(msgGasPriceTopic, 0, false, msg)
+}
+
+func HandlePriceUpdate(msgArr []byte, topicName string) {
+	var priceUpdateRawMap map[string]json.RawMessage
+	if err := json.Unmarshal(msgArr, &priceUpdateRawMap); err != nil {
+		log.Printf("Message: %s received on topic: %s size: %d\n", msgArr, topicName, len(msgArr))
+		log.Fatalf("Unmarshal failed: %v\n", err.Error())
+	}
+	priceUpdateMap := make(map[string]PriceUpdates)
+	for key, value := range priceUpdateRawMap {
+		myPriceUpdates := PriceUpdates{Useconds: 0, Diesel: "0", E5: "0", E10: "0", Diesel_delta: 0, E5_delta: 0, E10_delta: 0}
+		if err := json.Unmarshal(value, &myPriceUpdates); err != nil {
+			log.Printf("PriceUpdate: %v\n", string(value))
+			log.Printf("Unmarshal failed: %v\n", err)
+		} else {
+			myPriceUpdates.Diesel = json.Number(strings.TrimSpace(strings.ReplaceAll(myPriceUpdates.Diesel.String(), ".", "")))
+			myPriceUpdates.E5 = json.Number(strings.TrimSpace(strings.ReplaceAll(myPriceUpdates.E5.String(), ".", "")))
+			myPriceUpdates.E10 = json.Number(strings.TrimSpace(strings.ReplaceAll(myPriceUpdates.E10.String(), ".", "")))
+			priceUpdateMap[key] = myPriceUpdates
+		}
+	}
+	//log.Default().Printf("PriceUpdateMap: %v", priceUpdateMap)
+	msgFileStr := os.Getenv("MSG_MESSAGES")
+	var myGasStationPrices []gasstation.GasStationPrices
+	for key, value := range priceUpdateMap {
+		myGasStationPrice := gasstation.GasStationPrices{GasStationID: key, E5: int(convertJsonNumberToInt(value.E5)), E10: int(convertJsonNumberToInt(value.E10)),
+			Diesel: int(convertJsonNumberToInt(value.Diesel)), Timestamp: time.Unix(value.Useconds, 0)}
+		if len(strings.TrimSpace(msgFileStr)) > 3 {
+			myGasStationPrice = scramblePrices(myGasStationPrice)
+		}
+		myGasStationPrices = append(myGasStationPrices, myGasStationPrice)
+	}
+	log.Default().Printf("GasStationPrices: %v", myGasStationPrices)
+	//gasstation.UpdatePrice(myGasStationPrices)
 }
 
 func convertJsonNumberToInt(value json.Number) int64 {
