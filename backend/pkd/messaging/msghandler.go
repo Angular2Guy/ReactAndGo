@@ -1,6 +1,7 @@
 package messaging
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -8,10 +9,26 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+type PriceUpdates struct {
+	useconds     int64
+	diesel       string
+	e5           string
+	e10          string
+	diesel_delta string
+	e5_delta     string
+	e10_delta    string
+}
+
 var client mqtt.Client
 
 var gasPriceMsgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	fmt.Printf("Message %s received on topic %s\n", msg.Payload(), msg.Topic())
+	//fmt.Printf("Message: %s received on topic: %s size: %d\n", msg.Payload(), msg.Topic(), len(msg.Payload()))
+	var priceUpdateMap map[string]PriceUpdates
+	if err := json.Unmarshal(msg.Payload(), &priceUpdateMap); err != nil {
+		fmt.Printf("Message: %s received on topic: %s size: %d\n", msg.Payload(), msg.Topic(), len(msg.Payload()))
+		log.Fatalf("Unmarshal failed: %v", err.Error())
+	}
+	log.Default().Printf("PriceUpdateMap: %v", priceUpdateMap)
 }
 
 var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -63,5 +80,5 @@ func Stop() {
 
 func SendMsg(msg string) {
 	msgGasPriceTopic := os.Getenv("MSG_GAS_PRICE_TOPIC")
-	client.Publish(msgGasPriceTopic, 1, false, msg)
+	client.Publish(msgGasPriceTopic, 0, false, msg)
 }

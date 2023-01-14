@@ -2,9 +2,11 @@ package cron
 
 import (
 	gsclient "angular-and-go/pkd/contr/client"
+	"angular-and-go/pkd/messaging"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -90,12 +92,15 @@ func Start() {
 	for index, _ := range apikeys {
 		apikeys[index] = os.Getenv(fmt.Sprintf("APIKEY%v", index+1))
 	}
+	msgFileStr := os.Getenv("MSG_MESSAGES")
+	msgFiles := strings.Split(msgFileStr, ";")
+
 	scheduler := gocron.NewScheduler(time.UTC)
 	scheduler.Every(1).Day().At("01:07").Do(func() {
 		gsclient.UpdateGasStations(nil)
 	})
-	//scheduler.Every(2).Minutes().Tag("prices").Do(updatePriceRegion, HamburgAndSH, apikeys)
-	scheduler.Every(5).Minutes().Tag("prices").Do(updatePriceRegion, HamburgAndSH, apikeys)
+	scheduler.Every(30).Seconds().Tag("prices").Do(sendTestPriceMsgs, msgFiles)
+	//scheduler.Every(5).Minutes().Tag("prices").Do(updatePriceRegion, HamburgAndSH, apikeys)
 	/*
 		for _, value := range HamburgAndSH {
 			fmt.Printf("Lag: %f Lng: %f Rad: %f\n", value.Latitude, value.Longitude, 25.0)
@@ -103,6 +108,17 @@ func Start() {
 		}
 	*/
 	scheduler.StartAsync()
+}
+
+func sendTestPriceMsgs(msgFiles []string) {
+	for _, value := range msgFiles {
+		jsonFile, err := os.ReadFile(fmt.Sprintf("msg-examples/%v", value))
+		if err != nil {
+			log.Fatalf("file not found: %v", value)
+		}
+		messaging.SendMsg(string(jsonFile))
+		time.Sleep(10 * time.Second)
+	}
 }
 
 func updatePriceRegion(regionCircleCenters [16]CircleCenter, apikeys [3]string) {
