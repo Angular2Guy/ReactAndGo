@@ -5,28 +5,42 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 type PriceUpdates struct {
-	useconds     int64
-	diesel       string
-	e5           string
-	e10          string
-	diesel_delta string
-	e5_delta     string
-	e10_delta    string
+	Useconds     int64
+	Diesel       json.Number
+	E5           json.Number
+	E10          json.Number
+	Diesel_delta float64
+	E5_delta     float64
+	E10_delta    float64
 }
 
 var client mqtt.Client
 
 var gasPriceMsgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	//fmt.Printf("Message: %s received on topic: %s size: %d\n", msg.Payload(), msg.Topic(), len(msg.Payload()))
-	var priceUpdateMap map[string]PriceUpdates
-	if err := json.Unmarshal(msg.Payload(), &priceUpdateMap); err != nil {
-		fmt.Printf("Message: %s received on topic: %s size: %d\n", msg.Payload(), msg.Topic(), len(msg.Payload()))
-		log.Fatalf("Unmarshal failed: %v", err.Error())
+	var priceUpdateRawMap map[string]json.RawMessage
+	if err := json.Unmarshal(msg.Payload(), &priceUpdateRawMap); err != nil {
+		log.Printf("Message: %s received on topic: %s size: %d\n", msg.Payload(), msg.Topic(), len(msg.Payload()))
+		log.Fatalf("Unmarshal failed: %v\n", err.Error())
+	}
+	priceUpdateMap := make(map[string]PriceUpdates)
+	for key, value := range priceUpdateRawMap {
+		var myPriceUpdates PriceUpdates
+		if err := json.Unmarshal(value, &myPriceUpdates); err != nil {
+			log.Printf("PriceUpdate: %v\n", string(value))
+			log.Printf("Unmarshal failed: %v\n", err)
+		} else {
+			myPriceUpdates.Diesel = json.Number(strings.ReplaceAll(myPriceUpdates.Diesel.String(), ".", ""))
+			myPriceUpdates.E5 = json.Number(strings.ReplaceAll(myPriceUpdates.E5.String(), ".", ""))
+			myPriceUpdates.E10 = json.Number(strings.ReplaceAll(myPriceUpdates.E10.String(), ".", ""))
+			priceUpdateMap[key] = myPriceUpdates
+		}
 	}
 	log.Default().Printf("PriceUpdateMap: %v", priceUpdateMap)
 }
