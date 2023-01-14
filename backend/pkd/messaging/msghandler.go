@@ -31,14 +31,14 @@ var gasPriceMsgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.M
 	}
 	priceUpdateMap := make(map[string]PriceUpdates)
 	for key, value := range priceUpdateRawMap {
-		var myPriceUpdates PriceUpdates
+		myPriceUpdates := PriceUpdates{Useconds: 0, Diesel: "0", E5: "0", E10: "0", Diesel_delta: 0, E5_delta: 0, E10_delta: 0}
 		if err := json.Unmarshal(value, &myPriceUpdates); err != nil {
 			log.Printf("PriceUpdate: %v\n", string(value))
 			log.Printf("Unmarshal failed: %v\n", err)
 		} else {
-			myPriceUpdates.Diesel = json.Number(strings.ReplaceAll(myPriceUpdates.Diesel.String(), ".", ""))
-			myPriceUpdates.E5 = json.Number(strings.ReplaceAll(myPriceUpdates.E5.String(), ".", ""))
-			myPriceUpdates.E10 = json.Number(strings.ReplaceAll(myPriceUpdates.E10.String(), ".", ""))
+			myPriceUpdates.Diesel = json.Number(strings.TrimSpace(strings.ReplaceAll(myPriceUpdates.Diesel.String(), ".", "")))
+			myPriceUpdates.E5 = json.Number(strings.TrimSpace(strings.ReplaceAll(myPriceUpdates.E5.String(), ".", "")))
+			myPriceUpdates.E10 = json.Number(strings.TrimSpace(strings.ReplaceAll(myPriceUpdates.E10.String(), ".", "")))
 			priceUpdateMap[key] = myPriceUpdates
 		}
 	}

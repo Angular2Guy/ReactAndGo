@@ -127,7 +127,7 @@ func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64, apike
 	}
 	stationPricesMap := make(map[string]gasstation.GasStationPrices)
 	for _, value := range myGsResponse.Stations {
-		stationPricesMap[value.Id] = gasstation.GasStationPrices{GasStationID: value.Id, E5: int(value.E5 * 1000), E10: int(value.E10 * 1000), Diesel: int(value.Diesel * 1000), Date: time.Now()}
+		stationPricesMap[value.Id] = gasstation.GasStationPrices{GasStationID: value.Id, E5: int(value.E5 * 1000), E10: int(value.E10 * 1000), Diesel: int(value.Diesel * 1000), Timestamp: time.Now()}
 	}
 	var gasPriceUpdates []gasstation.GasStationPrices
 	for _, value := range stationPricesMap {

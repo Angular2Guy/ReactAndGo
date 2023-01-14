@@ -28,7 +28,7 @@ type GasStationPrices struct {
 	E5           int
 	E10          int
 	Diesel       int
-	Date         time.Time
+	Timestamp    time.Time
 }
 
 type GasStationImport struct {
@@ -111,7 +111,7 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 	stationPricesMap := make(map[string]GasStationPrices)
 	var stationPricesKeys []string
 	for _, value := range gasStationPrices {
-		stationPricesMap[value.GasStationID] = GasStationPrices{GasStationID: value.GasStationID, E5: int(value.E5), E10: int(value.E10), Diesel: int(value.Diesel), Date: time.Now()}
+		stationPricesMap[value.GasStationID] = GasStationPrices{GasStationID: value.GasStationID, E5: int(value.E5), E10: int(value.E10), Diesel: int(value.Diesel), Timestamp: time.Now()}
 		stationPricesKeys = append(stationPricesKeys, value.GasStationID)
 	}
 	gasPriceUpdateMap := make(map[string]gsmodel.GasPrice)
@@ -130,14 +130,14 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 				myChanges = myChanges + 4
 			}
 			// validation checks
-			if stationPricesMap[value.GasStationID].Date.Before(time.Now().Add(time.Hour*-720)) || stationPricesMap[value.GasStationID].Diesel < 10 ||
+			if stationPricesMap[value.GasStationID].Timestamp.Before(time.Now().Add(time.Hour*-720)) || stationPricesMap[value.GasStationID].Diesel < 10 ||
 				stationPricesMap[value.GasStationID].E10 < 10 || stationPricesMap[value.GasStationID].E5 < 10 {
 				myChanges = 0
 			}
 			//log.Printf("GasStation: %v Changes: %v", value.GasStationID, myChanges)
 			if myChanges > 0 {
 				gasPriceUpdateMap[value.GasStationID] = gsmodel.GasPrice{GasStationID: value.GasStationID, E5: stationPricesMap[value.GasStationID].E5, E10: stationPricesMap[value.GasStationID].E10,
-					Diesel: stationPricesMap[value.GasStationID].Diesel, Date: stationPricesMap[value.GasStationID].Date, Changed: myChanges}
+					Diesel: stationPricesMap[value.GasStationID].Diesel, Date: stationPricesMap[value.GasStationID].Timestamp, Changed: myChanges}
 				value, _ := json.Marshal(gasPriceUpdateMap[value.GasStationID])
 				fmt.Printf("Update: %v\n", string(value))
 			}
