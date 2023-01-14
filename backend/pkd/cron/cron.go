@@ -92,21 +92,17 @@ func Start() {
 	for index, _ := range apikeys {
 		apikeys[index] = os.Getenv(fmt.Sprintf("APIKEY%v", index+1))
 	}
-	msgFileStr := os.Getenv("MSG_MESSAGES")
-	msgFiles := strings.Split(msgFileStr, ";")
 
 	scheduler := gocron.NewScheduler(time.UTC)
 	scheduler.Every(1).Day().At("01:07").Do(func() {
 		gsclient.UpdateGasStations(nil)
 	})
-	scheduler.Every(30).Seconds().Tag("prices").Do(sendTestPriceMsgs, msgFiles)
-	//scheduler.Every(5).Minutes().Tag("prices").Do(updatePriceRegion, HamburgAndSH, apikeys)
-	/*
-		for _, value := range HamburgAndSH {
-			fmt.Printf("Lag: %f Lng: %f Rad: %f\n", value.Latitude, value.Longitude, 25.0)
-			scheduler.Every(2).Minutes().Tag("prices").Do(gsclient.UpdateGsPrices, value.Latitude, value.Longitude, 25.0)
-		}
-	*/
+
+	msgFileStr := os.Getenv("MSG_MESSAGES")
+	if len(strings.TrimSpace(msgFileStr)) > 3 {
+		msgFiles := strings.Split(msgFileStr, ";")
+		scheduler.Every(30).Seconds().Tag("prices").Do(sendTestPriceMsgs, msgFiles)
+	}
 	scheduler.StartAsync()
 }
 

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
@@ -23,6 +24,8 @@ type PriceUpdates struct {
 }
 
 var client mqtt.Client
+
+var randSource = rand.NewSource(time.Now().UnixNano())
 
 var gasPriceMsgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	//fmt.Printf("Message: %s received on topic: %s size: %d\n", msg.Payload(), msg.Topic(), len(msg.Payload()))
@@ -45,10 +48,14 @@ var gasPriceMsgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.M
 		}
 	}
 	//log.Default().Printf("PriceUpdateMap: %v", priceUpdateMap)
+	msgFileStr := os.Getenv("MSG_MESSAGES")
 	var myGasStationPrices []gasstation.GasStationPrices
 	for key, value := range priceUpdateMap {
 		myGasStationPrice := gasstation.GasStationPrices{GasStationID: key, E5: int(convertJsonNumberToInt(value.E5)), E10: int(convertJsonNumberToInt(value.E10)),
 			Diesel: int(convertJsonNumberToInt(value.Diesel)), Timestamp: time.Unix(value.Useconds, 0)}
+		if len(strings.TrimSpace(msgFileStr)) > 3 {
+			myGasStationPrice = scramblePrices(myGasStationPrice)
+		}
 		myGasStationPrices = append(myGasStationPrices, myGasStationPrice)
 	}
 	log.Default().Printf("GasStationPrices: %v", myGasStationPrices)
@@ -114,4 +121,14 @@ func convertJsonNumberToInt(value json.Number) int64 {
 		log.Printf("Failed to convert: %v", value)
 	}
 	return result
+}
+
+func scramblePrices(myGasStationPrices gasstation.GasStationPrices) gasstation.GasStationPrices {
+	r1 := rand.New(randSource)
+	scrambleValue := r1.Intn(20) - 10
+	//log.Printf("ScrambleValue: %v", scrambleValue)
+	myGasStationPrices.E10 = myGasStationPrices.E10 + scrambleValue
+	myGasStationPrices.E5 = myGasStationPrices.E5 + scrambleValue
+	myGasStationPrices.Diesel = myGasStationPrices.Diesel + scrambleValue
+	return myGasStationPrices
 }
