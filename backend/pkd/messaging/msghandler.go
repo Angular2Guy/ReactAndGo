@@ -51,7 +51,7 @@ var gasPriceMsgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.M
 			Diesel: int(convertJsonNumberToInt(value.Diesel)), Timestamp: time.Unix(value.Useconds, 0)}
 		myGasStationPrices = append(myGasStationPrices, myGasStationPrice)
 	}
-	log.Default().Fatalf("GasStationPrices: %v", myGasStationPrices)
+	log.Default().Printf("GasStationPrices: %v", myGasStationPrices)
 	//gasstation.UpdatePrice(myGasStationPrices)
 }
 
