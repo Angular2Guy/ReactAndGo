@@ -111,7 +111,7 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 	stationPricesMap := make(map[string]GasStationPrices)
 	var stationPricesKeys []string
 	for _, value := range gasStationPrices {
-		stationPricesMap[value.GasStationID] = GasStationPrices{GasStationID: value.GasStationID, E5: int(value.E5), E10: int(value.E10), Diesel: int(value.Diesel), Timestamp: time.Now()}
+		stationPricesMap[value.GasStationID] = value
 		stationPricesKeys = append(stationPricesKeys, value.GasStationID)
 	}
 	gasPriceUpdateMap := make(map[string]gsmodel.GasPrice)

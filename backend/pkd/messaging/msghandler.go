@@ -1,11 +1,13 @@
 package messaging
 
 import (
+	"angular-and-go/pkd/gasstation"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
@@ -42,7 +44,15 @@ var gasPriceMsgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.M
 			priceUpdateMap[key] = myPriceUpdates
 		}
 	}
-	log.Default().Printf("PriceUpdateMap: %v", priceUpdateMap)
+	//log.Default().Printf("PriceUpdateMap: %v", priceUpdateMap)
+	var myGasStationPrices []gasstation.GasStationPrices
+	for key, value := range priceUpdateMap {
+		myGasStationPrice := gasstation.GasStationPrices{GasStationID: key, E5: int(convertJsonNumberToInt(value.E5)), E10: int(convertJsonNumberToInt(value.E10)),
+			Diesel: int(convertJsonNumberToInt(value.Diesel)), Timestamp: time.Unix(value.Useconds, 0)}
+		myGasStationPrices = append(myGasStationPrices, myGasStationPrice)
+	}
+	log.Default().Fatalf("GasStationPrices: %v", myGasStationPrices)
+	//gasstation.UpdatePrice(myGasStationPrices)
 }
 
 var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -95,4 +105,13 @@ func Stop() {
 func SendMsg(msg string) {
 	msgGasPriceTopic := os.Getenv("MSG_GAS_PRICE_TOPIC")
 	client.Publish(msgGasPriceTopic, 0, false, msg)
+}
+
+func convertJsonNumberToInt(value json.Number) int64 {
+	var result int64 = 0
+	var err error
+	if result, err = value.Int64(); err != nil {
+		log.Printf("Failed to convert: %v", value)
+	}
+	return result
 }
