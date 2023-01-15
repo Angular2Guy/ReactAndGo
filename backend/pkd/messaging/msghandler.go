@@ -29,10 +29,10 @@ var randSource = rand.NewSource(time.Now().UnixNano())
 
 var gasPriceMsgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	//fmt.Printf("Message: %s received on topic: %s size: %d\n", msg.Payload(), msg.Topic(), len(msg.Payload()))
-	//startTime := time.Now()
+	startTime := time.Now()
 	fmt.Printf("Message received on topic: %s size: %d\n", msg.Topic(), len(msg.Payload()))
 	HandlePriceUpdate(msg.Payload(), msg.Topic())
-	fmt.Printf("Message processed on topic: %s size: %d\n", msg.Topic(), len(msg.Payload()))
+	fmt.Printf("Message processed in: %v on topic: %s size: %d\n", time.Since(startTime), msg.Topic(), len(msg.Payload()))
 }
 
 var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
