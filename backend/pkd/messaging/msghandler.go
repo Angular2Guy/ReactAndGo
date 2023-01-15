@@ -29,7 +29,10 @@ var randSource = rand.NewSource(time.Now().UnixNano())
 
 var gasPriceMsgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	//fmt.Printf("Message: %s received on topic: %s size: %d\n", msg.Payload(), msg.Topic(), len(msg.Payload()))
+	//startTime := time.Now()
+	fmt.Printf("Message received on topic: %s size: %d\n", msg.Topic(), len(msg.Payload()))
 	HandlePriceUpdate(msg.Payload(), msg.Topic())
+	fmt.Printf("Message processed on topic: %s size: %d\n", msg.Topic(), len(msg.Payload()))
 }
 
 var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -38,6 +41,8 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
 	fmt.Println("Connected")
+	msgGasPriceTopic := os.Getenv("MSG_GAS_PRICE_TOPIC")
+	subscribeToTopic(msgGasPriceTopic)
 }
 
 var connectionLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
@@ -67,12 +72,7 @@ func Start() {
 	}
 
 	msgGasPriceTopic := os.Getenv("MSG_GAS_PRICE_TOPIC")
-	token = client.Subscribe(msgGasPriceTopic, 1, gasPriceMsgHandler)
-	if token.Wait() && token.Error() != nil {
-		log.Printf("Topic subription to topic: %v failed: %v", msgGasPriceTopic, token.Error().Error())
-	} else {
-		log.Printf("Subscribed to topic %s\n", msgGasPriceTopic)
-	}
+	subscribeToTopic(msgGasPriceTopic)
 }
 
 func Stop() {
@@ -114,8 +114,18 @@ func HandlePriceUpdate(msgArr []byte, topicName string) {
 		}
 		myGasStationPrices = append(myGasStationPrices, myGasStationPrice)
 	}
-	log.Default().Printf("GasStationPrices: %v", myGasStationPrices)
-	//gasstation.UpdatePrice(myGasStationPrices)
+	//log.Printf("GasStationPrices: %v", myGasStationPrices)
+	log.Printf("Priceupdates received: %v", len(myGasStationPrices))
+	gasstation.UpdatePrice(myGasStationPrices)
+}
+
+func subscribeToTopic(topicName string) {
+	token := client.Subscribe(topicName, 1, gasPriceMsgHandler)
+	if token.Wait() && token.Error() != nil {
+		log.Printf("Topic subription to topic: %v failed: %v", topicName, token.Error().Error())
+	} else {
+		log.Printf("Subscribed to topic %s\n", topicName)
+	}
 }
 
 func convertJsonNumberToInt(value json.Number) int64 {

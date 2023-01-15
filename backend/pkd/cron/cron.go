@@ -101,7 +101,7 @@ func Start() {
 	msgFileStr := os.Getenv("MSG_MESSAGES")
 	if len(strings.TrimSpace(msgFileStr)) > 3 {
 		msgFiles := strings.Split(msgFileStr, ";")
-		scheduler.Every(30).Seconds().Tag("prices").Do(sendTestPriceMsgs, msgFiles)
+		scheduler.Every(60).Seconds().Tag("prices").Do(sendTestPriceMsgs, msgFiles)
 	}
 	scheduler.StartAsync()
 }

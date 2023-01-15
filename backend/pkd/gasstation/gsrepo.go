@@ -4,7 +4,6 @@ import (
 	gsbody "angular-and-go/pkd/contr/model"
 	"angular-and-go/pkd/database"
 	"angular-and-go/pkd/gasstation/gsmodel"
-	"encoding/json"
 	"fmt"
 	"log"
 	"math"
@@ -130,16 +129,16 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 				myChanges = myChanges + 4
 			}
 			// validation checks
-			if stationPricesMap[value.GasStationID].Timestamp.Before(time.Now().Add(time.Hour*-720)) || stationPricesMap[value.GasStationID].Diesel < 10 ||
-				stationPricesMap[value.GasStationID].E10 < 10 || stationPricesMap[value.GasStationID].E5 < 10 {
+			if stationPricesMap[value.GasStationID].Timestamp.Before(time.Now().Add(time.Hour*-720)) || stationPricesMap[value.GasStationID].Diesel < 15 ||
+				stationPricesMap[value.GasStationID].E10 < 15 || stationPricesMap[value.GasStationID].E5 < 15 {
 				myChanges = 0
 			}
 			//log.Printf("GasStation: %v Changes: %v", value.GasStationID, myChanges)
 			if myChanges > 0 {
 				gasPriceUpdateMap[value.GasStationID] = gsmodel.GasPrice{GasStationID: value.GasStationID, E5: stationPricesMap[value.GasStationID].E5, E10: stationPricesMap[value.GasStationID].E10,
 					Diesel: stationPricesMap[value.GasStationID].Diesel, Date: stationPricesMap[value.GasStationID].Timestamp, Changed: myChanges}
-				value, _ := json.Marshal(gasPriceUpdateMap[value.GasStationID])
-				fmt.Printf("Update: %v\n", string(value))
+				//value, _ := json.Marshal(gasPriceUpdateMap[value.GasStationID])
+				//fmt.Printf("Update: %v\n", string(value))
 			}
 			delete(stationPricesMap, value.GasStationID)
 		}
@@ -147,6 +146,7 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 	for _, value := range gasPriceUpdateMap {
 		database.DB.Save(&value)
 	}
+	log.Printf("Prices updated: %v\n", len(gasPriceUpdateMap))
 	if len(stationPricesMap) > 0 {
 		//create new gas stations
 		log.Default().Printf("New GasStations: %v\n", len(stationPricesMap))
