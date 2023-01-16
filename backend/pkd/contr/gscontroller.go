@@ -2,7 +2,7 @@ package contr
 
 import (
 	gsclient "angular-and-go/pkd/contr/client"
-	gsbody "angular-and-go/pkd/contr/model"
+	gsbody "angular-and-go/pkd/contr/gsmodel"
 	"angular-and-go/pkd/gasstation"
 
 	"github.com/gin-gonic/gin"

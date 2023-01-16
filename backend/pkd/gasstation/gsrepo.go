@@ -1,7 +1,7 @@
 package gasstation
 
 import (
-	gsbody "angular-and-go/pkd/contr/model"
+	gsbody "angular-and-go/pkd/contr/gsmodel"
 	"angular-and-go/pkd/database"
 	"angular-and-go/pkd/gasstation/gsmodel"
 	"fmt"
@@ -198,17 +198,22 @@ func FindBySearchPlace(searchPlace gsbody.SearchPlaceBody) []gsmodel.GasStation 
 func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasStation {
 	var gasStations []gsmodel.GasStation
 	minMax := minMaxSquare{MinLat: 1000.0, MinLng: 1000.0, MaxLat: 0.0, MaxLng: 0.0}
-	//fmt.Printf("StartLat: %v, StartLng: %v\n", searchLocation.Latitude, searchLocation.Longitude)
-	northLat, northLng := calcLocation(searchLocation.Latitude, searchLocation.Longitude, 20.0, 0.0)
+	//fmt.Printf("StartLat: %v, StartLng: %v Radius: %v\n", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Radius)
+	//max supported radius 20km and add 0.1 for floation point side effects
+	myRadius := searchLocation.Radius + 0.1
+	if myRadius > 20.0 {
+		myRadius = 20.1
+	}
+	northLat, northLng := calcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 0.0)
 	minMax = updateMinMaxSquare(northLat, northLng, minMax)
 	//fmt.Printf("NorthLat: %v, NorthLng: %v\n", northLat, northLng)
-	eastLat, eastLng := calcLocation(searchLocation.Latitude, searchLocation.Longitude, 20.0, 90.0)
+	eastLat, eastLng := calcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 90.0)
 	minMax = updateMinMaxSquare(eastLat, eastLng, minMax)
 	//fmt.Printf("EastLat: %v, EastLng: %v\n", eastLat, eastLng)
-	southLat, southLng := calcLocation(searchLocation.Latitude, searchLocation.Longitude, 20.0, 180.0)
+	southLat, southLng := calcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 180.0)
 	minMax = updateMinMaxSquare(southLat, southLng, minMax)
 	//fmt.Printf("SouthLat: %v, SouthLng: %v\n", southLat, southLng)
-	westLat, westLng := calcLocation(searchLocation.Latitude, searchLocation.Longitude, 20.0, 270.0)
+	westLat, westLng := calcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 270.0)
 	minMax = updateMinMaxSquare(westLat, westLng, minMax)
 	//fmt.Printf("WestLat: %v, WestLng: %v\n", westLat, westLng)
 	//fmt.Printf("MinLat: %v, MinLng: %v, MaxLat: %v, MaxLng: %v\n", minMax.MinLat, minMax.MinLng, minMax.MaxLat, minMax.MaxLng)
@@ -220,7 +225,7 @@ func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasSta
 	for _, myGasStation := range gasStations {
 		distance, bearing := calcDistance(searchLocation.Latitude, searchLocation.Longitude, myGasStation.Latitude, myGasStation.Longitude)
 		//fmt.Printf("Distance: %v, Bearing: %v\n", distance, bearing)
-		if distance < 20.1 && bearing > -1.0 {
+		if distance < myRadius && bearing > -1.0 {
 			filteredGasStations = append(filteredGasStations, myGasStation)
 		}
 	}

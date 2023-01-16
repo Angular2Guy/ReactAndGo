@@ -137,6 +137,7 @@ func convertJsonNumberToInt(value json.Number) int64 {
 	return result
 }
 
+// to have new test prices every time
 func scramblePrices(myGasStationPrices gasstation.GasStationPrices) gasstation.GasStationPrices {
 	r1 := rand.New(randSource)
 	scrambleValue := r1.Intn(20) - 10

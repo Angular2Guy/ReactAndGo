@@ -4,4 +4,4 @@ curl -X POST http://localhost:3000/gasstation/search/place/ -H 'Content-Type: ap
 
 curl -X POST http://localhost:3000/gasstation/search/place -H 'Content-Type: application/json' -d '{"StationName": "Berlin", "PostCode": "13088"}'
 
-curl -X POST http://localhost:3000/gasstation/search/location -H 'Content-Type: application/json' -d '{"Longitude": 13.519067, "Latitude": 52.522686}'
+curl -X POST http://localhost:3000/gasstation/search/location -H 'Content-Type: application/json' -d '{"Longitude": 13.519067, "Latitude": 52.522686, "Radius": 25.0}'
