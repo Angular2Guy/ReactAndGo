@@ -3,9 +3,8 @@ package database
 import (
 	"angular-and-go/pkd/appuser/aumodel"
 	"angular-and-go/pkd/gasstation/gsmodel"
+	"log"
 )
-
-//import "angular-and-go/pkd/gasstation/gsmodel"
 
 func MigrateDB() {
 	//DB.AutoMigrate(&gsmodel.GasStation{})
@@ -21,4 +20,5 @@ func MigrateDB() {
 	if !DB.Migrator().HasTable(&aumodel.LoggedOutUser{}) {
 		DB.AutoMigrate(&aumodel.LoggedOutUser{})
 	}
+	log.Printf("DB Migration Done.")
 }
