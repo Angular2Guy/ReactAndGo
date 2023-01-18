@@ -1,6 +1,7 @@
 package contr
 
 import (
+	"angular-and-go/pkd/appuser"
 	gsclient "angular-and-go/pkd/contr/client"
 	gsbody "angular-and-go/pkd/contr/gsmodel"
 	"angular-and-go/pkd/gasstation"
@@ -24,7 +25,8 @@ func Start() {
 }
 
 func postsCreate(c *gin.Context) {
-
+	var myAppUser appuser.AppUserIn
+	appuser.Signin(myAppUser)
 }
 
 func getGasPriceByGasStationId(c *gin.Context) {

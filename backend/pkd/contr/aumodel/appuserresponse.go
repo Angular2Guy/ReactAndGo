@@ -1,5 +1,6 @@
 package aubody
 
 type AppUserResponse struct {
-	Token string
+	Token   string
+	Message string
 }
