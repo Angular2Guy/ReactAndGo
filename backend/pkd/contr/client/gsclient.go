@@ -115,7 +115,7 @@ func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64, apike
 		return err
 	}
 	defer response.Body.Close()
-	if response.StatusCode > 300 {
+	if response.StatusCode >= 300 {
 		log.Printf("Response status: %v\n", response.Status)
 		err := fmt.Errorf("response status: %v", response.Status)
 		return err
