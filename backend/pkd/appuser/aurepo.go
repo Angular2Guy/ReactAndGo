@@ -4,7 +4,10 @@ import (
 	"angular-and-go/pkd/appuser/aumodel"
 	"angular-and-go/pkd/database"
 	"log"
+	"os"
+	"time"
 
+	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -26,19 +29,32 @@ const (
 	Failed
 )
 
-func Login(appUserIn AppUserIn) string {
+func Login(appUserIn AppUserIn) (string, int) {
 	result := ""
+	status := 401
+
 	var appUser aumodel.AppUser
 	if err := database.DB.Where("username = ?", appUserIn.Username).First(&appUser); err != nil {
 		log.Printf("User not found: %v", appUserIn.Username)
-		return result
+		return result, status
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(appUser.Password), []byte(appUserIn.Password)); err != nil {
 		log.Printf("Password wrong user: %v", appUser.Username)
-		return result
+		return result, status
 	}
 	// add jwt token creation
-	return result
+	myToken := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
+		"sub": appUser.Username,
+		"exp": time.Now().Add(time.Second * 60).Unix(),
+	})
+	jwtTokenSecrect := os.Getenv("JWT_TOKEN_SECRET")
+	result, err := myToken.SignedString([]byte(jwtTokenSecrect))
+	if err != nil {
+		log.Printf("Failed to create jwt token: %v\n", err)
+	} else {
+		status = 200
+	}
+	return result, status
 }
 
 func Signin(appUserIn AppUserIn) SigninResult {

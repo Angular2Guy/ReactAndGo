@@ -2,6 +2,7 @@ package contr
 
 import (
 	"angular-and-go/pkd/appuser"
+	aubody "angular-and-go/pkd/contr/aumodel"
 	gsclient "angular-and-go/pkd/contr/client"
 	gsbody "angular-and-go/pkd/contr/gsmodel"
 	"angular-and-go/pkd/gasstation"
@@ -11,7 +12,8 @@ import (
 
 func Start() {
 	router := gin.Default()
-	router.POST("/posts", postsCreate)
+	router.PUT("/appuser/signin", postSignin)
+	router.PUT("/appuser/login", postLogin)
 	router.GET("/clienttest", gsclient.UpdateGasStations)
 	router.GET("/gasprice/:id", getGasPriceByGasStationId)
 	router.GET("/gasstation/:id", getGasStationById)
@@ -24,9 +26,16 @@ func Start() {
 	router.Run() // listen and serve on 0.0.0.0:3000
 }
 
-func postsCreate(c *gin.Context) {
+func postSignin(c *gin.Context) {
 	var myAppUser appuser.AppUserIn
 	appuser.Signin(myAppUser)
+}
+
+func postLogin(c *gin.Context) {
+	var myAppUser appuser.AppUserIn
+	result, status := appuser.Login(myAppUser)
+	appAuResponse := aubody.AppUserResponse{Token: result, Message: ""}
+	c.JSON(status, appAuResponse)
 }
 
 func getGasPriceByGasStationId(c *gin.Context) {
