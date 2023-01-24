@@ -6,14 +6,15 @@ import (
 	gsclient "angular-and-go/pkd/contr/client"
 	gsbody "angular-and-go/pkd/contr/gsmodel"
 	"angular-and-go/pkd/gasstation"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Start() {
 	router := gin.Default()
-	router.PUT("/appuser/signin", postSignin)
-	router.PUT("/appuser/login", postLogin)
+	router.POST("/appuser/signin", postSignin)
+	router.POST("/appuser/login", postLogin)
 	router.GET("/clienttest", gsclient.UpdateGasStations)
 	router.GET("/gasprice/:id", getGasPriceByGasStationId)
 	router.GET("/gasstation/:id", getGasStationById)
@@ -27,34 +28,50 @@ func Start() {
 }
 
 func postSignin(c *gin.Context) {
-	var myAppUser appuser.AppUserIn
-	appuser.Signin(myAppUser)
+	var appUserRequest aubody.AppUserRequest
+	c.Bind(&appUserRequest)
+	myAppUser := appuser.AppUserIn{Username: appUserRequest.Username, Password: appUserRequest.Password, Latitude: appUserRequest.Latitude, Uuid: "", Longitude: appUserRequest.Longitude}
+	result := appuser.Signin(myAppUser)
+	httpResult := http.StatusNotAcceptable
+	message := ""
+	if result == appuser.Ok {
+		httpResult = http.StatusAccepted
+	} else if result == appuser.UsernameTaken {
+		message = "Username not available."
+	}
+	c.JSON(httpResult, aubody.AppUserResponse{Token: "", Message: message})
 }
 
 func postLogin(c *gin.Context) {
-	var myAppUser appuser.AppUserIn
+	var appUserRequest aubody.AppUserRequest
+	c.Bind(&appUserRequest)
+	myAppUser := appuser.AppUserIn{Username: appUserRequest.Username, Password: appUserRequest.Password, Latitude: appUserRequest.Latitude, Uuid: "", Longitude: appUserRequest.Longitude}
 	result, status := appuser.Login(myAppUser)
-	appAuResponse := aubody.AppUserResponse{Token: result, Message: ""}
+	var message = ""
+	if status != http.StatusOK {
+		message = "Login failed."
+	}
+	appAuResponse := aubody.AppUserResponse{Token: result, Message: message}
 	c.JSON(status, appAuResponse)
 }
 
 func getGasPriceByGasStationId(c *gin.Context) {
 	gasstationId := c.Params.ByName("id")
 	gsEntity := gasstation.FindPricesByStid(gasstationId)
-	c.JSON(200, gsEntity)
+	c.JSON(http.StatusOK, gsEntity)
 }
 
 func getGasStationById(c *gin.Context) {
 	gasstationId := c.Params.ByName("id")
 	gsEntity := gasstation.FindById(gasstationId)
-	c.JSON(200, gsEntity)
+	c.JSON(http.StatusOK, gsEntity)
 }
 
 func searchGasStationPlace(c *gin.Context) {
 	var searchPlaceBody gsbody.SearchPlaceBody
 	c.Bind(&searchPlaceBody)
 	gsEntity := gasstation.FindBySearchPlace(searchPlaceBody)
-	c.JSON(200, gsEntity)
+	c.JSON(http.StatusOK, gsEntity)
 }
 
 func searchGasStationLocation(c *gin.Context) {
@@ -64,7 +81,7 @@ func searchGasStationLocation(c *gin.Context) {
 	c.Bind(&searchLocationBody)
 	//fmt.Printf("Lat: %v, Lng: %v\n", searchLocationBody.Latitude, searchLocationBody.Longitude)
 	gsEntity := gasstation.FindBySearchLocation(searchLocationBody)
-	c.JSON(200, gsEntity)
+	c.JSON(http.StatusOK, gsEntity)
 }
 
 func postsUpdate(c *gin.Context) {
