@@ -13,6 +13,7 @@ import (
 
 func CheckToken(c *gin.Context) {
 	log.Printf("Check token: %v\n", c.Request.Header.Get("Authorization"))
+
 	tokenStr := c.Request.Header.Get("Authorization")
 	if tokenStr == "" {
 		c.AbortWithStatus(http.StatusUnauthorized)
@@ -39,5 +40,6 @@ func CheckToken(c *gin.Context) {
 	} else {
 		c.AbortWithStatus(http.StatusUnauthorized)
 	}
+
 	c.Next()
 }
