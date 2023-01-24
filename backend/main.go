@@ -2,7 +2,7 @@ package main
 
 import (
 	"angular-and-go/pkd/config"
-	"angular-and-go/pkd/contr"
+	"angular-and-go/pkd/controller"
 	"angular-and-go/pkd/cron"
 	"angular-and-go/pkd/database"
 	"angular-and-go/pkd/messaging"
@@ -28,7 +28,7 @@ func main() {
 	// kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
-	go contr.Start()
+	go controller.Start()
 
 	<-quit
 	log.Println("Shutting down server...")

@@ -1,32 +1,14 @@
-package contr
+package controller
 
 import (
 	"angular-and-go/pkd/appuser"
-	aubody "angular-and-go/pkd/contr/aumodel"
-	gsclient "angular-and-go/pkd/contr/client"
-	gsbody "angular-and-go/pkd/contr/gsmodel"
-	token "angular-and-go/pkd/contr/token"
+	aubody "angular-and-go/pkd/controller/aumodel"
+	gsbody "angular-and-go/pkd/controller/gsmodel"
 	"angular-and-go/pkd/gasstation"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
-
-func Start() {
-	router := gin.Default()
-	router.POST("/appuser/signin", postSignin)
-	router.POST("/appuser/login", postLogin)
-	router.GET("/clienttest", token.CheckToken, gsclient.UpdateGasStations)
-	router.GET("/gasprice/:id", token.CheckToken, getGasPriceByGasStationId)
-	router.GET("/gasstation/:id", token.CheckToken, getGasStationById)
-	router.POST("/gasstation/search/place", token.CheckToken, searchGasStationPlace)
-	router.POST("/gasstation/search/location", token.CheckToken, searchGasStationLocation)
-	router.PUT("/posts/:id", postsUpdate)
-	router.DELETE("/posts/:id", postsDelete)
-	router.Static("/static", "./static")
-	router.NoRoute(func(c *gin.Context) { c.Redirect(302, "/static") })
-	router.Run() // listen and serve on 0.0.0.0:3000
-}
 
 func postSignin(c *gin.Context) {
 	var appUserRequest aubody.AppUserRequest

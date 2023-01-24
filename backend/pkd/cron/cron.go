@@ -1,7 +1,7 @@
 package cron
 
 import (
-	gsclient "angular-and-go/pkd/contr/client"
+	gsclient "angular-and-go/pkd/controller/client"
 	"angular-and-go/pkd/messaging"
 	"fmt"
 	"log"
