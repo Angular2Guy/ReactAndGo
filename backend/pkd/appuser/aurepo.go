@@ -6,9 +6,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -33,20 +35,37 @@ const (
 func Login(appUserIn AppUserIn) (string, int) {
 	result := ""
 	status := http.StatusUnauthorized
-	log.Printf("%v", appUserIn.Username)
+	//log.Printf("%v", appUserIn.Username)
+	roles := []string{"GUEST"}
 	var appUser aumodel.AppUser
 	if err := database.DB.Where("username = ?", appUserIn.Username).First(&appUser); err.Error != nil {
-		log.Printf("User not found: %v error: %v", appUserIn.Username, err.Error)
+		log.Printf("User not found: %v error: %v\n", appUserIn.Username, err.Error)
 		return result, status
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(appUser.Password), []byte(appUserIn.Password)); err != nil {
-		log.Printf("Password wrong. Username: %v", appUser.Username)
+		log.Printf("Password wrong. Username: %v\n", appUser.Username)
 		return result, status
 	}
 	// add jwt token creation
+	var myUuid uuid.UUID
+	if myUuid1, err := uuid.NewRandom(); err != nil {
+		log.Printf("Uuid creation failed: %v\n", err.Error())
+		return result, status
+	} else {
+		myUuid = myUuid1
+		roles = append(roles, "USER")
+	}
+
+	tokenTtl := 60
+	if len(strings.TrimSpace(os.Getenv("MSG_MESSAGES"))) <= 3 {
+		tokenTtl = tokenTtl * 10
+	}
 	myToken := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
-		"sub": appUser.Username,
-		"exp": time.Now().Add(time.Second * 60).Unix(),
+		"sub":     appUser.Username,
+		"uuid":    myUuid.String(),
+		"auth":    strings.Join(roles[:], ","),
+		"lastmsg": time.Now().Unix(),
+		"exp":     time.Now().Add(time.Second * time.Duration(tokenTtl)).Unix(),
 	})
 	jwtTokenSecrect := os.Getenv("JWT_TOKEN_SECRET")
 	result, err := myToken.SignedString([]byte(jwtTokenSecrect))
