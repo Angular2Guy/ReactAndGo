@@ -64,7 +64,7 @@ func Signin(appUserIn AppUserIn) SigninResult {
 	}
 	err := database.DB.Transaction(func(tx *gorm.DB) error {
 		var appUser aumodel.AppUser
-		if err := tx.Where("name = ?", appUserIn.Username).First(&appUser); err == nil {
+		if err := tx.Where("username = ?", appUserIn.Username).First(&appUser); err == nil {
 			result = UsernameTaken
 			return nil
 		}
