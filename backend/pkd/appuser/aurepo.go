@@ -4,6 +4,7 @@ import (
 	"angular-and-go/pkd/appuser/aumodel"
 	"angular-and-go/pkd/database"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -31,15 +32,15 @@ const (
 
 func Login(appUserIn AppUserIn) (string, int) {
 	result := ""
-	status := 401
-
+	status := http.StatusUnauthorized
+	log.Printf("%v", appUserIn.Username)
 	var appUser aumodel.AppUser
-	if err := database.DB.Where("username = ?", appUserIn.Username).First(&appUser); err != nil {
-		log.Printf("User not found: %v", appUserIn.Username)
+	if err := database.DB.Where("username = ?", appUserIn.Username).First(&appUser); err.Error != nil {
+		log.Printf("User not found: %v error: %v", appUserIn.Username, err.Error)
 		return result, status
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(appUser.Password), []byte(appUserIn.Password)); err != nil {
-		log.Printf("Password wrong user: %v", appUser.Username)
+		log.Printf("Password wrong. Username: %v", appUser.Username)
 		return result, status
 	}
 	// add jwt token creation
@@ -52,7 +53,7 @@ func Login(appUserIn AppUserIn) (string, int) {
 	if err != nil {
 		log.Printf("Failed to create jwt token: %v\n", err)
 	} else {
-		status = 200
+		status = http.StatusOK
 	}
 	return result, status
 }
@@ -64,7 +65,7 @@ func Signin(appUserIn AppUserIn) SigninResult {
 	}
 	err := database.DB.Transaction(func(tx *gorm.DB) error {
 		var appUser aumodel.AppUser
-		if err := tx.Where("username = ?", appUserIn.Username).First(&appUser); err == nil {
+		if err := tx.Where("username = ?", appUserIn.Username).First(&appUser); err.Error == nil {
 			result = UsernameTaken
 			return nil
 		}
