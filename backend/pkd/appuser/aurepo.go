@@ -3,14 +3,10 @@ package appuser
 import (
 	"angular-and-go/pkd/appuser/aumodel"
 	"angular-and-go/pkd/database"
+	"angular-and-go/pkd/token"
 	"log"
 	"net/http"
-	"os"
-	"strings"
-	"time"
 
-	"github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -36,7 +32,6 @@ func Login(appUserIn AppUserIn) (string, int) {
 	result := ""
 	status := http.StatusUnauthorized
 	//log.Printf("%v", appUserIn.Username)
-	roles := []string{"GUEST"}
 	var appUser aumodel.AppUser
 	if err := database.DB.Where("username = ?", appUserIn.Username).First(&appUser); err.Error != nil {
 		log.Printf("User not found: %v error: %v\n", appUserIn.Username, err.Error)
@@ -46,29 +41,8 @@ func Login(appUserIn AppUserIn) (string, int) {
 		log.Printf("Password wrong. Username: %v\n", appUser.Username)
 		return result, status
 	}
-	// add jwt token creation
-	var myUuid uuid.UUID
-	if myUuid1, err := uuid.NewRandom(); err != nil {
-		log.Printf("Uuid creation failed: %v\n", err.Error())
-		return result, status
-	} else {
-		myUuid = myUuid1
-		roles = append(roles, "USER")
-	}
-
-	tokenTtl := 60
-	if len(strings.TrimSpace(os.Getenv("MSG_MESSAGES"))) <= 3 {
-		tokenTtl = tokenTtl * 10
-	}
-	myToken := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
-		"sub":     appUser.Username,
-		"uuid":    myUuid.String(),
-		"auth":    strings.Join(roles[:], ","),
-		"lastmsg": time.Now().Unix(),
-		"exp":     time.Now().Add(time.Second * time.Duration(tokenTtl)).Unix(),
-	})
-	jwtTokenSecrect := os.Getenv("JWT_TOKEN_SECRET")
-	result, err := myToken.SignedString([]byte(jwtTokenSecrect))
+	//jwt token creation
+	result, err := token.CreateToken(token.TokenUser{Username: appUser.Username, Roles: []string{"USERS"}})
 	if err != nil {
 		log.Printf("Failed to create jwt token: %v\n", err)
 	} else {

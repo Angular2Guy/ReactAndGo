@@ -104,12 +104,11 @@ func HandlePriceUpdate(msgArr []byte, topicName string) {
 		}
 	}
 	//log.Default().Printf("PriceUpdateMap: %v", priceUpdateMap)
-	msgFileStr := os.Getenv("MSG_MESSAGES")
 	var myGasStationPrices []gasstation.GasStationPrices
 	for key, value := range priceUpdateMap {
 		myGasStationPrice := gasstation.GasStationPrices{GasStationID: key, E5: int(convertJsonNumberToInt(value.E5)), E10: int(convertJsonNumberToInt(value.E10)),
 			Diesel: int(convertJsonNumberToInt(value.Diesel)), Timestamp: time.Unix(value.Useconds, 0)}
-		if len(strings.TrimSpace(msgFileStr)) > 3 {
+		if len(strings.TrimSpace(os.Getenv("MSG_MESSAGES"))) > 3 {
 			myGasStationPrice = scramblePrices(myGasStationPrice)
 		}
 		myGasStationPrices = append(myGasStationPrices, myGasStationPrice)

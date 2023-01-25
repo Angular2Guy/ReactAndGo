@@ -2,7 +2,7 @@ package controller
 
 import (
 	gsclient "angular-and-go/pkd/controller/client"
-	token "angular-and-go/pkd/controller/token"
+	token "angular-and-go/pkd/token"
 
 	"github.com/gin-gonic/gin"
 )
