@@ -22,7 +22,10 @@ async function startWatching() {
         treeShaking: true,
         plugins: [sassPlugin()],    
       });
-    await ctx.watch();
+      let { host, port } = await ctx.serve({
+        servedir: 'public',
+});
+      console.log(`host: ${host}:${port}`);
 }  
   
-  startWatching();
+startWatching();
