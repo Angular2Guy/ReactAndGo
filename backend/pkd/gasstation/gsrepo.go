@@ -173,7 +173,7 @@ func FindPricesByStids(stids []string) []gsmodel.GasPrice {
 	//log.Printf("Cut off date: %v", dateStr)
 	//database.DB.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").Find(&myGasPrice)
 	database.DB.Transaction(func(tx *gorm.DB) error {
-		tx.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").FindInBatches(&values, 1000, func(tx *gorm.DB, batch int) error {
+		tx.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").FindInBatches(&values, 20000, func(tx *gorm.DB, batch int) error {
 			myGasPrice = append(myGasPrice, values...)
 			return nil
 		})
