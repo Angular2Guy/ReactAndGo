@@ -171,14 +171,26 @@ func FindPricesByStids(stids []string) []gsmodel.GasPrice {
 	threeMonthsAgo := time.Now().Add(time.Hour * -2160)
 	dateStr := fmt.Sprintf("%04d-%02d-%02d", threeMonthsAgo.Year(), threeMonthsAgo.Month(), threeMonthsAgo.Day())
 	//log.Printf("Cut off date: %v", dateStr)
-	//database.DB.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").Find(&myGasPrice)
+	chuncks := chunkSlice(stids, 1000)
+	log.Printf("Number of Chunks: %v\n", len(chuncks))
 	database.DB.Transaction(func(tx *gorm.DB) error {
-		tx.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").FindInBatches(&values, 20000, func(tx *gorm.DB, batch int) error {
+		for _, chunk := range chuncks {
+			//log.Printf("Chunk: %v\n", chunk)
+			tx.Where("stid IN ? and date >= date(?) ", chunk, dateStr).Order("date desc").Find(&values)
 			myGasPrice = append(myGasPrice, values...)
-			return nil
-		})
+		}
 		return nil
 	})
+	//database.DB.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").Find(&myGasPrice)
+	/*
+		database.DB.Transaction(func(tx *gorm.DB) error {
+			tx.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").FindInBatches(&values, 20000, func(tx *gorm.DB, batch int) error {
+				myGasPrice = append(myGasPrice, values...)
+				return nil
+			})
+			return nil
+		})
+	*/
 	return myGasPrice
 }
 
@@ -241,6 +253,20 @@ func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasSta
 		}
 	}
 	return filteredGasStations
+}
+
+func chunkSlice[T any](mySlice []T, chunkSize int) (s [][]T) {
+	numberOfChunks := len(mySlice)/chunkSize + 1
+	var result [][]T
+	for i := 0; i < numberOfChunks; i++ {
+
+		min := (i * len(mySlice) / numberOfChunks)
+		max := ((i + 1) * len(mySlice)) / numberOfChunks
+
+		result = append(result, mySlice[min:max])
+
+	}
+	return result
 }
 
 func calcDistance(startLat float64, startLng float64, destLat float64, destLng float64) (float64, float64) {
