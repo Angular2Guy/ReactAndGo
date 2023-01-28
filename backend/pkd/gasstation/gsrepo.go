@@ -143,9 +143,12 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 			delete(stationPricesMap, value.GasStationID)
 		}
 	}
-	for _, value := range gasPriceUpdateMap {
-		database.DB.Save(&value)
-	}
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		for _, value := range gasPriceUpdateMap {
+			tx.Save(&value)
+		}
+		return nil
+	})
 	log.Printf("Prices updated: %v\n", len(gasPriceUpdateMap))
 	if len(stationPricesMap) > 0 {
 		//create new gas stations
@@ -164,10 +167,18 @@ func FindById(id string) gsmodel.GasStation {
 
 func FindPricesByStids(stids []string) []gsmodel.GasPrice {
 	var myGasPrice []gsmodel.GasPrice
+	var values []gsmodel.GasPrice
 	threeMonthsAgo := time.Now().Add(time.Hour * -2160)
 	dateStr := fmt.Sprintf("%04d-%02d-%02d", threeMonthsAgo.Year(), threeMonthsAgo.Month(), threeMonthsAgo.Day())
 	//log.Printf("Cut off date: %v", dateStr)
-	database.DB.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").Find(&myGasPrice)
+	//database.DB.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").Find(&myGasPrice)
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		tx.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").FindInBatches(&values, 1000, func(tx *gorm.DB, batch int) error {
+			myGasPrice = append(myGasPrice, values...)
+			return nil
+		})
+		return nil
+	})
 	return myGasPrice
 }
 
