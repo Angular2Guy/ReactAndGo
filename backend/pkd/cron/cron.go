@@ -98,6 +98,8 @@ func Start() {
 		gsclient.UpdateGasStations(nil)
 	})
 
+	scheduler.Every(60).Seconds().Tag("messaging").Do(messaging.ConnectionCheck)
+
 	msgFileStr := os.Getenv("MSG_MESSAGES")
 	if len(strings.TrimSpace(msgFileStr)) > 3 {
 		msgFiles := strings.Split(msgFileStr, ";")

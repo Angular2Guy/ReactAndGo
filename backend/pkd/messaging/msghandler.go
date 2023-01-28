@@ -47,6 +47,7 @@ var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
 
 var connectionLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
 	fmt.Printf("Connection Lost: %s\n", err.Error())
+	client.Disconnect(0)
 }
 
 func Start() {
@@ -82,6 +83,15 @@ func Stop() {
 func SendMsg(msg string) {
 	msgGasPriceTopic := os.Getenv("MSG_GAS_PRICE_TOPIC")
 	client.Publish(msgGasPriceTopic, 0, false, msg)
+}
+
+func ConnectionCheck() {
+	if !client.IsConnected() || !client.IsConnectionOpen() {
+		log.Printf("Trying to reconnect. IsConnected: %v IsConnectionOpen: %v\n", client.IsConnected(), client.IsConnectionOpen())
+		client.Disconnect(0)
+		Start()
+	}
+	//log.Printf("ConnectionCheck() done.\n")
 }
 
 func HandlePriceUpdate(msgArr []byte, topicName string) {
