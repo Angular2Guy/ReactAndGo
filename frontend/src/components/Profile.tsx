@@ -7,8 +7,9 @@ interface PropsTypes {
 }
 
 const Profile = (props: PropsTypes) => {
+    const {firstName, lastName} = props;
     return <h1>
-        Name: {props.firstName} {props.lastName}
+        Name: {firstName} {lastName}
         {props.children}
     </h1>
 };
