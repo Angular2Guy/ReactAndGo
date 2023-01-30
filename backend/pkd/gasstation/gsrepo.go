@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"gorm.io/gorm"
@@ -167,17 +169,36 @@ func FindById(id string) gsmodel.GasStation {
 
 func FindPricesByStids(stids []string) []gsmodel.GasPrice {
 	var myGasPrice []gsmodel.GasPrice
-	var values []gsmodel.GasPrice
 	threeMonthsAgo := time.Now().Add(time.Hour * -2160)
 	dateStr := fmt.Sprintf("%04d-%02d-%02d", threeMonthsAgo.Year(), threeMonthsAgo.Month(), threeMonthsAgo.Day())
 	//log.Printf("Cut off date: %v", dateStr)
 	chuncks := chunkSlice(stids, 1000)
 	log.Printf("Number of Chunks: %v\n", len(chuncks))
 	database.DB.Transaction(func(tx *gorm.DB) error {
+		var wg sync.WaitGroup
+		var mutex = &sync.Mutex{}
+		parSelects := strings.ToLower(strings.TrimSpace(os.Getenv("DB_PARALLEL_SELECTS")))
 		for _, chunk := range chuncks {
-			//log.Printf("Chunk: %v\n", chunk)
-			tx.Where("stid IN ? and date >= date(?) ", chunk, dateStr).Order("date desc").Find(&values)
-			myGasPrice = append(myGasPrice, values...)
+			if parSelects == "true" {
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					var values []gsmodel.GasPrice
+					//log.Printf("Chunk: %v\n", chunk)
+					tx.Where("stid IN ? and date >= date(?) ", chunk, dateStr).Order("date desc").Find(&values)
+					mutex.Lock()
+					myGasPrice = append(myGasPrice, values...)
+					mutex.Unlock()
+				}()
+			} else {
+				var values []gsmodel.GasPrice
+				//log.Printf("Chunk: %v\n", chunk)
+				tx.Where("stid IN ? and date >= date(?) ", chunk, dateStr).Order("date desc").Find(&values)
+				myGasPrice = append(myGasPrice, values...)
+			}
+		}
+		if parSelects == "true" {
+			wg.Wait()
 		}
 		return nil
 	})
