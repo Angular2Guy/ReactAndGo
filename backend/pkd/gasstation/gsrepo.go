@@ -172,7 +172,7 @@ func FindPricesByStids(stids []string) []gsmodel.GasPrice {
 	dateStr := fmt.Sprintf("%04d-%02d-%02d", threeMonthsAgo.Year(), threeMonthsAgo.Month(), threeMonthsAgo.Day())
 	//log.Printf("Cut off date: %v", dateStr)
 	cunckedSelects := strings.ToLower(strings.TrimSpace(os.Getenv("DB_CHUNKED_SELECTS")))
-	chunkSize := 100000
+	chunkSize := 20000
 	if cunckedSelects == "true" {
 		chunkSize = 999
 	}
