@@ -130,8 +130,8 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 				myChanges = myChanges + 4
 			}
 			// validation checks
-			if stationPricesMap[value.GasStationID].Timestamp.Before(time.Now().Add(time.Hour*-720)) || stationPricesMap[value.GasStationID].Diesel < 15 ||
-				stationPricesMap[value.GasStationID].E10 < 15 || stationPricesMap[value.GasStationID].E5 < 15 {
+			if stationPricesMap[value.GasStationID].Timestamp.Before(time.Now().Add(time.Hour*-720)) || stationPricesMap[value.GasStationID].Diesel < 0 ||
+				stationPricesMap[value.GasStationID].E10 < 0 || stationPricesMap[value.GasStationID].E5 < 0 {
 				myChanges = 0
 			}
 			//log.Printf("GasStation: %v Changes: %v", value.GasStationID, myChanges)
