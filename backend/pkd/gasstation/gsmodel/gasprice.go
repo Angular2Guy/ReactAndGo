@@ -8,7 +8,7 @@ type Tabler interface {
 
 type GasPrice struct {
 	ID           int64  `gorm:"primaryKey"`
-	GasStationID string `gorm:"column:stid,index:idx_stid"`
+	GasStationID string `gorm:"column:stid;index:idx_stid"`
 	E5           int
 	E10          int
 	Diesel       int
