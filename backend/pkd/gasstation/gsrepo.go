@@ -252,7 +252,7 @@ func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasSta
 	//filter for stations in circle
 	filteredGasStations := []gsmodel.GasStation{}
 	for _, myGasStation := range gasStations {
-		distance, bearing := calcDistance(searchLocation.Latitude, searchLocation.Longitude, myGasStation.Latitude, myGasStation.Longitude)
+		distance, bearing := myGasStation.CalcDistanceBearing(searchLocation.Latitude, searchLocation.Longitude)
 		//fmt.Printf("Distance: %v, Bearing: %v\n", distance, bearing)
 		if distance < myRadius && bearing > -1.0 {
 			filteredGasStations = append(filteredGasStations, myGasStation)
@@ -275,22 +275,23 @@ func chunkSlice[T any](mySlice []T, chunkSize int) (s [][]T) {
 	return result
 }
 
-func calcDistance(startLat float64, startLng float64, destLat float64, destLng float64) (float64, float64) {
-	var radStartLat = toRad(startLat)
-	var radDestLat = toRad(destLat)
-	var radDeltaLat = toRad(destLat - startLat)
-	var radDeltaLng = toRad(destLng - startLng)
-	//distance
-	var a = math.Sin(radDeltaLat/2)*math.Sin(radDeltaLat/2) + math.Cos(radStartLat)*math.Cos(radDestLat)*math.Sin(radDeltaLng/2)*math.Sin(radDeltaLng/2)
-	var c = 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
-	var distance = earthRadius * c
-	//bearing
-	var y = math.Sin(radDeltaLng) * math.Cos(radDestLat)
-	var x = math.Cos(radStartLat)*math.Sin(radDestLat) - math.Sin(radStartLat)*math.Cos(radDestLat)*math.Cos(radDeltaLng)
-	var bearing = math.Mod((toDeg(math.Atan2(y, x)) + 360.0), 360.0)
-	return distance, bearing
-}
-
+/*
+	func calcDistance(startLat float64, startLng float64, destLat float64, destLng float64) (float64, float64) {
+		var radStartLat = toRad(startLat)
+		var radDestLat = toRad(destLat)
+		var radDeltaLat = toRad(destLat - startLat)
+		var radDeltaLng = toRad(destLng - startLng)
+		//distance
+		var a = math.Sin(radDeltaLat/2)*math.Sin(radDeltaLat/2) + math.Cos(radStartLat)*math.Cos(radDestLat)*math.Sin(radDeltaLng/2)*math.Sin(radDeltaLng/2)
+		var c = 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+		var distance = earthRadius * c
+		//bearing
+		var y = math.Sin(radDeltaLng) * math.Cos(radDestLat)
+		var x = math.Cos(radStartLat)*math.Sin(radDestLat) - math.Sin(radStartLat)*math.Cos(radDestLat)*math.Cos(radDeltaLng)
+		var bearing = math.Mod((toDeg(math.Atan2(y, x)) + 360.0), 360.0)
+		return distance, bearing
+	}
+*/
 func calcLocation(startLat float64, startLng float64, distanceKm float64, bearing float64) (float64, float64) {
 	var radBearing = toRad(bearing)
 	var radStartLat = toRad(startLat)
