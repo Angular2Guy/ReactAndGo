@@ -8,14 +8,18 @@ import './App.css';
 //import FunctionEvent from './components/FunctionEvent';
 //import ClassEvent from './components/ClassEvent';
 //import FunctionalCounter from './components/FunctionalCounter';
-import ConditionalComponent from './components/ConditionalComponent';
+//import ConditionalComponent from './components/ConditionalComponent';
+//import Product from './components/Product';
+import Form from './components/Form';
 
 function App() {  
   return (
     <div className="App">
-      <ConditionalComponent></ConditionalComponent>
+      <Form></Form>
      {/*
+      <Product></Product>
       <FunctionalCounter></FunctionalCounter>
+      <ConditionalComponent></ConditionalComponent>
       <ClassEvent/>
       <FunctionEvent></FunctionEvent>
       <Resume name='Max'></Resume>
