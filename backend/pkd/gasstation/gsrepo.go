@@ -144,6 +144,24 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 			delete(stationPricesMap, value.GasStationID)
 		}
 	}
+	if len(stationPricesMap) > 0 {
+		var stationIds []string
+		for _, stationPrice := range stationPricesMap {
+			stationIds = append(stationIds, stationPrice.GasStationID)
+		}
+		myGasStations := findByIds(stationIds)
+		for _, gasStation := range myGasStations {
+			value := stationPricesMap[gasStation.ID]
+			gasPriceUpdateMap[value.GasStationID] = gsmodel.GasPrice{GasStationID: value.GasStationID, E5: stationPricesMap[value.GasStationID].E5, E10: stationPricesMap[value.GasStationID].E10,
+				Diesel: stationPricesMap[value.GasStationID].Diesel, Date: stationPricesMap[value.GasStationID].Timestamp, Changed: 21}
+			log.Printf("GasStation with first price: %v\n", gasStation.ID)
+			delete(stationPricesMap, value.GasStationID)
+		}
+		//create new gas stations
+		if len(stationPricesMap) > 0 {
+			log.Default().Printf("New GasStations: %v\n", len(stationPricesMap))
+		}
+	}
 	database.DB.Transaction(func(tx *gorm.DB) error {
 		for _, value := range gasPriceUpdateMap {
 			tx.Save(&value)
@@ -151,11 +169,12 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 		return nil
 	})
 	log.Printf("Prices updated: %v\n", len(gasPriceUpdateMap))
-	if len(stationPricesMap) > 0 {
-		//create new gas stations
-		log.Default().Printf("New GasStations: %v\n", len(stationPricesMap))
-	}
+}
 
+func findByIds(ids []string) []gsmodel.GasStation {
+	var result []gsmodel.GasStation
+	database.DB.Where("id in ?", ids).Find(&result)
+	return result
 }
 
 func FindById(id string) gsmodel.GasStation {
@@ -168,8 +187,8 @@ func FindById(id string) gsmodel.GasStation {
 
 func FindPricesByStids(stids []string) []gsmodel.GasPrice {
 	var myGasPrice []gsmodel.GasPrice
-	threeMonthsAgo := time.Now().Add(time.Hour * -2160)
-	dateStr := fmt.Sprintf("%04d-%02d-%02d", threeMonthsAgo.Year(), threeMonthsAgo.Month(), threeMonthsAgo.Day())
+	oneMonthAgo := time.Now().Add(time.Hour * -720)
+	dateStr := fmt.Sprintf("%04d-%02d-%02d", oneMonthAgo.Year(), oneMonthAgo.Month(), oneMonthAgo.Day())
 	//log.Printf("Cut off date: %v", dateStr)
 	cunckedSelects := strings.ToLower(strings.TrimSpace(os.Getenv("DB_CHUNKED_SELECTS")))
 	chunkSize := 10000
