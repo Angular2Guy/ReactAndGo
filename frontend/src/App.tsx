@@ -3,6 +3,7 @@ import './App.css';
 import Header from './components/Header';
 import Form from './components/Form';
 import TodoList from './components/TodoList';
+import Modal from './components/Modal';
 
 export interface TodoItem1 {
   name: string;
@@ -14,6 +15,7 @@ function App() {
   const [todoList, setTodoList] = useState([] as TodoItem1[]);
   return (
     <div className="App">
+      <Modal/>
       <Header></Header>
       <Form todo={todo} setTodo={setTodo} todoList={todoList} setTodoList={setTodoList}></Form>
       <TodoList todoList={todoList} setTodoList={setTodoList}></TodoList>
