@@ -6,7 +6,6 @@ import (
 	"angular-and-go/pkd/gasstation/gsmodel"
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"strings"
 	"time"
@@ -252,16 +251,16 @@ func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasSta
 	if myRadius > 20.0 {
 		myRadius = 20.1
 	}
-	northLat, northLng := calcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 0.0)
+	northLat, northLng := gsmodel.CalcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 0.0)
 	minMax = updateMinMaxSquare(northLat, northLng, minMax)
 	//fmt.Printf("NorthLat: %v, NorthLng: %v\n", northLat, northLng)
-	eastLat, eastLng := calcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 90.0)
+	eastLat, eastLng := gsmodel.CalcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 90.0)
 	minMax = updateMinMaxSquare(eastLat, eastLng, minMax)
 	//fmt.Printf("EastLat: %v, EastLng: %v\n", eastLat, eastLng)
-	southLat, southLng := calcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 180.0)
+	southLat, southLng := gsmodel.CalcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 180.0)
 	minMax = updateMinMaxSquare(southLat, southLng, minMax)
 	//fmt.Printf("SouthLat: %v, SouthLng: %v\n", southLat, southLng)
-	westLat, westLng := calcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 270.0)
+	westLat, westLng := gsmodel.CalcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 270.0)
 	minMax = updateMinMaxSquare(westLat, westLng, minMax)
 	//fmt.Printf("WestLat: %v, WestLng: %v\n", westLat, westLng)
 	//fmt.Printf("MinLat: %v, MinLng: %v, MaxLat: %v, MaxLng: %v\n", minMax.MinLat, minMax.MinLng, minMax.MaxLat, minMax.MaxLng)
@@ -292,42 +291,6 @@ func chunkSlice[T any](mySlice []T, chunkSize int) (s [][]T) {
 
 	}
 	return result
-}
-
-/*
-	func calcDistance(startLat float64, startLng float64, destLat float64, destLng float64) (float64, float64) {
-		var radStartLat = toRad(startLat)
-		var radDestLat = toRad(destLat)
-		var radDeltaLat = toRad(destLat - startLat)
-		var radDeltaLng = toRad(destLng - startLng)
-		//distance
-		var a = math.Sin(radDeltaLat/2)*math.Sin(radDeltaLat/2) + math.Cos(radStartLat)*math.Cos(radDestLat)*math.Sin(radDeltaLng/2)*math.Sin(radDeltaLng/2)
-		var c = 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
-		var distance = earthRadius * c
-		//bearing
-		var y = math.Sin(radDeltaLng) * math.Cos(radDestLat)
-		var x = math.Cos(radStartLat)*math.Sin(radDestLat) - math.Sin(radStartLat)*math.Cos(radDestLat)*math.Cos(radDeltaLng)
-		var bearing = math.Mod((toDeg(math.Atan2(y, x)) + 360.0), 360.0)
-		return distance, bearing
-	}
-*/
-func calcLocation(startLat float64, startLng float64, distanceKm float64, bearing float64) (float64, float64) {
-	var radBearing = toRad(bearing)
-	var radStartLat = toRad(startLat)
-	var radStartLng = toRad(startLng)
-	var radDestLat = math.Asin(math.Sin(radStartLat)*math.Cos(distanceKm/earthRadius) + math.Cos(radStartLat)*math.Sin(distanceKm/earthRadius)*math.Cos(radBearing))
-	var radDestLng = radStartLng + math.Atan2(math.Sin(radBearing)*math.Sin(distanceKm/earthRadius)*math.Cos(radStartLat), math.Cos(distanceKm/earthRadius)-math.Sin(radStartLat)*math.Sin(radDestLat))
-	destLat := toDeg(radDestLat)
-	destLng := toDeg(radDestLng)
-	return destLat, destLng
-}
-
-func toRad(myValue float64) float64 {
-	return myValue * math.Pi / 180
-}
-
-func toDeg(myValue float64) float64 {
-	return myValue * 180 / math.Pi
 }
 
 func updateMinMaxSquare(newLat float64, newLng float64, minMax minMaxSquare) minMaxSquare {

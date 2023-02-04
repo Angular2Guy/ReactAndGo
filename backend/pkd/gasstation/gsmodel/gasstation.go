@@ -32,13 +32,14 @@ type GasStation struct {
 type MyGasStation interface {
 	GasStation
 	CalcDistance(startLat float64, startLng float64) (float64, float64)
+	CalcLocation(startLat float64, startLng float64, distanceKm float64, bearing float64) (float64, float64)
 }
 
 func (gasStation GasStation) CalcDistanceBearing(startLat float64, startLng float64) (float64, float64) {
-	var radStartLat = toRad1(startLat)
-	var radDestLat = toRad1(gasStation.Latitude)
-	var radDeltaLat = toRad1(gasStation.Latitude - startLat)
-	var radDeltaLng = toRad1(gasStation.Longitude - startLng)
+	var radStartLat = toRad(startLat)
+	var radDestLat = toRad(gasStation.Latitude)
+	var radDeltaLat = toRad(gasStation.Latitude - startLat)
+	var radDeltaLng = toRad(gasStation.Longitude - startLng)
 	//distance
 	var a = math.Sin(radDeltaLat/2)*math.Sin(radDeltaLat/2) + math.Cos(radStartLat)*math.Cos(radDestLat)*math.Sin(radDeltaLng/2)*math.Sin(radDeltaLng/2)
 	var c = 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
@@ -46,14 +47,25 @@ func (gasStation GasStation) CalcDistanceBearing(startLat float64, startLng floa
 	//bearing
 	var y = math.Sin(radDeltaLng) * math.Cos(radDestLat)
 	var x = math.Cos(radStartLat)*math.Sin(radDestLat) - math.Sin(radStartLat)*math.Cos(radDestLat)*math.Cos(radDeltaLng)
-	var bearing = math.Mod((toDeg1(math.Atan2(y, x)) + 360.0), 360.0)
+	var bearing = math.Mod((toDeg(math.Atan2(y, x)) + 360.0), 360.0)
 	return distance, bearing
 }
 
-func toRad1(myValue float64) float64 {
+func CalcLocation(startLat float64, startLng float64, distanceKm float64, bearing float64) (float64, float64) {
+	var radBearing = toRad(bearing)
+	var radStartLat = toRad(startLat)
+	var radStartLng = toRad(startLng)
+	var radDestLat = math.Asin(math.Sin(radStartLat)*math.Cos(distanceKm/earthRadius) + math.Cos(radStartLat)*math.Sin(distanceKm/earthRadius)*math.Cos(radBearing))
+	var radDestLng = radStartLng + math.Atan2(math.Sin(radBearing)*math.Sin(distanceKm/earthRadius)*math.Cos(radStartLat), math.Cos(distanceKm/earthRadius)-math.Sin(radStartLat)*math.Sin(radDestLat))
+	destLat := toDeg(radDestLat)
+	destLng := toDeg(radDestLng)
+	return destLat, destLng
+}
+
+func toRad(myValue float64) float64 {
 	return myValue * math.Pi / 180
 }
 
-func toDeg1(myValue float64) float64 {
+func toDeg(myValue float64) float64 {
 	return myValue * 180 / math.Pi
 }
