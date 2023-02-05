@@ -1,4 +1,4 @@
-import styles from "../style.module.css";
+import styles from "../style.module.scss";
 import {TodoItem1} from "../App";
 import React from "react";
 

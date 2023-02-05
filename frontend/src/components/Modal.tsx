@@ -1,6 +1,6 @@
 import {createPortal} from "react-dom";
 import { useRecoilState } from "recoil";
-import styles from './modal.module.css';
+import styles from './modal.module.scss';
 import GlobalState from "../GlobalState";
 import { useState } from "react";
 
