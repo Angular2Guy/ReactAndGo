@@ -2,10 +2,29 @@
     color: #000000;
 }
 .userNameInput {
-    font-size: 12px;
+    margin-top: 10px;
+    width: 100%;
+    font-size: 16px;
+    text-align: center;
+}
+.modalButtons {
+    display: flex;
+    margin-top: 10px;
+    justify-content: space-evenly;
+    height: 40px;
 }
 .loginButton {
+    width: 45%;
+    height: 100%;
     background-color: #0000ff;
+    border-radius: 5px;
+    color: #ffffff;
+}
+
+.cancelButton {
+    width: 45%;
+    height: 100%;
+    background-color: #4444ff;
     border-radius: 5px;
     color: #ffffff;
 }
