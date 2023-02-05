@@ -1,0 +1,11 @@
+.modalForm {
+    color: #000000;
+}
+.userNameInput {
+    font-size: 12px;
+}
+.loginButton {
+    background-color: #0000ff;
+    border-radius: 5px;
+    color: #ffffff;
+}

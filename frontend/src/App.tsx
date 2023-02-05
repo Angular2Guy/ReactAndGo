@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+//import React, { useState } from 'react';
 import './App.css';
 import Header from './components/Header';
-import Form from './components/Form';
-import TodoList from './components/TodoList';
+//import Form from './components/Form';
+//import TodoList from './components/TodoList';
 import Modal from './components/Modal';
+import { RecoilRoot } from 'recoil';
 
 export interface TodoItem1 {
   name: string;
@@ -11,14 +12,18 @@ export interface TodoItem1 {
 }
 
 function App() {
-  const [todo, setTodo] = useState('');
-  const [todoList, setTodoList] = useState([] as TodoItem1[]);
+  //const [todo, setTodo] = useState('');
+  //const [todoList, setTodoList] = useState([] as TodoItem1[]);
   return (
     <div className="App">
+      <RecoilRoot>
+      <Header/>
       <Modal/>
-      <Header></Header>
+      {/*
       <Form todo={todo} setTodo={setTodo} todoList={todoList} setTodoList={setTodoList}></Form>
       <TodoList todoList={todoList} setTodoList={setTodoList}></TodoList>
+      */}
+      </RecoilRoot>
     </div>
   );
 }
