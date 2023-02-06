@@ -1,5 +1,5 @@
 import { useRecoilState } from "recoil";
-import styles from './modal.module.scss';
+//import styles from './modal.module.scss';
 import GlobalState from "../GlobalState";
 import { useState } from "react";
 import Button from '@mui/material/Button';
@@ -10,6 +10,17 @@ import Tab from '@mui/material/Tab';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 
+interface UserRequest {
+    Username:  string
+	Password:  string
+	Latitude?: number
+	Longitude?: number
+}
+
+interface UserResponse {
+    Token?:  string
+	Message?: string
+}
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -52,8 +63,18 @@ const Modal = () => {
 const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     setPassword2(event.currentTarget.value as string);      
 };
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();      
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify({ Username: userName, Password: password1, Latitude: 0.0, Longitude: 0.0 } as UserRequest)
+    };
+    //const httpResponse = activeTab === 0 ? await fetch('/appuser/login', requestOptions) : await fetch('/appuser/signin', requestOptions);
+    //for testing
+    const httpResponse = activeTab === 0 ? await fetch('http://localhost:3000/appuser/login', requestOptions) : await fetch('http://localhost:3000/appuser/signin', requestOptions);
+    const userResponse = await httpResponse.json() as UserResponse;
+    console.log(userResponse);
       setGlobalUserName(userName);
       setUserName('');
       setOpen(false);      
