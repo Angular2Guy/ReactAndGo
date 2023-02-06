@@ -2,13 +2,7 @@ import { useRecoilState } from "recoil";
 //import styles from './modal.module.scss';
 import GlobalState from "../GlobalState";
 import { useState } from "react";
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
+import {Box,TextField,Tab,Tabs,Button,Dialog,DialogContent} from '@mui/material';
 
 interface UserRequest {
     Username:  string
@@ -70,9 +64,7 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
         headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({ Username: userName, Password: password1, Latitude: 0.0, Longitude: 0.0 } as UserRequest)
     };
-    //const httpResponse = activeTab === 0 ? await fetch('/appuser/login', requestOptions) : await fetch('/appuser/signin', requestOptions);
-    //for testing
-    const httpResponse = activeTab === 0 ? await fetch('http://localhost:3000/appuser/login', requestOptions) : await fetch('http://localhost:3000/appuser/signin', requestOptions);
+    const httpResponse = activeTab === 0 ? await fetch('/appuser/login', requestOptions) : await fetch('/appuser/signin', requestOptions);
     const userResponse = await httpResponse.json() as UserResponse;
     console.log(userResponse);
       setGlobalUserName(userName);
