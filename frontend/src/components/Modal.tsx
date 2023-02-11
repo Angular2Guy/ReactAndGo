@@ -1,8 +1,9 @@
 import { useRecoilState } from "recoil";
-//import styles from './modal.module.scss';
+import styles from './modal.module.scss';
 import GlobalState from "../GlobalState";
 import { useState } from "react";
 import {Box,TextField,Tab,Tabs,Button,Dialog,DialogContent} from '@mui/material';
+//import { Token } from "@mui/icons-material";
 
 interface UserRequest {
     Username:  string
@@ -42,9 +43,11 @@ interface TabPanelProps {
 
 const Modal = () => {
    const [globalUserName, setGlobalUserName] = useRecoilState(GlobalState.userNameState);
+   const [globalJwtToken, setGlobalJwtToken] = useRecoilState(GlobalState.jwtTokenState);
    const [userName, setUserName] = useState('');
    const [password1, setPassword1] = useState('');
    const [password2, setPassword2] = useState('');
+   const [responseMsg, setResponseMsg] = useState('');
    const [open, setOpen] = useState(true);
    const [activeTab, setActiveTab] = useState(0);
 
@@ -64,24 +67,32 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
         headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({ Username: userName, Password: password1, Latitude: 0.0, Longitude: 0.0 } as UserRequest)
     };
+    setResponseMsg('');
     const httpResponse = activeTab === 0 ? await fetch('/appuser/login', requestOptions) : await fetch('/appuser/signin', requestOptions);
     const userResponse = await httpResponse.json() as UserResponse;
     console.log(userResponse);
-      setGlobalUserName(userName);
+    if(!userResponse?.Message && !!userResponse?.Token && userResponse.Token?.length > 10) {
+      setGlobalUserName(userName);  
+      setGlobalJwtToken(userResponse.Token);    
       setUserName('');
-      setOpen(false);      
+      setOpen(false);               
+    } else if(!!userResponse?.Message) {
+      setResponseMsg(userResponse.Message);
+    }
   }
   const handleCancel = (event: React.FormEvent) => {
    event.preventDefault();
       setUserName('');
       setPassword1('');
       setPassword2('');
+      setResponseMsg('');
   };
   const handleClose = () => {
     //setOpen(false);
   };
   const handleTabChange = (event: React.BaseSyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
+    setResponseMsg('');
   };
   const a11yProps = (index: number) => {
     return {
@@ -123,10 +134,16 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
             type="password"
             fullWidth
             variant="standard"
-          />      
+          />
+          <div>
             <Button type="submit">Ok</Button>
-          <Button onClick={handleCancel}>Cancel</Button>
-          <div>GlobalUserName: {globalUserName}</div>
+          <Button onClick={handleCancel}>Cancel</Button>   
+          </div>                
+          <div className={styles.responseMsg}>
+          {[responseMsg].filter(value => !!value).map((value,index) => 
+              <span key={index}>Message: {value}</span>
+              )}          
+          </div> 
       </Box>
       </TabPanel>
       <TabPanel value={activeTab} index={1}>
@@ -168,10 +185,16 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
             type="password"
             fullWidth
             variant="standard"
-          />      
+          />   
+          <div>
             <Button type="submit">Ok</Button>
-          <Button onClick={handleCancel}>Cancel</Button>
-          <div>GlobalUserName: {globalUserName}</div>
+          <Button onClick={handleCancel}>Cancel</Button>          
+          </div>  
+          <div className={styles.responseMsg}>
+          {[responseMsg].filter(value => !!value).map((value,index) => 
+              <span key={index}>Message: {value}</span>
+              )}
+          </div> 
       </Box>
       </TabPanel>      
         </DialogContent>
