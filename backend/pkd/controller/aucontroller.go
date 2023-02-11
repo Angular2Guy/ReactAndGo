@@ -2,12 +2,19 @@ package controller
 
 import (
 	"angular-and-go/pkd/appuser"
+	aufile "angular-and-go/pkd/appuser/file"
 	aubody "angular-and-go/pkd/controller/aumodel"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+func getPlzCoordinates(c *gin.Context) {
+	filePath := c.Params.ByName("path")
+	aufile.UpdatePlzCoordinates(filePath)
+
+}
 
 func postSignin(c *gin.Context) {
 	//jsonData, err := ioutil.ReadAll(c.Request.Body)
