@@ -11,7 +11,7 @@ import (
 )
 
 func getPlzCoordinates(c *gin.Context) {
-	filePath := c.Params.ByName("path")
+	filePath := c.Params.ByName("filename")
 	aufile.UpdatePlzCoordinates(filePath)
 
 }
