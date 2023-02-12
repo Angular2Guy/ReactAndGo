@@ -78,7 +78,41 @@ func createPostCode(plzContainer *plzContainer) PostCodeData {
 	postCodeData.PostCode = plzContainer.Properties.Plz
 	postCodeData.SquareKM = plzContainer.Properties.SquareKM
 	postCodeData.Population = plzContainer.Properties.Population
-	postCodeData.CenterLongitude = 0.0
-	postCodeData.CenterLatitude = 0.0
+	postCodeData.CenterLongitude, postCodeData.CenterLatitude = calcCentroid(plzContainer)
 	return postCodeData
+}
+
+func calcCentroid(plzContainer *plzContainer) (float64, float64) {
+	polygonArea := calcPolygonArea(plzContainer)
+	//log.Printf("PolygonArea: %v", polygonArea)
+	coordinateLists := plzContainer.Geometry.Coordinates
+	centerLongitude := 0.0
+	centerLatitude := 0.0
+	for _, coordinateTuples := range coordinateLists {
+		for index, coordinateTuple := range coordinateTuples {
+			if index >= len(coordinateTuples)-1 {
+				continue
+			}
+			centerLongitude += (coordinateTuple[0] + coordinateTuples[index+1][0]) * (coordinateTuple[0]*coordinateTuples[index+1][1] - coordinateTuples[index+1][0]*coordinateTuple[1])
+			centerLatitude += (coordinateTuple[1] + coordinateTuples[index+1][1]) * (coordinateTuple[0]*coordinateTuples[index+1][1] - coordinateTuples[index+1][0]*coordinateTuple[1])
+		}
+	}
+	centerLongitude = centerLongitude / (6 * polygonArea)
+	centerLatitude = centerLatitude / (6 * polygonArea)
+	return centerLongitude, centerLatitude
+}
+
+func calcPolygonArea(plzContainer *plzContainer) float64 {
+	coordinateLists := plzContainer.Geometry.Coordinates
+	polygonArea := 0.0
+	for _, coordinateTuples := range coordinateLists {
+		for index, coordinateTuple := range coordinateTuples {
+			if index >= len(coordinateTuples)-1 {
+				continue
+			}
+			polygonArea += coordinateTuple[0]*coordinateTuples[index+1][1] - coordinateTuples[index+1][0]*coordinateTuple[1]
+		}
+	}
+	polygonArea = polygonArea / 2
+	return polygonArea
 }
