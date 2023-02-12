@@ -11,9 +11,8 @@ import (
 )
 
 func getPlzCoordinates(c *gin.Context) {
-	filePath := c.Params.ByName("filename")
+	filePath := c.Query("filename")
 	aufile.UpdatePlzCoordinates(filePath)
-
 }
 
 func postSignin(c *gin.Context) {

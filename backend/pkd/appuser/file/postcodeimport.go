@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"compress/gzip"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -41,17 +42,17 @@ type PostCodeData struct {
 }
 
 func UpdatePlzCoordinates(fileName string) {
-	filePath := strings.ToLower(strings.TrimSpace(os.Getenv("PLZ_IMPORT_PATH")))
+	filePath := strings.TrimSpace(os.Getenv("PLZ_IMPORT_PATH"))
 	log.Printf("File: %v%v", filePath, fileName)
-	file, err := os.Open(fileName)
+	file, err := os.Open(fmt.Sprintf("%v%v", filePath, strings.TrimSpace(fileName)))
 	defer file.Close()
 	if err != nil {
-		log.Printf("Failed to open file: %v, %v\n", fileName, err.Error())
+		log.Printf("Failed to open file: %v, %v\n", fmt.Sprintf("%v%v", filePath, strings.TrimSpace(fileName)), err.Error())
 		return
 	}
 	gzReader, err := gzip.NewReader(bufio.NewReader(file))
 	if err != nil {
-		log.Printf("Failed to gzip reader: %v, %v\n", fileName, err.Error())
+		log.Printf("Failed to create buffered gzip reader: %v, %v\n", fmt.Sprintf("%v%v", filePath, strings.TrimSpace(fileName)), err.Error())
 		return
 	}
 	defer gzReader.Close()
@@ -59,6 +60,7 @@ func UpdatePlzCoordinates(fileName string) {
 	jsonDecoder := json.NewDecoder(gzReader)
 	plzContainerNumber := 0
 
+	jsonDecoder.Token()
 	for jsonDecoder.More() {
 		myPlzContainer := plzContainer{}
 		jsonDecoder.Decode(&myPlzContainer)
@@ -66,6 +68,7 @@ func UpdatePlzCoordinates(fileName string) {
 		myPostCode := createPostCode(&myPlzContainer)
 		log.Printf("PostCode: %v\n", myPostCode)
 	}
+	jsonDecoder.Token()
 	log.Printf("Number of postcodes: %v", plzContainerNumber)
 }
 
@@ -74,6 +77,7 @@ func createPostCode(plzContainer *plzContainer) PostCodeData {
 	postCodeData.Label = plzContainer.Properties.Label
 	postCodeData.PostCode = plzContainer.Properties.Plz
 	postCodeData.SquareKM = plzContainer.Properties.SquareKM
+	postCodeData.Population = plzContainer.Properties.Population
 	postCodeData.CenterLongitude = 0.0
 	postCodeData.CenterLatitude = 0.0
 	return postCodeData
