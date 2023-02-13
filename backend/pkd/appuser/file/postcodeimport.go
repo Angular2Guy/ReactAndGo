@@ -41,7 +41,7 @@ type PostCodeData struct {
 	CenterLatitude  float64
 }
 
-func UpdatePlzCoordinates(fileName string) {
+func UpdatePostCodeCoordinates(fileName string) {
 	filePath := strings.TrimSpace(os.Getenv("PLZ_IMPORT_PATH"))
 	log.Printf("File: %v%v", filePath, fileName)
 	file, err := os.Open(fmt.Sprintf("%v%v", filePath, strings.TrimSpace(fileName)))

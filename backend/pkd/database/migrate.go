@@ -20,5 +20,8 @@ func MigrateDB() {
 	if !DB.Migrator().HasTable(&aumodel.LoggedOutUser{}) {
 		DB.AutoMigrate(&aumodel.LoggedOutUser{})
 	}
+	if !DB.Migrator().HasTable(&aumodel.PostCodeLocation{}) {
+		DB.AutoMigrate(&aumodel.PostCodeLocation{})
+	}
 	log.Printf("DB Migration Done.")
 }

@@ -10,9 +10,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func getPlzCoordinates(c *gin.Context) {
+func getPostCodeCoordinates(c *gin.Context) {
 	filePath := c.Query("filename")
-	aufile.UpdatePlzCoordinates(filePath)
+	aufile.UpdatePostCodeCoordinates(filePath)
 }
 
 func postSignin(c *gin.Context) {
