@@ -1,6 +1,7 @@
 package aufile
 
 import (
+	appuser "angular-and-go/pkd/appuser"
 	"bufio"
 	"compress/gzip"
 	"encoding/json"
@@ -32,15 +33,6 @@ type plzContainer struct {
 	Geometry   plzPolygon    `json:"geometry"`
 }
 
-type PostCodeData struct {
-	Label           string
-	PostCode        int32
-	Population      int32
-	SquareKM        float32
-	CenterLongitude float64
-	CenterLatitude  float64
-}
-
 func UpdatePostCodeCoordinates(fileName string) {
 	filePath := strings.TrimSpace(os.Getenv("PLZ_IMPORT_PATH"))
 	log.Printf("File: %v%v", filePath, fileName)
@@ -59,6 +51,7 @@ func UpdatePostCodeCoordinates(fileName string) {
 
 	jsonDecoder := json.NewDecoder(gzReader)
 	plzContainerNumber := 0
+	result := []appuser.PostCodeData{}
 
 	jsonDecoder.Token()
 	for jsonDecoder.More() {
@@ -66,14 +59,16 @@ func UpdatePostCodeCoordinates(fileName string) {
 		jsonDecoder.Decode(&myPlzContainer)
 		plzContainerNumber++
 		myPostCode := createPostCode(&myPlzContainer)
-		log.Printf("PostCode: %v\n", myPostCode)
+		result = append(result, myPostCode)
+		//log.Printf("PostCode: %v\n", myPostCode)
 	}
 	jsonDecoder.Token()
-	log.Printf("Number of postcodes: %v", plzContainerNumber)
+	//log.Printf("Number of postcodes: %v\n", plzContainerNumber)
+	appuser.ImportPostCodeData(result)
 }
 
-func createPostCode(plzContainer *plzContainer) PostCodeData {
-	postCodeData := PostCodeData{}
+func createPostCode(plzContainer *plzContainer) appuser.PostCodeData {
+	postCodeData := appuser.PostCodeData{}
 	postCodeData.Label = plzContainer.Properties.Label
 	postCodeData.PostCode = plzContainer.Properties.Plz
 	postCodeData.SquareKM = plzContainer.Properties.SquareKM

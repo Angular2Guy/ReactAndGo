@@ -21,6 +21,15 @@ type AppUserIn struct {
 
 type SigninResult int
 
+type PostCodeData struct {
+	Label           string
+	PostCode        int32
+	Population      int32
+	SquareKM        float32
+	CenterLongitude float64
+	CenterLatitude  float64
+}
+
 const (
 	Ok SigninResult = iota
 	UsernameTaken
@@ -73,6 +82,32 @@ func Signin(appUserIn AppUserIn) SigninResult {
 		result = Failed
 	} else if result == Invalid {
 		result = Ok
+	}
+	return result
+}
+
+func ImportPostCodeData(postCodeData []PostCodeData) {
+	postCodeLocations := mapToPostCodeLocation(postCodeData)
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		for _, postCodeLocation := range postCodeLocations {
+			tx.Save(&postCodeLocation)
+		}
+		return nil
+	})
+	log.Printf("PostCodeLocations saved: %v\n", len(postCodeLocations))
+}
+
+func mapToPostCodeLocation(postCodeData []PostCodeData) []aumodel.PostCodeLocation {
+	result := []aumodel.PostCodeLocation{}
+	for _, myPostCodeData := range postCodeData {
+		myPostCodeLocation := aumodel.PostCodeLocation{}
+		myPostCodeLocation.Label = myPostCodeData.Label
+		myPostCodeLocation.PostCode = myPostCodeData.PostCode
+		myPostCodeLocation.Population = myPostCodeData.Population
+		myPostCodeLocation.SquareKM = myPostCodeData.SquareKM
+		myPostCodeLocation.CenterLongitude = myPostCodeData.CenterLongitude
+		myPostCodeLocation.CenterLatitude = myPostCodeData.CenterLatitude
+		result = append(result, myPostCodeLocation)
 	}
 	return result
 }
