@@ -3,8 +3,9 @@ import './App.scss';
 import Header from './components/Header';
 //import Form from './components/Form';
 //import TodoList from './components/TodoList';
-import Modal from './components/Modal';
+import LoginModal from './components/LoginModal';
 import { RecoilRoot } from 'recoil';
+import LocationModal from './components/LocationModal';
 
 export interface TodoItem1 {
   name: string;
@@ -18,7 +19,8 @@ function App() {
     <div className="App">
       <RecoilRoot>
       <Header/>
-      <Modal/>
+      <LoginModal/>
+      <LocationModal/>
       {/*
       <Form todo={todo} setTodo={setTodo} todoList={todoList} setTodoList={setTodoList}></Form>
       <TodoList todoList={todoList} setTodoList={setTodoList}></TodoList>

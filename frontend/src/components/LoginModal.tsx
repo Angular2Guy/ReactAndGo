@@ -2,7 +2,7 @@ import { useRecoilState } from "recoil";
 import styles from './modal.module.scss';
 import GlobalState from "../GlobalState";
 import { useState } from "react";
-import {Box,TextField,Tab,Tabs,Button,Dialog,DialogContent} from '@mui/material';
+import {Box,TextField,Button,Tab,Tabs,Dialog,DialogContent} from '@mui/material';
 //import { Token } from "@mui/icons-material";
 
 interface UserRequest {
@@ -41,7 +41,7 @@ interface TabPanelProps {
     );
   }
 
-const Modal = () => {
+const LoginModal = () => {
    const [globalUserName, setGlobalUserName] = useRecoilState(GlobalState.userNameState);
    const [globalJwtToken, setGlobalJwtToken] = useRecoilState(GlobalState.jwtTokenState);
    const [userName, setUserName] = useState('');
@@ -201,4 +201,4 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
         </Dialog>);
 }
 
-export default Modal;
+export default LoginModal;
