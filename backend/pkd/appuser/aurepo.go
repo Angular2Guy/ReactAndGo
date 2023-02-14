@@ -88,9 +88,27 @@ func Signin(appUserIn AppUserIn) SigninResult {
 
 func ImportPostCodeData(postCodeData []PostCodeData) {
 	postCodeLocations := mapToPostCodeLocation(postCodeData)
+	var oriPostCodeLocations []aumodel.PostCodeLocation
+	database.DB.Find(&oriPostCodeLocations)
+	postCodeLocationsMap := make(map[int32]aumodel.PostCodeLocation)
+	for _, oriPostCodeLocation := range oriPostCodeLocations {
+		postCodeLocationsMap[oriPostCodeLocation.PostCode] = oriPostCodeLocation
+	}
+
 	database.DB.Transaction(func(tx *gorm.DB) error {
 		for _, postCodeLocation := range postCodeLocations {
-			tx.Save(&postCodeLocation)
+			oriPostCodeLocation, exists := postCodeLocationsMap[postCodeLocation.PostCode]
+			if exists {
+				oriPostCodeLocation.Label = postCodeLocation.Label
+				oriPostCodeLocation.PostCode = postCodeLocation.PostCode
+				oriPostCodeLocation.Population = postCodeLocation.Population
+				oriPostCodeLocation.SquareKM = postCodeLocation.SquareKM
+				oriPostCodeLocation.CenterLongitude = postCodeLocation.CenterLongitude
+				oriPostCodeLocation.CenterLatitude = postCodeLocation.CenterLatitude
+				tx.Save(&oriPostCodeLocation)
+			} else {
+				tx.Save(&postCodeLocation)
+			}
 		}
 		return nil
 	})
