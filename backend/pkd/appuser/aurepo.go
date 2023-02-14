@@ -4,8 +4,10 @@ import (
 	"angular-and-go/pkd/appuser/aumodel"
 	"angular-and-go/pkd/database"
 	"angular-and-go/pkd/token"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -36,6 +38,13 @@ const (
 	Invalid
 	Failed
 )
+
+func FindLocation(locationStr string) []aumodel.PostCodeLocation {
+	result := []aumodel.PostCodeLocation{}
+	database.DB.Where("lower(label) like ?", fmt.Sprintf("%%%v%%", strings.ToLower(strings.TrimSpace(locationStr)))).Find(&result).Limit(20)
+	//log.Printf("Select: %v failed. %v", fmt.Sprintf("%%%v%%", strings.ToLower(strings.TrimSpace(locationStr))), err)
+	return result
+}
 
 func Login(appUserIn AppUserIn) (string, int) {
 	result := ""

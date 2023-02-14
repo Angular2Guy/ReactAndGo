@@ -11,6 +11,7 @@ func Start() {
 	router := gin.Default()
 	router.POST("/appuser/signin", postSignin)
 	router.POST("/appuser/login", postLogin)
+	router.GET("/appuser/location", getLocation)
 	router.GET("/config/updategs", token.CheckToken, gsclient.UpdateGasStations)
 	router.GET("/config/updatepc", token.CheckToken, getPostCodeCoordinates)
 	router.GET("/gasprice/:id", token.CheckToken, getGasPriceByGasStationId)

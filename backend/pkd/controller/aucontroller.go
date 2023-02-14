@@ -2,6 +2,7 @@ package controller
 
 import (
 	"angular-and-go/pkd/appuser"
+	"angular-and-go/pkd/appuser/aumodel"
 	aufile "angular-and-go/pkd/appuser/file"
 	aubody "angular-and-go/pkd/controller/aumodel"
 	"log"
@@ -9,6 +10,38 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+type postCodeLocationJson struct {
+	Longitude  float64
+	Latitude   float64
+	Label      string
+	PostCode   int32
+	SquareKM   float32
+	Population int32
+}
+
+func getLocation(c *gin.Context) {
+	locationStr := c.Query("location")
+	postCodeLocations := appuser.FindLocation(locationStr)
+	myPostCodeLocations := mapToPostCodeLocation(postCodeLocations)
+	c.JSON(http.StatusOK, myPostCodeLocations)
+}
+
+func mapToPostCodeLocation(postCodeLocations []aumodel.PostCodeLocation) []postCodeLocationJson {
+	result := []postCodeLocationJson{}
+	for _, postCodeLocation := range postCodeLocations {
+		myPostCodeLocation := postCodeLocationJson{
+			Longitude:  postCodeLocation.CenterLongitude,
+			Latitude:   postCodeLocation.CenterLatitude,
+			Label:      postCodeLocation.Label,
+			PostCode:   postCodeLocation.PostCode,
+			SquareKM:   postCodeLocation.SquareKM,
+			Population: postCodeLocation.Population,
+		}
+		result = append(result, myPostCodeLocation)
+	}
+	return result
+}
 
 func getPostCodeCoordinates(c *gin.Context) {
 	filePath := c.Query("filename")
