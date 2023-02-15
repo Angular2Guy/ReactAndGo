@@ -11,15 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type postCodeLocationJson struct {
-	Longitude  float64
-	Latitude   float64
-	Label      string
-	PostCode   int32
-	SquareKM   float32
-	Population int32
-}
-
 func getLocation(c *gin.Context) {
 	locationStr := c.Query("location")
 	postCodeLocations := appuser.FindLocation(locationStr)
@@ -27,10 +18,10 @@ func getLocation(c *gin.Context) {
 	c.JSON(http.StatusOK, myPostCodeLocations)
 }
 
-func mapToPostCodeLocation(postCodeLocations []aumodel.PostCodeLocation) []postCodeLocationJson {
-	result := []postCodeLocationJson{}
+func mapToPostCodeLocation(postCodeLocations []aumodel.PostCodeLocation) []aubody.PostCodeLocationResponse {
+	result := []aubody.PostCodeLocationResponse{}
 	for _, postCodeLocation := range postCodeLocations {
-		myPostCodeLocation := postCodeLocationJson{
+		myPostCodeLocation := aubody.PostCodeLocationResponse{
 			Longitude:  postCodeLocation.CenterLongitude,
 			Latitude:   postCodeLocation.CenterLatitude,
 			Label:      postCodeLocation.Label,
