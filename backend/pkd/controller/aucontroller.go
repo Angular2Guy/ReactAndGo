@@ -50,7 +50,7 @@ func postSignin(c *gin.Context) {
 	if err := c.Bind(&appUserRequest); err != nil {
 		log.Printf("postSingin: %v", err.Error())
 	}
-	myAppUser := appuser.AppUserIn{Username: appUserRequest.Username, Password: appUserRequest.Password, Latitude: appUserRequest.Latitude, Uuid: "", Longitude: appUserRequest.Longitude}
+	myAppUser := appuser.AppUserIn{Username: appUserRequest.Username, Password: appUserRequest.Password, Uuid: ""}
 	result := appuser.Signin(myAppUser)
 	httpResult := http.StatusNotAcceptable
 	message := ""
@@ -67,12 +67,28 @@ func postLogin(c *gin.Context) {
 	if err := c.Bind(&appUserRequest); err != nil {
 		log.Printf("postLogin: %v", err.Error())
 	}
-	myAppUser := appuser.AppUserIn{Username: appUserRequest.Username, Password: appUserRequest.Password, Latitude: appUserRequest.Latitude, Uuid: "", Longitude: appUserRequest.Longitude}
-	result, status := appuser.Login(myAppUser)
+	myAppUser := appuser.AppUserIn{Username: appUserRequest.Username, Password: appUserRequest.Password, Uuid: ""}
+	result, status, userLongitude, userLatitude, searchRadius := appuser.Login(myAppUser)
 	var message = ""
 	if status != http.StatusOK {
 		message = "Login failed."
 	}
-	appAuResponse := aubody.AppUserResponse{Token: result, Message: message}
+	appAuResponse := aubody.AppUserResponse{Token: result, Message: message, Longitude: userLongitude, Latitude: userLatitude, SearchRadius: searchRadius}
 	c.JSON(status, appAuResponse)
+}
+
+func putUserLocationRadius(c *gin.Context) {
+	var appUserRequest aubody.AppUserRequest
+	if err := c.Bind(&appUserRequest); err != nil {
+		log.Printf("postLogin: %v", err.Error())
+	}
+	myAppUser := appuser.AppUserIn{Username: appUserRequest.Username, Uuid: "", Longitude: appUserRequest.Longitude, Latitude: appUserRequest.Latitude, SearchRadius: appUserRequest.SearchRadius}
+	result := appuser.StoreLocationAndRadius(myAppUser)
+	httpResult := http.StatusOK
+	message := "Ok"
+	if result != appuser.Ok {
+		httpResult = http.StatusBadRequest
+		message = "Invalid"
+	}
+	c.JSON(httpResult, aubody.AppUserResponse{Token: "", Message: message, Longitude: appUserRequest.Longitude, Latitude: appUserRequest.Latitude, SearchRadius: appUserRequest.SearchRadius})
 }

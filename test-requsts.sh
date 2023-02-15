@@ -9,3 +9,5 @@ curl -X POST http://localhost:3000/gasstation/search/location -H 'Content-Type: 
 curl -X POST http://localhost:3000/appuser/signin -H 'Content-Type: application/json' -d '{"Username": "Max123","Password": "Password123","Latitude": 54.824158,"Longitude": 8.346131}'
 
 curl -X POST http://localhost:3000/appuser/login -H 'Content-Type: application/json' -d '{"Username": "Max123","Password": "Password123"}'
+
+curl -X PUT http://localhost:3000/appuser/locationradius -H 'Content-Type: application/json' -d '{"Username": "Max123", "Latitude": 12.12, "Longitude": 21.21, "SearchRadius": 10.0}'

@@ -14,14 +14,15 @@ import (
 )
 
 type AppUserIn struct {
-	Username  string
-	Password  string
-	Uuid      string
-	Latitude  float64
-	Longitude float64
+	Username     string
+	Password     string
+	Uuid         string
+	Latitude     float64
+	Longitude    float64
+	SearchRadius float64
 }
 
-type SigninResult int
+type DbResult int
 
 type PostCodeData struct {
 	Label           string
@@ -33,7 +34,7 @@ type PostCodeData struct {
 }
 
 const (
-	Ok SigninResult = iota
+	Ok DbResult = iota
 	UsernameTaken
 	Invalid
 	Failed
@@ -46,18 +47,18 @@ func FindLocation(locationStr string) []aumodel.PostCodeLocation {
 	return result
 }
 
-func Login(appUserIn AppUserIn) (string, int) {
+func Login(appUserIn AppUserIn) (string, int, float64, float64, float64) {
 	result := ""
 	status := http.StatusUnauthorized
 	//log.Printf("%v", appUserIn.Username)
 	var appUser aumodel.AppUser
 	if err := database.DB.Where("username = ?", appUserIn.Username).First(&appUser); err.Error != nil {
 		log.Printf("User not found: %v error: %v\n", appUserIn.Username, err.Error)
-		return result, status
+		return result, status, 0.0, 0.0, 0.0
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(appUser.Password), []byte(appUserIn.Password)); err != nil {
 		log.Printf("Password wrong. Username: %v\n", appUser.Username)
-		return result, status
+		return result, status, 0.0, 0.0, 0.0
 	}
 	//jwt token creation
 	result, err := token.CreateToken(token.TokenUser{Username: appUser.Username, Roles: []string{"USERS"}})
@@ -66,11 +67,11 @@ func Login(appUserIn AppUserIn) (string, int) {
 	} else {
 		status = http.StatusOK
 	}
-	return result, status
+	return result, status, appUser.Longitude, appUser.Latitude, appUser.SearchRadius
 }
 
-func Signin(appUserIn AppUserIn) SigninResult {
-	var result SigninResult = Invalid
+func Signin(appUserIn AppUserIn) DbResult {
+	var result DbResult = Invalid
 	if len(appUserIn.Username) < 4 || len(appUserIn.Password) < 8 {
 		return result
 	}
@@ -82,8 +83,6 @@ func Signin(appUserIn AppUserIn) SigninResult {
 		}
 		appUser.Username = appUserIn.Username
 		appUser.Password = string(generatePasswordHash(appUserIn.Password))
-		appUser.Latitude = appUserIn.Latitude
-		appUser.Longitude = appUserIn.Longitude
 		tx.Save(&appUser)
 		return nil
 	})
@@ -95,6 +94,22 @@ func Signin(appUserIn AppUserIn) SigninResult {
 	return result
 }
 
+func StoreLocationAndRadius(appUserIn AppUserIn) DbResult {
+	result := Invalid
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		var appUser aumodel.AppUser
+		if err := tx.Where("username = ?", appUserIn.Username).Find(&appUser); err.Error == nil {
+			appUser.Longitude = appUserIn.Longitude
+			appUser.Latitude = appUserIn.Latitude
+			appUser.SearchRadius = appUserIn.SearchRadius
+			tx.Save(&appUser)
+			result = Ok
+		}
+		return nil
+	})
+	return result
+}
+
 func ImportPostCodeData(postCodeData []PostCodeData) {
 	postCodeLocations := mapToPostCodeLocation(postCodeData)
 	var oriPostCodeLocations []aumodel.PostCodeLocation
@@ -103,7 +118,6 @@ func ImportPostCodeData(postCodeData []PostCodeData) {
 	for _, oriPostCodeLocation := range oriPostCodeLocations {
 		postCodeLocationsMap[oriPostCodeLocation.PostCode] = oriPostCodeLocation
 	}
-
 	database.DB.Transaction(func(tx *gorm.DB) error {
 		for _, postCodeLocation := range postCodeLocations {
 			oriPostCodeLocation, exists := postCodeLocationsMap[postCodeLocation.PostCode]

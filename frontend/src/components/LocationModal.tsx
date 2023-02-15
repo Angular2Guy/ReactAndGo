@@ -17,18 +17,21 @@ const LocationModal = () => {
     const [options, setOptions] = useState([] as PostCodeLocation[]);    
     const [globalLocationModalState, setGlobalLocationModalState] = useRecoilState(GlobalState.locationModalState);
     const [globalJwtTokenState, setGlobalJwtTokenState] = useRecoilState(GlobalState.jwtTokenState);
+    const [userPostCodeLocation, setUserPostCodeLocation] = useState(null);
     
     useEffect(() => {
         if (!open) {
           setOptions([]);
         }
+
       }, [open]);
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         console.log("Submit: ",event);
     }
 
     const handleClose = (event: React.FormEvent) => {
-        setGlobalLocationModalState(false);
+        setGlobalLocationModalState(false);        
     } 
 
     const handleChange = async (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -42,8 +45,14 @@ const LocationModal = () => {
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` }            
         };
         const response = await fetch(`/appuser/location?location=${event.currentTarget.value}`, requestOptions);
-        //console.log(event.currentTarget.value);
-        console.log(response);
+        const locations = await response.json();        
+        setOptions(locations);
+        //console.log(locations);
+    }
+
+    const handleOptionChange = (event: React.SyntheticEvent<Element, Event>, value: string) =>{        
+        console.log(value);
+
     }
 
     return (<Dialog open={globalLocationModalState} className="backDrop">
@@ -62,10 +71,11 @@ const LocationModal = () => {
             onClose={() => {
                 setOpen(false);
               }}
-            style={{ width: 300 }}           
+            style={{ width: 300 }}  
+            onInputChange={handleOptionChange}         
             getOptionLabel={option => option.Label}
             options={options}
-            renderInput={(params) => <TextField {...params} label="Locations" onChange={ev => handleChange(ev)} />}
+            renderInput={(params) => <TextField {...params} label="Locations" onChange={handleChange} />}
         ></Autocomplete>
     </Box>
     </DialogContent>
