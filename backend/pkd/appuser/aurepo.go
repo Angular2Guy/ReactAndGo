@@ -41,7 +41,7 @@ const (
 
 func FindLocation(locationStr string) []aumodel.PostCodeLocation {
 	result := []aumodel.PostCodeLocation{}
-	database.DB.Where("lower(label) like ?", fmt.Sprintf("%%%v%%", strings.ToLower(strings.TrimSpace(locationStr)))).Find(&result).Limit(20)
+	database.DB.Where("lower(label) like ?", fmt.Sprintf("%%%v%%", strings.ToLower(strings.TrimSpace(locationStr)))).Limit(20).Find(&result)
 	//log.Printf("Select: %v failed. %v", fmt.Sprintf("%%%v%%", strings.ToLower(strings.TrimSpace(locationStr))), err)
 	return result
 }

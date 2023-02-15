@@ -6,6 +6,7 @@ import (
 	aufile "angular-and-go/pkd/appuser/file"
 	aubody "angular-and-go/pkd/controller/aumodel"
 	"log"
+	"math"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ import (
 func getLocation(c *gin.Context) {
 	locationStr := c.Query("location")
 	postCodeLocations := appuser.FindLocation(locationStr)
+	//log.Printf("Locations: %v", postCodeLocations)
 	myPostCodeLocations := mapToPostCodeLocation(postCodeLocations)
 	c.JSON(http.StatusOK, myPostCodeLocations)
 }
@@ -21,15 +23,17 @@ func getLocation(c *gin.Context) {
 func mapToPostCodeLocation(postCodeLocations []aumodel.PostCodeLocation) []aubody.PostCodeLocationResponse {
 	result := []aubody.PostCodeLocationResponse{}
 	for _, postCodeLocation := range postCodeLocations {
-		myPostCodeLocation := aubody.PostCodeLocationResponse{
-			Longitude:  postCodeLocation.CenterLongitude,
-			Latitude:   postCodeLocation.CenterLatitude,
-			Label:      postCodeLocation.Label,
-			PostCode:   postCodeLocation.PostCode,
-			SquareKM:   postCodeLocation.SquareKM,
-			Population: postCodeLocation.Population,
+		if !math.IsNaN(postCodeLocation.CenterLatitude) && !math.IsNaN(postCodeLocation.CenterLongitude) && !math.IsNaN(float64(postCodeLocation.SquareKM)) {
+			myPostCodeLocation := aubody.PostCodeLocationResponse{
+				Longitude:  postCodeLocation.CenterLongitude,
+				Latitude:   postCodeLocation.CenterLatitude,
+				Label:      postCodeLocation.Label,
+				PostCode:   postCodeLocation.PostCode,
+				SquareKM:   postCodeLocation.SquareKM,
+				Population: postCodeLocation.Population,
+			}
+			result = append(result, myPostCodeLocation)
 		}
-		result = append(result, myPostCodeLocation)
 	}
 	return result
 }

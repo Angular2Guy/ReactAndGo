@@ -22,6 +22,7 @@ const (
 
 const (
 	HeaderAuth     = "Authorization"
+	HeaderBearer   = "Bearer"
 	JwtTokenSecret = "JWT_TOKEN_SECRET"
 	TokenAuth      = "auth"
 	TokenSub       = "sub"
