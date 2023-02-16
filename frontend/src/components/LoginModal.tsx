@@ -12,9 +12,15 @@ interface UserRequest {
 	Longitude?: number
 }
 
-interface UserResponse {
+export interface UserResponse {
     Token?:  string
 	Message?: string
+  Longitude?: number
+	Latitude?: number
+	SearchRadius?: number
+	TargetDiesel?: number
+	TargetE5?: number
+	TargetE10?: number
 }
 
 interface TabPanelProps {
@@ -44,6 +50,7 @@ interface TabPanelProps {
 const LoginModal = () => {
    const [globalUserName, setGlobalUserName] = useRecoilState(GlobalState.userNameState);
    const [globalJwtToken, setGlobalJwtToken] = useRecoilState(GlobalState.jwtTokenState);
+   const [globalUserDataState, setGlobalUserDataState] = useRecoilState(GlobalState.userDataState);
    const [userName, setUserName] = useState('');
    const [password1, setPassword1] = useState('');
    const [password2, setPassword2] = useState('');
@@ -65,7 +72,7 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
       const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({ Username: userName, Password: password1, Latitude: 0.0, Longitude: 0.0 } as UserRequest)
+        body: JSON.stringify({ Username: userName, Password: password1 } as UserRequest)
     };
     setResponseMsg('');
     const httpResponse = activeTab === 0 ? await fetch('/appuser/login', requestOptions) : await fetch('/appuser/signin', requestOptions);
@@ -74,6 +81,7 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
     if(!userResponse?.Message && !!userResponse?.Token && userResponse.Token?.length > 10) {
       setGlobalUserName(userName);  
       setGlobalJwtToken(userResponse.Token);    
+      setGlobalUserDataState(userResponse);
       setUserName('');
       setOpen(false);               
     } else if(!!userResponse?.Message) {

@@ -17,13 +17,12 @@ const LocationModal = () => {
     const [options, setOptions] = useState([] as PostCodeLocation[]);    
     const [globalLocationModalState, setGlobalLocationModalState] = useRecoilState(GlobalState.locationModalState);
     const [globalJwtTokenState, setGlobalJwtTokenState] = useRecoilState(GlobalState.jwtTokenState);
-    const [userPostCodeLocation, setUserPostCodeLocation] = useState(null);
+    const [globalUserDataState, setGlobalUserDataState] = useRecoilState(GlobalState.userDataState);
     
     useEffect(() => {
         if (!open) {
           setOptions([]);
-        }
-
+        }            
       }, [open]);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

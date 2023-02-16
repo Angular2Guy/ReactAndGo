@@ -5,6 +5,10 @@ const GlobalState = {
         key: 'userNameState',
         default: '',
     }),
+    userDataState: atom({
+        key: 'userDataState',
+        default: {},
+    }),
     jwtTokenState: atom({
         key: 'jwtTokenState',
         default: '',
