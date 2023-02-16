@@ -1,6 +1,7 @@
 import { useRecoilState } from "recoil";
 import styles from './modal.module.scss';
 import GlobalState from "../GlobalState";
+import {UserDataState} from "../GlobalState";
 import { useState } from "react";
 import {Box,TextField,Button,Tab,Tabs,Dialog,DialogContent} from '@mui/material';
 //import { Token } from "@mui/icons-material";
@@ -81,7 +82,7 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
     if(!userResponse?.Message && !!userResponse?.Token && userResponse.Token?.length > 10) {
       setGlobalUserName(userName);  
       setGlobalJwtToken(userResponse.Token);    
-      setGlobalUserDataState(userResponse);
+      setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius} as UserDataState);
       setUserName('');
       setOpen(false);               
     } else if(!!userResponse?.Message) {
