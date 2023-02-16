@@ -1,8 +1,13 @@
 import { useRecoilState } from "recoil";
 import GlobalState from "../GlobalState";
 import {UserDataState} from "../GlobalState";
-import { useEffect,useState } from "react";
+import { useMemo,useEffect,useState } from "react";
 import {Box,TextField,Button,Dialog,DialogContent, Autocomplete} from '@mui/material';
+import {UserRequest, UserResponse} from "./LoginModal";
+
+export interface LocationModalProperties {
+    open: boolean;
+}
 
 interface PostCodeLocation {
 	Longitude:  number;
@@ -22,21 +27,27 @@ const LocationModal = () => {
     const [globalLocationModalState, setGlobalLocationModalState] = useRecoilState(GlobalState.locationModalState);
     const [globalJwtTokenState, setGlobalJwtTokenState] = useRecoilState(GlobalState.jwtTokenState);
     const [globalUserDataState, setGlobalUserDataState] = useRecoilState(GlobalState.userDataState);
+    const [globalUserNameState, setGlobalUserNameState] = useRecoilState(GlobalState.userNameState);
     
     useEffect(() => {
         if (!open) {
           setOptions([]);
-        }      
-        setLongitude(globalUserDataState.Longitude);
-        setLatitude(globalUserDataState.Latitude);      
-        setSearchRadius(globalUserDataState.SearchRadius);
-      }, [open]);
+        }                   
+      }, [open]);      
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         console.log("Submit: ",event);
-        setGlobalUserDataState({Latitude: latitude, Longitude: longitude, SearchRadius: searchRadius, 
+        const requestOptions = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}`},
+            body: JSON.stringify({Username: globalUserNameState, Password: '', Latitude: latitude, Longitude: longitude, SearchRadius: searchRadius} as UserRequest)             
+        };
+        const response = await fetch('/appuser/locationradius', requestOptions);
+        const userResponse = response.json() as UserResponse;
+        setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius, 
             TargetDiesel: globalUserDataState.TargetDiesel, TargetE10: globalUserDataState.TargetE10, TargetE5: globalUserDataState.TargetE5} as UserDataState);
+        setGlobalLocationModalState(false);
     }
 /*
     const handleClose = (event: React.FormEvent) => {
@@ -81,7 +92,14 @@ const LocationModal = () => {
         setGlobalLocationModalState(false);
     }
 
-    return (<Dialog open={globalLocationModalState} className="backDrop">
+    let dialogOpen = useMemo(() => {        
+        setLongitude(globalUserDataState.Longitude);
+        setLatitude(globalUserDataState.Latitude);      
+        setSearchRadius(globalUserDataState.SearchRadius);           
+        return globalLocationModalState;
+    }, [globalLocationModalState]);    
+
+    return (<Dialog open={dialogOpen} className="backDrop">
         <DialogContent>
          <Box
       component="form"     
@@ -114,8 +132,7 @@ const LocationModal = () => {
             label="Search Radius"
             type="string"
             fullWidth
-            variant="standard"
-          />      
+            variant="standard"/>      
           <div>
             <Button type="submit">Ok</Button>
             <Button onClick={handleCancel}>Cancel</Button>  

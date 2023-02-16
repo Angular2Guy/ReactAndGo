@@ -6,15 +6,16 @@ import { useState } from "react";
 import {Box,TextField,Button,Tab,Tabs,Dialog,DialogContent} from '@mui/material';
 //import { Token } from "@mui/icons-material";
 
-interface UserRequest {
+export interface UserRequest {
   Username:  string
 	Password:  string
 	Latitude?: number
 	Longitude?: number
+  SearchRadius?: number
 }
 
 export interface UserResponse {
-    Token?:  string
+  Token?:  string
 	Message?: string
   Longitude?: number
 	Latitude?: number
@@ -82,7 +83,8 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
     if(!userResponse?.Message && !!userResponse?.Token && userResponse.Token?.length > 10) {
       setGlobalUserName(userName);  
       setGlobalJwtToken(userResponse.Token);    
-      setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius} as UserDataState);
+      setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius,
+        TargetDiesel: globalUserDataState.TargetDiesel, TargetE10: globalUserDataState.TargetE10, TargetE5: globalUserDataState.TargetE5} as UserDataState);
       setUserName('');
       setOpen(false);               
     } else if(!!userResponse?.Message) {
