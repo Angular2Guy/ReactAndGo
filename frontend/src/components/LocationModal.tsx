@@ -1,4 +1,4 @@
-import { useRecoilState } from "recoil";
+import { useRecoilState,useRecoilValue } from "recoil";
 import GlobalState from "../GlobalState";
 import {UserDataState} from "../GlobalState";
 import { useMemo,useEffect,useState } from "react";
@@ -25,9 +25,9 @@ const LocationModal = () => {
     const [latitude, setLatitude] = useState(0);
     const [options, setOptions] = useState([] as PostCodeLocation[]);    
     const [globalLocationModalState, setGlobalLocationModalState] = useRecoilState(GlobalState.locationModalState);
-    const [globalJwtTokenState, setGlobalJwtTokenState] = useRecoilState(GlobalState.jwtTokenState);
+    const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
     const [globalUserDataState, setGlobalUserDataState] = useRecoilState(GlobalState.userDataState);
-    const [globalUserNameState, setGlobalUserNameState] = useRecoilState(GlobalState.userNameState);
+    const globalUserNameState = useRecoilValue(GlobalState.userNameState);
     
     useEffect(() => {
         if (!open) {
@@ -97,7 +97,7 @@ const LocationModal = () => {
         setLatitude(globalUserDataState.Latitude);      
         setSearchRadius(globalUserDataState.SearchRadius);           
         return globalLocationModalState;
-    }, [globalLocationModalState]);    
+    }, [globalLocationModalState, globalUserDataState.Longitude, globalUserDataState.Latitude, globalUserDataState.SearchRadius]);    
 
     return (<Dialog open={dialogOpen} className="backDrop">
         <DialogContent>

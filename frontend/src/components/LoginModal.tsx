@@ -1,4 +1,4 @@
-import { useRecoilState } from "recoil";
+import { useRecoilState,useSetRecoilState } from "recoil";
 import styles from './modal.module.scss';
 import GlobalState from "../GlobalState";
 import {UserDataState} from "../GlobalState";
@@ -50,8 +50,8 @@ interface TabPanelProps {
   }
 
 const LoginModal = () => {
-   const [globalUserName, setGlobalUserName] = useRecoilState(GlobalState.userNameState);
-   const [globalJwtToken, setGlobalJwtToken] = useRecoilState(GlobalState.jwtTokenState);
+   const setGlobalUserName = useSetRecoilState(GlobalState.userNameState);
+   const setGlobalJwtToken = useSetRecoilState(GlobalState.jwtTokenState);
    const [globalUserDataState, setGlobalUserDataState] = useRecoilState(GlobalState.userDataState);
    const [userName, setUserName] = useState('');
    const [password1, setPassword1] = useState('');
