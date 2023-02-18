@@ -25,6 +25,10 @@ const GlobalState = {
     locationModalState: atom({
         key: 'locationModalState',
         default: false
+    }),
+    targetPriceModalState: atom({
+        key: 'targetPriceModalState',
+        default: false
     })
 }
 export default GlobalState;

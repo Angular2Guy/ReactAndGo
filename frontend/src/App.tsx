@@ -6,6 +6,7 @@ import Header from './components/Header';
 import LoginModal from './components/LoginModal';
 import { RecoilRoot } from 'recoil';
 import LocationModal from './components/LocationModal';
+import TargetPriceModal from './components/TargetPriceModal';
 
 export interface TodoItem1 {
   name: string;
@@ -21,6 +22,7 @@ function App() {
       <Header/>
       <LoginModal/>
       <LocationModal/>
+      <TargetPriceModal/>
       {/*
       <Form todo={todo} setTodo={setTodo} todoList={todoList} setTodoList={setTodoList}></Form>
       <TodoList todoList={todoList} setTodoList={setTodoList}></TodoList>
