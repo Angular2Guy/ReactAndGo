@@ -5,10 +5,6 @@ import { useMemo,useEffect,useState } from "react";
 import {Box,TextField,Button,Dialog,DialogContent, Autocomplete} from '@mui/material';
 import {UserRequest, UserResponse} from "./LoginModal";
 
-export interface LocationModalProperties {
-    open: boolean;
-}
-
 interface PostCodeLocation {
 	Longitude:  number;
 	Latitude:  number;
