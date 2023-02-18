@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -20,6 +21,13 @@ type AppUserIn struct {
 	Latitude     float64
 	Longitude    float64
 	SearchRadius float64
+}
+
+type AppTargetIn struct {
+	Username     string
+	TargetDiesel string
+	TargetE10    string
+	TargetE5     string
 }
 
 type DbResult int
@@ -106,6 +114,40 @@ func StoreLocationAndRadius(appUserIn AppUserIn) DbResult {
 			result = Ok
 		}
 		return nil
+	})
+	return result
+}
+
+func StoreTargetPrices(appTargetIn AppTargetIn) DbResult {
+	result := Invalid
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		var appUser aumodel.AppUser
+		var txError error = nil
+		if err := tx.Where("username = ?", appTargetIn.Username).Find(&appUser); err.Error == nil {
+			if targetPrice, err := strconv.ParseInt(strings.ReplaceAll(appTargetIn.TargetDiesel, ".", ""), 10, 32); err == nil {
+				appUser.TargetDiesel = int(targetPrice)
+			} else {
+				log.Printf("TargetDiesel: %v\n", appTargetIn.TargetDiesel)
+				txError = err
+			}
+			if targetPrice, err := strconv.ParseInt(strings.ReplaceAll(appTargetIn.TargetE10, ".", ""), 10, 32); err == nil {
+				appUser.TargetE10 = int(targetPrice)
+			} else {
+				log.Printf("TargetE10: %v\n", appTargetIn.TargetE10)
+				txError = err
+			}
+			if targetPrice, err := strconv.ParseInt(strings.ReplaceAll(appTargetIn.TargetE5, ".", ""), 10, 32); err == nil {
+				appUser.TargetE5 = int(targetPrice)
+			} else {
+				log.Printf("TargetE5: %v\n", appTargetIn.TargetE5)
+				txError = err
+			}
+			if txError == nil {
+				tx.Save(&appUser)
+				result = Ok
+			}
+		}
+		return txError
 	})
 	return result
 }

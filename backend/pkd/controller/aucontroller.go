@@ -5,6 +5,7 @@ import (
 	"angular-and-go/pkd/appuser/aumodel"
 	aufile "angular-and-go/pkd/appuser/file"
 	aubody "angular-and-go/pkd/controller/aumodel"
+	"fmt"
 	"log"
 	"math"
 	"net/http"
@@ -74,14 +75,14 @@ func postLogin(c *gin.Context) {
 		message = "Login failed."
 	}
 	appAuResponse := aubody.AppUserResponse{Token: result, Message: message, Longitude: userLongitude, Latitude: userLatitude,
-		SearchRadius: searchRadius, TargetE5: targetE5, TargetE10: targetE10, TargetDiesel: targetDiesel}
+		SearchRadius: searchRadius, TargetE5: fmt.Sprintf("%v", (targetE5 / 1000)), TargetE10: fmt.Sprintf("%v", (targetE10 / 1000)), TargetDiesel: fmt.Sprintf("%v", (targetDiesel / 1000))}
 	c.JSON(status, appAuResponse)
 }
 
 func putUserLocationRadius(c *gin.Context) {
 	var appUserRequest aubody.AppUserRequest
 	if err := c.Bind(&appUserRequest); err != nil {
-		log.Printf("postLogin: %v", err.Error())
+		log.Printf("putUserLocationRadius: %v", err.Error())
 	}
 	myAppUser := appuser.AppUserIn{Username: appUserRequest.Username, Uuid: "", Longitude: appUserRequest.Longitude, Latitude: appUserRequest.Latitude, SearchRadius: appUserRequest.SearchRadius}
 	result := appuser.StoreLocationAndRadius(myAppUser)
@@ -91,5 +92,21 @@ func putUserLocationRadius(c *gin.Context) {
 		httpResult = http.StatusBadRequest
 		message = "Invalid"
 	}
-	c.JSON(httpResult, aubody.AppUserResponse{Token: "", Message: message, Longitude: appUserRequest.Longitude, Latitude: appUserRequest.Latitude, SearchRadius: appUserRequest.SearchRadius})
+	c.JSON(httpResult, aubody.AppUserResponse{Token: "", Message: message, Longitude: appUserRequest.Longitude, Latitude: appUserRequest.Latitude, SearchRadius: appUserRequest.SearchRadius, TargetDiesel: "0", TargetE10: "0", TargetE5: "0"})
+}
+
+func putTargetPrices(c *gin.Context) {
+	var appUserRequest aubody.AppUserRequest
+	if err := c.Bind(&appUserRequest); err != nil {
+		log.Printf("putUserLocationRadius: %v", err.Error())
+	}
+	myTargetPrices := appuser.AppTargetIn{Username: appUserRequest.Username, TargetDiesel: appUserRequest.TargetDiesel, TargetE10: appUserRequest.TargetE10, TargetE5: appUserRequest.TargetE5}
+	result := appuser.StoreTargetPrices(myTargetPrices)
+	httpResult := http.StatusOK
+	message := "Ok"
+	if result != appuser.Ok {
+		httpResult = http.StatusBadRequest
+		message = "Invalid"
+	}
+	c.JSON(httpResult, aubody.AppUserResponse{Token: "", Message: message, Longitude: 0.0, Latitude: 0.0, SearchRadius: 0.0, TargetDiesel: appUserRequest.TargetDiesel, TargetE10: appUserRequest.TargetE10, TargetE5: appUserRequest.TargetE5})
 }

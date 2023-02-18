@@ -6,7 +6,7 @@ type AppUserResponse struct {
 	Longitude    float64
 	Latitude     float64
 	SearchRadius float64
-	TargetDiesel int
-	TargetE5     int
-	TargetE10    int
+	TargetDiesel string
+	TargetE5     string
+	TargetE10    string
 }

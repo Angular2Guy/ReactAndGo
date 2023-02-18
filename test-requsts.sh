@@ -11,3 +11,5 @@ curl -X POST http://localhost:3000/appuser/signin -H 'Content-Type: application/
 curl -X POST http://localhost:3000/appuser/login -H 'Content-Type: application/json' -d '{"Username": "Max123","Password": "Password123"}'
 
 curl -X PUT http://localhost:3000/appuser/locationradius -H 'Content-Type: application/json' -d '{"Username": "Max123", "Latitude": 12.12, "Longitude": 21.21, "SearchRadius": 10.0}'
+
+curl -X PUT http://localhost:3000/appuser/targetprices -H 'Content-Type: application/json' -d '{"Username": "Max123", "TargetDiesel": "1.750", "TargetE10": "1.760", "TargetE5": "1.770"}'
