@@ -75,7 +75,7 @@ func postLogin(c *gin.Context) {
 		message = "Login failed."
 	}
 	appAuResponse := aubody.AppUserResponse{Token: result, Message: message, Longitude: userLongitude, Latitude: userLatitude,
-		SearchRadius: searchRadius, TargetE5: fmt.Sprintf("%v", (targetE5 / 1000)), TargetE10: fmt.Sprintf("%v", (targetE10 / 1000)), TargetDiesel: fmt.Sprintf("%v", (targetDiesel / 1000))}
+		SearchRadius: searchRadius, TargetE5: fmt.Sprintf("%v", (float64(targetE5) / 1000)), TargetE10: fmt.Sprintf("%v", (float64(targetE10) / 1000)), TargetDiesel: fmt.Sprintf("%v", (float64(targetDiesel) / 1000))}
 	c.JSON(status, appAuResponse)
 }
 
