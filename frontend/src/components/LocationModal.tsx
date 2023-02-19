@@ -6,6 +6,7 @@ import {Box,TextField,Button,Dialog,DialogContent, Autocomplete} from '@mui/mate
 import {UserRequest, UserResponse} from "./LoginModal";
 
 interface PostCodeLocation {
+    Message: string;
 	Longitude:  number;
 	Latitude:  number;
 	Label:      string;
@@ -35,7 +36,7 @@ const LocationModal = () => {
         event.preventDefault();
         console.log("Submit: ",event);
         const requestOptions = {
-            method: 'PUT',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}`},
             body: JSON.stringify({Username: globalUserNameState, Password: '', Latitude: latitude, Longitude: longitude, SearchRadius: searchRadius} as UserRequest)             
         };
@@ -89,6 +90,7 @@ const LocationModal = () => {
     }
 
     let dialogOpen = useMemo(() => {        
+        //console.log(globalUserDataState.Longitude+' '+globalUserDataState.Latitude);
         setLongitude(globalUserDataState.Longitude);
         setLatitude(globalUserDataState.Latitude);      
         setSearchRadius(globalUserDataState.SearchRadius);           

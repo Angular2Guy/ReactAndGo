@@ -1,4 +1,4 @@
-import { useRecoilState,useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import styles from './modal.module.scss';
 import GlobalState from "../GlobalState";
 import {UserDataState} from "../GlobalState";
@@ -52,7 +52,7 @@ interface TabPanelProps {
 const LoginModal = () => {
    const setGlobalUserName = useSetRecoilState(GlobalState.userNameState);
    const setGlobalJwtToken = useSetRecoilState(GlobalState.jwtTokenState);
-   const [globalUserDataState, setGlobalUserDataState] = useRecoilState(GlobalState.userDataState);
+   const setGlobalUserDataState = useSetRecoilState(GlobalState.userDataState);
    const [userName, setUserName] = useState('');
    const [password1, setPassword1] = useState('');
    const [password2, setPassword2] = useState('');
@@ -84,7 +84,7 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
       setGlobalUserName(userName);  
       setGlobalJwtToken(userResponse.Token);    
       setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius,
-        TargetDiesel: globalUserDataState.TargetDiesel, TargetE10: globalUserDataState.TargetE10, TargetE5: globalUserDataState.TargetE5} as UserDataState);
+        TargetDiesel: userResponse.TargetDiesel, TargetE10: userResponse.TargetE10, TargetE5: userResponse.TargetE5} as UserDataState);
       setUserName('');
       setOpen(false);               
     } else if(!!userResponse?.Message) {
