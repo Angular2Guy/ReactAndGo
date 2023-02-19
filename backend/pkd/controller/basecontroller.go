@@ -13,6 +13,7 @@ func Start() {
 	router.POST("/appuser/signin", postSignin)
 	router.POST("/appuser/login", postLogin)
 	router.GET("/appuser/location", token.CheckToken, getLocation)
+	router.GET("/appuser/refreshtoken", token.CheckToken, getRefreshToken)
 	router.POST("/appuser/locationradius", token.CheckToken, postUserLocationRadius)
 	router.POST("/appuser/targetprices", token.CheckToken, postTargetPrices)
 	router.GET("/config/updategs", token.CheckToken, gsclient.UpdateGasStations)

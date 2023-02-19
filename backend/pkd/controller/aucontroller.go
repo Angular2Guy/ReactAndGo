@@ -5,6 +5,7 @@ import (
 	"angular-and-go/pkd/appuser/aumodel"
 	aufile "angular-and-go/pkd/appuser/file"
 	aubody "angular-and-go/pkd/controller/aumodel"
+	token "angular-and-go/pkd/token"
 	"fmt"
 	"log"
 	"math"
@@ -12,6 +13,26 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+func getRefreshToken(c *gin.Context) {
+	status := http.StatusUnauthorized
+	message := "Invalid"
+	result := ""
+	userName, exits := c.Get("user")
+	roles, exists2 := c.Get("roles")
+	if exits && exists2 {
+		//jwt token creation
+		var err error
+		result, err = token.CreateToken(token.TokenUser{Username: userName.(string), Roles: []string{roles.(string)}})
+		if err != nil {
+			log.Printf("Failed to create jwt token: %v\n", err)
+		} else {
+			status = http.StatusOK
+			message = ""
+		}
+	}
+	c.JSON(status, aubody.AppUserResponse{Token: result, Message: message})
+}
 
 func getLocation(c *gin.Context) {
 	locationStr := c.Query("location")
