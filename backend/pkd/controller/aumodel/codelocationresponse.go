@@ -1,6 +1,7 @@
 package aubody
 
-type PostCodeLocationResponse struct {
+type CodeLocationResponse struct {
+	Message    string
 	Longitude  float64
 	Latitude   float64
 	Label      string

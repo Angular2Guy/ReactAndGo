@@ -21,11 +21,11 @@ func getLocation(c *gin.Context) {
 	c.JSON(http.StatusOK, myPostCodeLocations)
 }
 
-func mapToPostCodeLocation(postCodeLocations []aumodel.PostCodeLocation) []aubody.PostCodeLocationResponse {
-	result := []aubody.PostCodeLocationResponse{}
+func mapToPostCodeLocation(postCodeLocations []aumodel.PostCodeLocation) []aubody.CodeLocationResponse {
+	result := []aubody.CodeLocationResponse{}
 	for _, postCodeLocation := range postCodeLocations {
 		if !math.IsNaN(postCodeLocation.CenterLatitude) && !math.IsNaN(postCodeLocation.CenterLongitude) && !math.IsNaN(float64(postCodeLocation.SquareKM)) {
-			myPostCodeLocation := aubody.PostCodeLocationResponse{
+			myPostCodeLocation := aubody.CodeLocationResponse{
 				Longitude:  postCodeLocation.CenterLongitude,
 				Latitude:   postCodeLocation.CenterLatitude,
 				Label:      postCodeLocation.Label,
@@ -79,7 +79,7 @@ func postLogin(c *gin.Context) {
 	c.JSON(status, appAuResponse)
 }
 
-func putUserLocationRadius(c *gin.Context) {
+func postUserLocationRadius(c *gin.Context) {
 	var appUserRequest aubody.AppUserRequest
 	if err := c.Bind(&appUserRequest); err != nil {
 		log.Printf("putUserLocationRadius: %v", err.Error())
@@ -92,10 +92,10 @@ func putUserLocationRadius(c *gin.Context) {
 		httpResult = http.StatusBadRequest
 		message = "Invalid"
 	}
-	c.JSON(httpResult, aubody.AppUserResponse{Token: "", Message: message, Longitude: appUserRequest.Longitude, Latitude: appUserRequest.Latitude, SearchRadius: appUserRequest.SearchRadius, TargetDiesel: "0", TargetE10: "0", TargetE5: "0"})
+	c.JSON(httpResult, aubody.CodeLocationResponse{Message: message, Label: "", Longitude: appUserRequest.Longitude, Latitude: appUserRequest.Latitude, PostCode: 0, SquareKM: 0, Population: 0})
 }
 
-func putTargetPrices(c *gin.Context) {
+func postTargetPrices(c *gin.Context) {
 	var appUserRequest aubody.AppUserRequest
 	if err := c.Bind(&appUserRequest); err != nil {
 		log.Printf("putUserLocationRadius: %v", err.Error())
@@ -108,5 +108,5 @@ func putTargetPrices(c *gin.Context) {
 		httpResult = http.StatusBadRequest
 		message = "Invalid"
 	}
-	c.JSON(httpResult, aubody.AppUserResponse{Token: "", Message: message, Longitude: 0.0, Latitude: 0.0, SearchRadius: 0.0, TargetDiesel: appUserRequest.TargetDiesel, TargetE10: appUserRequest.TargetE10, TargetE5: appUserRequest.TargetE5})
+	c.JSON(httpResult, aubody.TargetPricesResponse{Message: message, TargetDiesel: appUserRequest.TargetDiesel, TargetE10: appUserRequest.TargetE10, TargetE5: appUserRequest.TargetE5})
 }
