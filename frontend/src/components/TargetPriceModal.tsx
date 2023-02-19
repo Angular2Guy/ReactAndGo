@@ -1,6 +1,5 @@
 import { useRecoilState,useRecoilValue } from "recoil";
 import GlobalState from "../GlobalState";
-import globalUserDataState from "../GlobalState";
 import {Box,TextField,Button,Dialog,DialogContent} from '@mui/material';
 import {useState,useMemo} from "react";
 import { UserRequest, UserResponse } from "./LoginModal";
@@ -46,10 +45,9 @@ const TargetPriceModal = () => {
         const response = await fetch('/appuser/targetprices', requestOptions);
         const result = await response.json() as UserResponse;        
         setGlobalUserDataState({Latitude: globalUserDataState.Latitude, Longitude: globalUserDataState.Longitude, SearchRadius: globalUserDataState.SearchRadius, 
-            TargetDiesel: !result.TargetDiesel ? 0 : result.TargetDiesel, TargetE10: !result.TargetE10 ? 0 : result.TargetE10, TargetE5: !result.TargetE5 ? 0 : result.TargetE5});
-        console.log(result.TargetDiesel);
-        console.log(result.TargetE10);
-        console.log(result.TargetE5);
+            TargetDiesel: !result.TargetDiesel ? 0 : result.TargetDiesel, TargetE10: !result.TargetE10 ? 0 : result.TargetE10, TargetE5: !result.TargetE5 ? 0 : result.TargetE5});        
+        setGlobalTargetPriceModalState(false);       
+        //console.log(result.TargetDiesel+' '+result.TargetE10+' '+result.TargetE5);        
     };
 
     const handleCancel = (event: React.FormEvent) => {

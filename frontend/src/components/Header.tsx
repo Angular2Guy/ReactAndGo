@@ -11,7 +11,7 @@ const Header = () => {
         console.log("Logout ",event);
     }
     const location = (event: React.FormEvent) => {
-        console.log("Location ",event);
+        //console.log("Location ",event);
         setLocationModalState(true)
     }
     const targetPrice = (event: React.FormEvent) => {

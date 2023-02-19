@@ -20,7 +20,7 @@ const LocationModal = () => {
     const [searchRadius, setSearchRadius] = useState(0);
     const [longitude, setLongitude] = useState(0);
     const [latitude, setLatitude] = useState(0);
-    const [options, setOptions] = useState([] as PostCodeLocation[]);    
+    const [options, setOptions] = useState([] as PostCodeLocation[]);       
     const [globalLocationModalState, setGlobalLocationModalState] = useRecoilState(GlobalState.locationModalState);
     const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
     const [globalUserDataState, setGlobalUserDataState] = useRecoilState(GlobalState.userDataState);
@@ -29,12 +29,12 @@ const LocationModal = () => {
     useEffect(() => {
         if (!open) {
           setOptions([]);
-        }                   
+        }            
       }, [open]);      
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log("Submit: ",event);
+        //console.log("Submit: ",event);
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}`},
@@ -62,20 +62,20 @@ const LocationModal = () => {
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` }            
         };
         const response = await fetch(`/appuser/location?location=${event.currentTarget.value}`, requestOptions);
-        const locations = await response.json();        
-        setOptions(locations);
+        const locations = await response.json() as PostCodeLocation[];        
+        setOptions(!locations ? [] : locations);
         //console.log(locations);
     }
 
     const handleSearchRadiusChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        console.log(event?.currentTarget?.value);
+        //console.log(event?.currentTarget?.value);
         const mySearchRadius = parseFloat(event?.currentTarget?.value);
         setSearchRadius(Number.isNaN(mySearchRadius) ? searchRadius : mySearchRadius);
     }
 
-    const handleOptionChange = (event: React.SyntheticEvent<Element, Event>, value: string) =>{        
+    const handleOptionChange = (event: React.SyntheticEvent<Element, Event>, value: string) =>{               
         const filteredOptions = options.filter(option => option.Label === value);
-        console.log(filteredOptions);
+        //console.log(filteredOptions);
         if(filteredOptions.length > 0) {
             setLongitude(filteredOptions[0].Longitude);
             setLatitude(filteredOptions[0].Latitude);
@@ -112,7 +112,7 @@ const LocationModal = () => {
             onClose={() => {
                 setOpen(false);
               }}
-            style={{ width: 300 }}  
+            style={{ width: 300 }}              
             onInputChange={handleOptionChange}         
             getOptionLabel={option => option.Label}
             options={options}
