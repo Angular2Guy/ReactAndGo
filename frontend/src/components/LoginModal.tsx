@@ -12,6 +12,9 @@ export interface UserRequest {
 	Latitude?: number
 	Longitude?: number
   SearchRadius?: number
+  TargetDiesel?: string
+	TargetE10?:    string
+	TargetE5?:     string
 }
 
 export interface UserResponse {

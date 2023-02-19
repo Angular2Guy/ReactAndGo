@@ -3,6 +3,7 @@ import GlobalState from "../GlobalState";
 import globalUserDataState from "../GlobalState";
 import {Box,TextField,Button,Dialog,DialogContent} from '@mui/material';
 import {useState,useMemo} from "react";
+import { UserRequest, UserResponse } from "./LoginModal";
 
 const TargetPriceModal = () => {
     const [targetDiesel, setTargetDiesel] = useState('0');
@@ -10,6 +11,7 @@ const TargetPriceModal = () => {
     const [targetE10, setTargetE10] = useState('0');
     const [globalTargetPriceModalState, setGlobalTargetPriceModalState] = useRecoilState(GlobalState.targetPriceModalState);
     const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
+    const globalUserNameState = useRecoilValue(GlobalState.userNameState);
     const [globalUserDataState, setGlobalUserDataState] = useRecoilState(GlobalState.userDataState);
 
     let dialogOpen = useMemo(() => {        
@@ -34,16 +36,28 @@ const TargetPriceModal = () => {
         setTargetE5(event.currentTarget.value);
     }
 
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        console.log(targetDiesel);
-        console.log(targetE5);
-        console.log(targetE10);
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}`},
+            body: JSON.stringify({Username: globalUserNameState, Password: '', TargetDiesel: targetDiesel, TargetE10: targetE10, TargetE5: targetE5} as UserRequest)             
+        };
+        const response = await fetch('/appuser/targetprices', requestOptions);
+        const result = await response.json() as UserResponse;        
+        setGlobalUserDataState({Latitude: globalUserDataState.Latitude, Longitude: globalUserDataState.Longitude, SearchRadius: globalUserDataState.SearchRadius, 
+            TargetDiesel: !result.TargetDiesel ? 0 : result.TargetDiesel, TargetE10: !result.TargetE10 ? 0 : result.TargetE10, TargetE5: !result.TargetE5 ? 0 : result.TargetE5});
+        console.log(result.TargetDiesel);
+        console.log(result.TargetE10);
+        console.log(result.TargetE5);
     };
 
     const handleCancel = (event: React.FormEvent) => {
         event.preventDefault();
         setGlobalTargetPriceModalState(false);
+        setTargetDiesel('0');
+        setTargetE10('0');
+        setTargetE5('0');
     }
 
     return (<Dialog open={dialogOpen} className="backDrop">
