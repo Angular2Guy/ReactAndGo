@@ -65,12 +65,12 @@ func CheckToken(c *gin.Context) {
 	log.Printf("Check token: %v\n", c.Request.Header.Get(HeaderAuth))
 
 	tokenStr := c.Request.Header.Get(HeaderAuth)
-	tokenStr = strings.Split(tokenStr, " ")[1]
-	if tokenStr == "" {
+	tokenStrs := strings.Split(tokenStr, " ")
+	if len(tokenStrs) < 2 || len(tokenStrs[1]) < 10 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(tokenStrs[1], func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}

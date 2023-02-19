@@ -5,7 +5,8 @@ import GlobalState from "../GlobalState";
 
 const Header = () => {
     const setLocationModalState = useSetRecoilState(GlobalState.locationModalState);
-    const setTargetPriceModalState = useSetRecoilState(GlobalState.targetPriceModalState);
+    const setTargetPriceModalState = useSetRecoilState(GlobalState.targetPriceModalState);    
+
     const logout = (event: React.FormEvent) => {
         console.log("Logout ",event);
     }
