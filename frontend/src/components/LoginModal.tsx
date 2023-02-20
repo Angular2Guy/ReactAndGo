@@ -75,7 +75,7 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
 };
 
 const refreshToken = () => {
-setInterval(() => {
+  const myInterval = setInterval(() => {
   const requestOptions = {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}`},            
@@ -85,6 +85,10 @@ setInterval(() => {
           console.log('Token refreshed.');
           jwtToken = result.Token;
           setGlobalJwtToken(result.Token);
+      } else {
+        jwtToken = '';
+        setGlobalJwtToken('');
+        clearInterval(myInterval);
       }
   });        
 }, 45000);
