@@ -12,6 +12,7 @@ func Start() {
 	router := gin.Default()
 	router.POST("/appuser/signin", postSignin)
 	router.POST("/appuser/login", postLogin)
+	router.GET("/appuser/logout", token.CheckToken, getLogout)
 	router.GET("/appuser/location", token.CheckToken, getLocation)
 	router.GET("/appuser/refreshtoken", token.CheckToken, getRefreshToken)
 	router.POST("/appuser/locationradius", token.CheckToken, postUserLocationRadius)

@@ -36,6 +36,14 @@ type TokenUser struct {
 	Roles    []string
 }
 
+type LoggedOutUserOut struct {
+	Username   string
+	Uuid       string
+	LastLogout time.Time
+}
+
+var LoggedOutUsers []LoggedOutUserOut
+
 func CreateToken(tokenUser TokenUser) (string, error) {
 	roles := []string{string(GuestRole)}
 	var myUuid uuid.UUID
@@ -82,16 +90,36 @@ func CheckToken(c *gin.Context) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
+	username := ""
+	uuid := ""
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if len(claims[TokenUuid].(string)) < 10 || len(claims[TokenAuth].(string)) <= 3 || float64(time.Now().Unix()) > claims[TokenExp].(float64) || float64(time.Now().Unix()) < claims[TokenLastMsg].(float64) {
 			c.AbortWithStatus(http.StatusUnauthorized)
 		}
 		c.Set("user", claims[TokenSub])
 		c.Set("roles", claims[TokenAuth])
+		c.Set("uuid", claims[TokenUuid])
+		username = claims[TokenSub].(string)
+		uuid = claims[TokenUuid].(string)
 	} else {
 		log.Printf("Token Claim check failed.\n")
 		c.AbortWithStatus(http.StatusUnauthorized)
 	}
 
+	if len(username) > 3 && len(uuid) > 10 && LoggedOutUser(username, uuid) {
+		log.Printf("User logged out.\n")
+		c.AbortWithStatus(http.StatusUnauthorized)
+	}
+
 	c.Next()
+}
+
+func LoggedOutUser(username string, uuid string) bool {
+	result := false
+	for _, myLoggedOutUser := range LoggedOutUsers {
+		if myLoggedOutUser.Username == username && myLoggedOutUser.Uuid == uuid {
+			result = true
+		}
+	}
+	return result
 }

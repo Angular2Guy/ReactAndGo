@@ -3,12 +3,13 @@ package appuser
 import (
 	"angular-and-go/pkd/appuser/aumodel"
 	"angular-and-go/pkd/database"
-	"angular-and-go/pkd/token"
+	token "angular-and-go/pkd/token"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -47,6 +48,20 @@ const (
 	Invalid
 	Failed
 )
+
+func StoreUserLogout(username string, uuid string) []token.LoggedOutUserOut {
+	database.DB.Delete("last_logout < ?", time.Now().Add(-4*time.Minute))
+	loggedOutUser := aumodel.LoggedOutUser{Username: username, Uuid: uuid, LastLogout: time.Now()}
+	database.DB.Save(loggedOutUser)
+	var loggedOutUsers []aumodel.LoggedOutUser
+	database.DB.Find(&loggedOutUsers)
+	var results []token.LoggedOutUserOut
+	for _, myLoggedOutUser := range loggedOutUsers {
+		loggedOutUserOut := token.LoggedOutUserOut{Username: myLoggedOutUser.Username, Uuid: myLoggedOutUser.Uuid, LastLogout: myLoggedOutUser.LastLogout}
+		results = append(results, loggedOutUserOut)
+	}
+	return results
+}
 
 func FindLocation(locationStr string) []aumodel.PostCodeLocation {
 	result := []aumodel.PostCodeLocation{}

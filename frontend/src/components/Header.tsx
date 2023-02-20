@@ -6,9 +6,11 @@ import GlobalState from "../GlobalState";
 const Header = () => {
     const setLocationModalState = useSetRecoilState(GlobalState.locationModalState);
     const setTargetPriceModalState = useSetRecoilState(GlobalState.targetPriceModalState);    
+    const setJwtTokenState = useSetRecoilState(GlobalState.jwtTokenState);    
 
     const logout = (event: React.FormEvent) => {
         console.log("Logout ",event);
+        setJwtTokenState('');        
     }
     const location = (event: React.FormEvent) => {
         //console.log("Location ",event);

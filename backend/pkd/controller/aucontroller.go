@@ -14,6 +14,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func getLogout(c *gin.Context) {
+	status := http.StatusUnauthorized
+	message := "Invalid"
+	username, exists1 := c.Get("user")
+	uuid, exists2 := c.Get("uuid")
+	if exists1 && exists2 {
+		token.LoggedOutUsers = appuser.StoreUserLogout(username.(string), uuid.(string))
+		if len(token.LoggedOutUsers) > 0 {
+			message = ""
+			status = http.StatusOK
+		}
+	}
+	c.JSON(status, aubody.AppUserResponse{Token: "", Message: message})
+}
+
 func getRefreshToken(c *gin.Context) {
 	status := http.StatusUnauthorized
 	message := "Invalid"
