@@ -1,11 +1,11 @@
 package cron
 
 import (
-	gsclient "angular-and-go/pkd/controller/client"
-	"angular-and-go/pkd/messaging"
 	"fmt"
 	"log"
 	"os"
+	gsclient "react-and-go/pkd/controller/client"
+	"react-and-go/pkd/messaging"
 	"strings"
 	"time"
 

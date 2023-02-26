@@ -1,4 +1,4 @@
-module angular-and-go
+module react-and-go
 
 go 1.19
 

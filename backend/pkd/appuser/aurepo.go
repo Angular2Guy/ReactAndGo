@@ -1,12 +1,12 @@
 package appuser
 
 import (
-	"angular-and-go/pkd/appuser/aumodel"
-	"angular-and-go/pkd/database"
-	token "angular-and-go/pkd/token"
 	"fmt"
 	"log"
 	"net/http"
+	"react-and-go/pkd/appuser/aumodel"
+	"react-and-go/pkd/database"
+	token "react-and-go/pkd/token"
 	"strconv"
 	"strings"
 	"time"

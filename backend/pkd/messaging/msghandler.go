@@ -1,12 +1,12 @@
 package messaging
 
 import (
-	"angular-and-go/pkd/gasstation"
 	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
 	"os"
+	"react-and-go/pkd/gasstation"
 	"strings"
 	"time"
 

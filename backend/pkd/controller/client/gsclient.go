@@ -1,13 +1,13 @@
 package gsclient
 
 import (
-	"angular-and-go/pkd/gasstation"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"react-and-go/pkd/gasstation"
 	"strconv"
 	"strings"
 	"time"

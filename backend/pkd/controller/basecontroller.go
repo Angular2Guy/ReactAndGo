@@ -1,9 +1,9 @@
 package controller
 
 import (
-	gsclient "angular-and-go/pkd/controller/client"
-	token "angular-and-go/pkd/token"
 	"net/http"
+	gsclient "react-and-go/pkd/controller/client"
+	token "react-and-go/pkd/token"
 
 	"github.com/gin-gonic/gin"
 )

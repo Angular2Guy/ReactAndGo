@@ -1,15 +1,15 @@
 package controller
 
 import (
-	"angular-and-go/pkd/appuser"
-	"angular-and-go/pkd/appuser/aumodel"
-	aufile "angular-and-go/pkd/appuser/file"
-	aubody "angular-and-go/pkd/controller/aumodel"
-	token "angular-and-go/pkd/token"
 	"fmt"
 	"log"
 	"math"
 	"net/http"
+	"react-and-go/pkd/appuser"
+	"react-and-go/pkd/appuser/aumodel"
+	aufile "react-and-go/pkd/appuser/file"
+	aubody "react-and-go/pkd/controller/aumodel"
+	token "react-and-go/pkd/token"
 
 	"github.com/gin-gonic/gin"
 )

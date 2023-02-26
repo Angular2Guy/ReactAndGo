@@ -1,13 +1,13 @@
 package aufile
 
 import (
-	appuser "angular-and-go/pkd/appuser"
 	"bufio"
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	appuser "react-and-go/pkd/appuser"
 	"strings"
 )
 

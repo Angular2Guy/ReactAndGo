@@ -1,10 +1,10 @@
 package controller
 
 import (
-	gsbody "angular-and-go/pkd/controller/gsmodel"
-	"angular-and-go/pkd/gasstation"
 	"log"
 	"net/http"
+	gsbody "react-and-go/pkd/controller/gsmodel"
+	"react-and-go/pkd/gasstation"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,12 +1,12 @@
 package gasstation
 
 import (
-	gsbody "angular-and-go/pkd/controller/gsmodel"
-	"angular-and-go/pkd/database"
-	"angular-and-go/pkd/gasstation/gsmodel"
 	"fmt"
 	"log"
 	"os"
+	gsbody "react-and-go/pkd/controller/gsmodel"
+	"react-and-go/pkd/database"
+	"react-and-go/pkd/gasstation/gsmodel"
 	"strings"
 	"time"
 

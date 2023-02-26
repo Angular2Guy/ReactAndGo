@@ -1,14 +1,14 @@
 package main
 
 import (
-	"angular-and-go/pkd/config"
-	"angular-and-go/pkd/controller"
-	"angular-and-go/pkd/cron"
-	"angular-and-go/pkd/database"
-	"angular-and-go/pkd/messaging"
 	"log"
 	"os"
 	"os/signal"
+	"react-and-go/pkd/config"
+	"react-and-go/pkd/controller"
+	"react-and-go/pkd/cron"
+	"react-and-go/pkd/database"
+	"react-and-go/pkd/messaging"
 	"syscall"
 	"time"
 )
