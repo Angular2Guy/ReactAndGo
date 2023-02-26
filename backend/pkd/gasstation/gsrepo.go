@@ -205,16 +205,6 @@ func FindPricesByStids(stids []string) []gsmodel.GasPrice {
 		}
 		return nil
 	})
-	//database.DB.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").Find(&myGasPrice)
-	/*
-		database.DB.Transaction(func(tx *gorm.DB) error {
-			tx.Where("stid IN ? and date >= date(?) ", stids, dateStr).Order("date desc").FindInBatches(&values, 20000, func(tx *gorm.DB, batch int) error {
-				myGasPrice = append(myGasPrice, values...)
-				return nil
-			})
-			return nil
-		})
-	*/
 	return myGasPrice
 }
 
