@@ -7,6 +7,7 @@ import (
 	gsbody "react-and-go/pkd/controller/gsmodel"
 	"react-and-go/pkd/database"
 	"react-and-go/pkd/gasstation/gsmodel"
+	"react-and-go/pkd/notification"
 	"strings"
 	"time"
 
@@ -168,11 +169,42 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 		return nil
 	})
 	log.Printf("Prices updated: %v\n", len(gasPriceUpdateMap))
+	go sendNotifications(gasPriceUpdateMap)
+}
+
+func sendNotifications(gasStationIDToGasPriceMap map[string]gsmodel.GasPrice) {
+	var gasStationIds []string
+	for key, _ := range gasStationIDToGasPriceMap {
+		gasStationIds = append(gasStationIds, key)
+	}
+	gasStations := findByIds(gasStationIds)
+	notification.SendNotifications(gasStationIDToGasPriceMap, gasStations)
+}
+
+func createChunks(ids []string) [][]string {
+	cunckedSelects := strings.ToLower(strings.TrimSpace(os.Getenv("DB_CHUNKED_SELECTS")))
+	chunkSize := 10000
+	if cunckedSelects == "true" {
+		chunkSize = 999
+	}
+	chuncks := chunkSlice(ids, chunkSize)
+	if len(chuncks) > 1 {
+		log.Printf("Number of Chunks: %v\n", len(chuncks))
+	}
+	return chuncks
 }
 
 func findByIds(ids []string) []gsmodel.GasStation {
 	var result []gsmodel.GasStation
-	database.DB.Where("id in ?", ids).Find(&result)
+	chuncks := createChunks(ids)
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		for _, chunk := range chuncks {
+			var values []gsmodel.GasStation
+			tx.Where("id in ?", chunk).Find(&values)
+			result = append(result, values...)
+		}
+		return nil
+	})
 	return result
 }
 
@@ -189,13 +221,7 @@ func FindPricesByStids(stids []string) []gsmodel.GasPrice {
 	oneMonthAgo := time.Now().Add(time.Hour * -720)
 	dateStr := fmt.Sprintf("%04d-%02d-%02d", oneMonthAgo.Year(), oneMonthAgo.Month(), oneMonthAgo.Day())
 	//log.Printf("Cut off date: %v", dateStr)
-	cunckedSelects := strings.ToLower(strings.TrimSpace(os.Getenv("DB_CHUNKED_SELECTS")))
-	chunkSize := 10000
-	if cunckedSelects == "true" {
-		chunkSize = 999
-	}
-	chuncks := chunkSlice(stids, chunkSize)
-	log.Printf("Number of Chunks: %v\n", len(chuncks))
+	chuncks := createChunks(stids)
 	database.DB.Transaction(func(tx *gorm.DB) error {
 		for _, chunk := range chuncks {
 			var values []gsmodel.GasPrice

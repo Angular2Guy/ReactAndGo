@@ -49,6 +49,12 @@ const (
 	Failed
 )
 
+func FindAllUsers() []aumodel.AppUser {
+	var result []aumodel.AppUser
+	database.DB.Find(&result)
+	return result
+}
+
 func StoreUserLogout(username string, uuid string) []token.LoggedOutUserOut {
 	database.DB.Delete("last_logout < ?", time.Now().Add(-4*time.Minute))
 	loggedOutUser := aumodel.LoggedOutUser{Username: username, Uuid: uuid, LastLogout: time.Now()}

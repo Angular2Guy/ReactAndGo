@@ -14,7 +14,7 @@ type GasStation struct {
 	StationName             string `gorm:"column:name"`
 	Brand                   string `gorm:"index:idx_brand"`
 	Street                  string
-	Place                   string
+	Place                   string `gorm:"index:idx_gas_station_place"`
 	HouseNumber             string
 	PostCode                string  `gorm:"index:idx_gas_station_post_code"`
 	Latitude                float64 `gorm:"column:lat;index:idx_lat"`
