@@ -14,6 +14,10 @@ const GlobalState = {
         key: 'userNameState',
         default: '',
     }),
+    userUuidState: atom({
+        key: 'userUuidState',
+        default: '',
+    }),
     userDataState: atom({
         key: 'userDataState',
         default: {Latitude: 0.0, Longitude: 0.0, SearchRadius: 0, TargetDiesel: 0.0, TargetE10: 0.0, TargetE5: 0.0} as UserDataState,

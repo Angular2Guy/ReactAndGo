@@ -20,6 +20,7 @@ export interface UserRequest {
 export interface UserResponse {
   Token?:  string
 	Message?: string
+  Uuid?: string
   Longitude?: number
 	Latitude?: number
 	SearchRadius?: number
@@ -54,6 +55,7 @@ interface TabPanelProps {
 
 const LoginModal = () => {
    const setGlobalUserName = useSetRecoilState(GlobalState.userNameState);
+   const setGlobalUuid = useSetRecoilState(GlobalState.userUuidState);
    const setGlobalJwtToken = useSetRecoilState(GlobalState.jwtTokenState);
    const setGlobalUserDataState = useSetRecoilState(GlobalState.userDataState);
    const [userName, setUserName] = useState('');
@@ -106,9 +108,10 @@ const refreshToken = () => {
     const httpResponse = activeTab === 0 ? await fetch('/appuser/login', requestOptions) : await fetch('/appuser/signin', requestOptions);
     const userResponse = await httpResponse.json() as UserResponse;
     console.log(userResponse);
-    if(!userResponse?.Message && !!userResponse?.Token && userResponse.Token?.length > 10) {
+    if(!userResponse?.Message && !!userResponse?.Token && userResponse.Token?.length > 10 && !!userResponse?.Uuid && userResponse.Uuid?.length > 10) {
       setGlobalUserName(userName);  
       setGlobalJwtToken(userResponse.Token);  
+      setGlobalUuid(userResponse.Uuid);
       jwtToken = userResponse.Token;  
       setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius,
         TargetDiesel: userResponse.TargetDiesel, TargetE10: userResponse.TargetE10, TargetE5: userResponse.TargetE5} as UserDataState);
