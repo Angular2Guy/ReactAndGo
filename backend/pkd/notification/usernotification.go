@@ -23,11 +23,12 @@ func SendNotifications(gasStationIDToGasPriceMap map[string]gsmodel.GasPrice, ga
 	for _, appUser := range allAppUsers {
 		for _, myGasStationWithPrice := range gasStationWithPricesMap {
 			//Target price reached?
-			if appUser.TargetDiesel <= myGasStationWithPrice.gasPrice.Diesel || appUser.TargetE10 <= myGasStationWithPrice.gasPrice.E10 || appUser.TargetE5 <= myGasStationWithPrice.gasPrice.E5 {
+			if appUser.TargetDiesel >= myGasStationWithPrice.gasPrice.Diesel || appUser.TargetE10 >= myGasStationWithPrice.gasPrice.E10 || appUser.TargetE5 >= myGasStationWithPrice.gasPrice.E5 {
 				//Distance match?
 				distance, _ := myGasStationWithPrice.gasStation.CalcDistanceBearing(appUser.Latitude, appUser.Longitude)
 				if appUser.SearchRadius >= distance {
-					log.Printf("Match found: %v %v\n", myGasStationWithPrice.gasStation.Brand, myGasStationWithPrice.gasStation.Place)
+					log.Printf("Match found: %v %v %v %v %v %v\n", distance, myGasStationWithPrice.gasStation.Brand, myGasStationWithPrice.gasStation.Place,
+						myGasStationWithPrice.gasPrice.Diesel, myGasStationWithPrice.gasPrice.E10, myGasStationWithPrice.gasPrice.E5)
 				}
 			}
 		}
