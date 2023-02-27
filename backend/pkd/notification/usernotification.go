@@ -22,8 +22,10 @@ func SendNotifications(gasStationIDToGasPriceMap map[string]gsmodel.GasPrice, ga
 	allAppUsers := appuser.FindAllUsers()
 	for _, appUser := range allAppUsers {
 		for _, myGasStationWithPrice := range gasStationWithPricesMap {
-			//Target price reached?
-			if appUser.TargetDiesel >= myGasStationWithPrice.gasPrice.Diesel || appUser.TargetE10 >= myGasStationWithPrice.gasPrice.E10 || appUser.TargetE5 >= myGasStationWithPrice.gasPrice.E5 {
+			//Type available and target price reached?
+			if (myGasStationWithPrice.gasPrice.Diesel > 10 && appUser.TargetDiesel >= myGasStationWithPrice.gasPrice.Diesel) ||
+				(myGasStationWithPrice.gasPrice.E10 > 10 && appUser.TargetE10 >= myGasStationWithPrice.gasPrice.E10) ||
+				(myGasStationWithPrice.gasPrice.E5 > 10 && appUser.TargetE5 >= myGasStationWithPrice.gasPrice.E5) {
 				//Distance match?
 				distance, _ := myGasStationWithPrice.gasStation.CalcDistanceBearing(appUser.Latitude, appUser.Longitude)
 				if appUser.SearchRadius >= distance {

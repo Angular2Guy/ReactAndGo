@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -106,12 +107,20 @@ func Signin(appUserIn AppUserIn) DbResult {
 	}
 	err := database.DB.Transaction(func(tx *gorm.DB) error {
 		var appUser aumodel.AppUser
+		//check usernames
 		if err := tx.Where("username = ?", appUserIn.Username).First(&appUser); err.Error == nil {
 			result = UsernameTaken
 			return nil
 		}
+		//generate uuid
+		myUuid, err := uuid.NewRandom()
+		if err != nil {
+			result = Failed
+			return nil
+		}
 		appUser.Username = appUserIn.Username
 		appUser.Password = string(generatePasswordHash(appUserIn.Password))
+		appUser.Uuid = myUuid.String()
 		tx.Save(&appUser)
 		return nil
 	})
