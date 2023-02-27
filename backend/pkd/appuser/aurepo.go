@@ -77,27 +77,28 @@ func FindLocation(locationStr string) []aumodel.PostCodeLocation {
 	return result
 }
 
-func Login(appUserIn AppUserIn) (string, int, float64, float64, float64, int, int, int) {
+func Login(appUserIn AppUserIn) (string, int, string, float64, float64, float64, int, int, int) {
 	result := ""
 	status := http.StatusUnauthorized
 	//log.Printf("%v", appUserIn.Username)
 	var appUser aumodel.AppUser
 	if err := database.DB.Where("username = ?", appUserIn.Username).First(&appUser); err.Error != nil {
 		log.Printf("User not found: %v error: %v\n", appUserIn.Username, err.Error)
-		return result, status, 0.0, 0.0, 0.0, 0, 0, 0
+		return result, status, "", 0.0, 0.0, 0.0, 0, 0, 0
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(appUser.Password), []byte(appUserIn.Password)); err != nil {
 		log.Printf("Password wrong. Username: %v\n", appUser.Username)
-		return result, status, 0.0, 0.0, 0.0, 0, 0, 0
+		return result, status, "", 0.0, 0.0, 0.0, 0, 0, 0
 	}
 	//jwt token creation
 	result, err := token.CreateToken(token.TokenUser{Username: appUser.Username, Roles: []string{"USERS"}})
 	if err != nil {
 		log.Printf("Failed to create jwt token: %v\n", err)
+		return result, status, "", 0.0, 0.0, 0.0, 0, 0, 0
 	} else {
 		status = http.StatusOK
 	}
-	return result, status, appUser.Longitude, appUser.Latitude, appUser.SearchRadius, appUser.TargetE5, appUser.TargetE10, appUser.TargetDiesel
+	return result, status, appUser.Uuid, appUser.Longitude, appUser.Latitude, appUser.SearchRadius, appUser.TargetE5, appUser.TargetE10, appUser.TargetDiesel
 }
 
 func Signin(appUserIn AppUserIn) DbResult {

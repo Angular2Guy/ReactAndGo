@@ -3,6 +3,7 @@ package aubody
 type AppUserResponse struct {
 	Token        string
 	Message      string
+	Uuid         string
 	Longitude    float64
 	Latitude     float64
 	SearchRadius float64

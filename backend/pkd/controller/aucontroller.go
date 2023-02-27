@@ -105,12 +105,12 @@ func postLogin(c *gin.Context) {
 		log.Printf("postLogin: %v", err.Error())
 	}
 	myAppUser := appuser.AppUserIn{Username: appUserRequest.Username, Password: appUserRequest.Password, Uuid: ""}
-	result, status, userLongitude, userLatitude, searchRadius, targetE5, targetE10, targetDiesel := appuser.Login(myAppUser)
+	result, status, userUuid, userLongitude, userLatitude, searchRadius, targetE5, targetE10, targetDiesel := appuser.Login(myAppUser)
 	var message = ""
 	if status != http.StatusOK {
 		message = "Login failed."
 	}
-	appAuResponse := aubody.AppUserResponse{Token: result, Message: message, Longitude: userLongitude, Latitude: userLatitude,
+	appAuResponse := aubody.AppUserResponse{Token: result, Message: message, Uuid: userUuid, Longitude: userLongitude, Latitude: userLatitude,
 		SearchRadius: searchRadius, TargetE5: fmt.Sprintf("%v", (float64(targetE5) / 1000)), TargetE10: fmt.Sprintf("%v", (float64(targetE10) / 1000)), TargetDiesel: fmt.Sprintf("%v", (float64(targetDiesel) / 1000))}
 	c.JSON(status, appAuResponse)
 }
