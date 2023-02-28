@@ -20,6 +20,7 @@ type AppUserIn struct {
 	Username     string
 	Password     string
 	Uuid         string
+	Language     UserLang
 	Latitude     float64
 	Longitude    float64
 	SearchRadius float64
@@ -42,6 +43,13 @@ type PostCodeData struct {
 	CenterLongitude float64
 	CenterLatitude  float64
 }
+
+type UserLang string
+
+const (
+	German  UserLang = "de"
+	English          = "en"
+)
 
 const (
 	Ok DbResult = iota
@@ -122,6 +130,7 @@ func Signin(appUserIn AppUserIn) DbResult {
 		appUser.Username = appUserIn.Username
 		appUser.Password = string(generatePasswordHash(appUserIn.Password))
 		appUser.Uuid = myUuid.String()
+		appUser.LangKey = string(appUserIn.Language)
 		tx.Save(&appUser)
 		return nil
 	})

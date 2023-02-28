@@ -1,6 +1,6 @@
 #!/bin/bash
 GOGC=off
-GOMEMLIMIT=64MiB
+GOMEMLIMIT=32MiB
 GODEBUG=gctrace=1
 #echo $GOGC $GOMEMLIMIT $GODEBUG
 #go build

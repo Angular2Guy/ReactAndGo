@@ -1,14 +1,33 @@
 package notification
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"react-and-go/pkd/appuser"
 	"react-and-go/pkd/gasstation/gsmodel"
+	"time"
 )
 
 type gasStationWithPrice struct {
 	gasStation gsmodel.GasStation
 	gasPrice   gsmodel.GasPrice
+}
+
+type NotificationData struct {
+	GasStationID string
+	StationName  string
+	Brand        string
+	Street       string
+	Place        string
+	HouseNumber  string
+	PostCode     string
+	Latitude     float64
+	Longitude    float64
+	E5           int
+	E10          int
+	Diesel       int
+	Timestamp    time.Time
 }
 
 func SendNotifications(gasStationIDToGasPriceMap map[string]gsmodel.GasPrice, gasStations []gsmodel.GasStation) {
@@ -20,7 +39,9 @@ func SendNotifications(gasStationIDToGasPriceMap map[string]gsmodel.GasPrice, ga
 		gasStationWithPricesMap[gasStation.ID] = myGasStationWithPrice
 	}
 	allAppUsers := appuser.FindAllUsers()
+	myNotificationMsgs := []NotificationMsg{}
 	for _, appUser := range allAppUsers {
+		gsMatches := []gasStationWithPrice{}
 		for _, myGasStationWithPrice := range gasStationWithPricesMap {
 			//Type available and target price reached?
 			if (myGasStationWithPrice.gasPrice.Diesel > 10 && appUser.TargetDiesel >= myGasStationWithPrice.gasPrice.Diesel) ||
@@ -29,10 +50,32 @@ func SendNotifications(gasStationIDToGasPriceMap map[string]gsmodel.GasPrice, ga
 				//Distance match?
 				distance, _ := myGasStationWithPrice.gasStation.CalcDistanceBearing(appUser.Latitude, appUser.Longitude)
 				if appUser.SearchRadius >= distance {
-					log.Printf("Match found: %v %v %v %v %v %v\n", distance, myGasStationWithPrice.gasStation.Brand, myGasStationWithPrice.gasStation.Place,
-						myGasStationWithPrice.gasPrice.Diesel, myGasStationWithPrice.gasPrice.E10, myGasStationWithPrice.gasPrice.E5)
+					//log.Printf("Match found: %v %v %v %v %v %v\n", distance, myGasStationWithPrice.gasStation.Brand, myGasStationWithPrice.gasStation.Place,
+					//	myGasStationWithPrice.gasPrice.Diesel, myGasStationWithPrice.gasPrice.E10, myGasStationWithPrice.gasPrice.E5)
+					gsMatches = append(gsMatches, myGasStationWithPrice)
 				}
 			}
 		}
+		if len(gsMatches) > 0 {
+			myTitle := "Gas price matches found."
+			myMessage := ""
+			myDatas := []NotificationData{}
+			for _, gsMatch := range gsMatches {
+				myMessage = myMessage + fmt.Sprintf("E5: %v, E10: %v, Diesel: %v\n", gsMatch.gasPrice.E5, gsMatch.gasPrice.E10, gsMatch.gasPrice.Diesel)
+				myNotificationData := NotificationData{GasStationID: gsMatch.gasStation.ID, StationName: gsMatch.gasStation.StationName, Brand: gsMatch.gasStation.Brand,
+					Street: gsMatch.gasStation.Street, Place: gsMatch.gasStation.Place, HouseNumber: gsMatch.gasStation.HouseNumber, PostCode: gsMatch.gasStation.PostCode,
+					Latitude: gsMatch.gasStation.Latitude, Longitude: gsMatch.gasStation.Longitude, Timestamp: time.Now(), E5: gsMatch.gasPrice.E5, E10: gsMatch.gasPrice.E10,
+					Diesel: gsMatch.gasPrice.Diesel}
+				myDatas = append(myDatas, myNotificationData)
+			}
+			myDataJson, err := json.Marshal(myDatas)
+			if err != nil {
+				log.Printf("Json marshal failed: %v", err)
+				myDataJson = []byte("[]")
+			}
+			myNotificationMsg := NotificationMsg{UserUuid: appUser.Uuid, Message: myMessage, Title: myTitle, DataJson: string(myDataJson)}
+			myNotificationMsgs = append(myNotificationMsgs, myNotificationMsg)
+		}
 	}
+	StoreNotifications(myNotificationMsgs)
 }
