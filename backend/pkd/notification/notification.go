@@ -61,7 +61,7 @@ func SendNotifications(gasStationIDToGasPriceMap map[string]gsmodel.GasPrice, ga
 			myMessage := ""
 			myDatas := []NotificationData{}
 			for _, gsMatch := range gsMatches {
-				myMessage = myMessage + fmt.Sprintf("E5: %v, E10: %v, Diesel: %v\n", gsMatch.gasPrice.E5, gsMatch.gasPrice.E10, gsMatch.gasPrice.Diesel)
+				myMessage = myMessage + fmt.Sprintf("Location: %v, E5: %v, E10: %v, Diesel: %v\n", gsMatch.gasStation.Place, (float64(gsMatch.gasPrice.E5)/1000), (float64(gsMatch.gasPrice.E10)/1000), (float64(gsMatch.gasPrice.Diesel)/1000))
 				myNotificationData := NotificationData{GasStationID: gsMatch.gasStation.ID, StationName: gsMatch.gasStation.StationName, Brand: gsMatch.gasStation.Brand,
 					Street: gsMatch.gasStation.Street, Place: gsMatch.gasStation.Place, HouseNumber: gsMatch.gasStation.HouseNumber, PostCode: gsMatch.gasStation.PostCode,
 					Latitude: gsMatch.gasStation.Latitude, Longitude: gsMatch.gasStation.Longitude, Timestamp: time.Now(), E5: gsMatch.gasPrice.E5, E10: gsMatch.gasPrice.E10,
@@ -74,6 +74,9 @@ func SendNotifications(gasStationIDToGasPriceMap map[string]gsmodel.GasPrice, ga
 				myDataJson = []byte("[]")
 			}
 			myNotificationMsg := NotificationMsg{UserUuid: appUser.Uuid, Message: myMessage, Title: myTitle, DataJson: string(myDataJson)}
+			if len(string(myDataJson)) > 3500 {
+				log.Printf("App User id: %v, Matches: %v, Json length: %v\n", appUser.Uuid, len(gsMatches), len(string(myDataJson)))
+			}
 			myNotificationMsgs = append(myNotificationMsgs, myNotificationMsg)
 		}
 	}

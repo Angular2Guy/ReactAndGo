@@ -8,6 +8,7 @@ import (
 	"react-and-go/pkd/controller"
 	"react-and-go/pkd/cron"
 	"react-and-go/pkd/database"
+	"react-and-go/pkd/database/dbmigrate"
 	"react-and-go/pkd/messaging"
 	"syscall"
 	"time"
@@ -16,7 +17,7 @@ import (
 func init() {
 	config.LoadEnvVariables()
 	database.ConnectToDB()
-	database.MigrateDB()
+	dbmigrate.MigrateDB()
 	messaging.Start()
 	cron.Start()
 }

@@ -77,7 +77,7 @@ func UpdateGasStations(gasStations []GasStationImport) {
 		fmt.Printf("GasStations updated: %v\n", gasStationsUpdated)
 		for _, value := range gasStationImportMap {
 			resultGs := createNewGasStation(value)
-			tx.Save(resultGs)
+			tx.Save(&resultGs)
 		}
 		fmt.Printf("GasStations new: %v\n", len(gasStationImportMap))
 		return nil
