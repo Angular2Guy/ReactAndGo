@@ -23,7 +23,8 @@ func Start() {
 	router.GET("/gasstation/:id", token.CheckToken, getGasStationById)
 	router.POST("/gasstation/search/place", token.CheckToken, searchGasStationPlace)
 	router.POST("/gasstation/search/location", token.CheckToken, searchGasStationLocation)
-	router.PUT("/posts/:id", postsUpdate)
+	router.GET("/usernotification/new/:useruuid", token.CheckToken, getNewUserNotifications)
+	router.GET("/usernotification/current/:useruuid", token.CheckToken, getCurrentUserNotifications)
 	router.Static("/static", "./static")
 	router.NoRoute(func(c *gin.Context) { c.Redirect(http.StatusTemporaryRedirect, "/static") })
 	router.Run() // listen and serve on 0.0.0.0:3000
