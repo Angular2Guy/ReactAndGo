@@ -1,12 +1,17 @@
-# AngularAndGo
+# ReactAndGo
 
-This is a learning project to test how an Angular frontend and a Golang backend can be integrated. 
+The ReactAndGo project is used to compare a single page application frontend based on React and a Rest backend based on Go, to Angular frontends and Spring Boot/Java backends. 
 
 ## Project Status
 
-Experimental project to gather experience.
-The backend provides a signin and login for the users. It uses currently a Postgresql DB for storage and the file docker-postgresql.sh contains the Docker commands to download and start/stop it. The Messaging is provided by an Apache ArtemisMQ server. The docker-artemis.sh file contains the Docker commands to download start/stop it. The application uses the Gin framework to provide the rest endpoints for the frontend and uses the Golang-Jwt library for the tokens. The Messages are processed with the Paho-MQTT library. 
+The ReactAndGo project is used to compare a single page application frontend based on React and a Rest backend based on Go, to Angular frontends and Spring Boot/Java backends. 
+
+The goal of the project is to send out notifications to car drivers if the gas price falls below their target price. The gas prices are imported from a provider via MQTT messaging and stored in the database. 
+
+For development 2 test messages are provided that are send to an Apache Artemis server to be processed in the project. The Apache Artemis server can be run as Docker image and the commands to download and run the image can be found in the 'docker-artemis.sh' file. As database Postgresql is used and it can be run as Docker image too. The commands can be found in the 'docker-postgres.sh' file.
+
 The frontend provides a login/signin dialog that uses React and MUI components.
+
 A combined build is still open.
 
 ## Articles
