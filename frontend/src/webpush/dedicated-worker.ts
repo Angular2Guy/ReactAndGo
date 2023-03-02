@@ -8,7 +8,7 @@ interface MsgData {
   newNotificationUrl: string;  
 }
 
-export interface UserResponse {
+interface UserResponse {
   Token?:  string
 	Message?: string
 }
@@ -20,6 +20,7 @@ const refreshToken = (myToken: string) => {
     clearInterval(tokenIntervalRef);
   }
   jwtToken = myToken;
+  if(!!jwtToken && jwtToken.length > 10) {
   tokenIntervalRef = setInterval(() => {
   const requestOptions = {
       method: 'GET',
@@ -29,13 +30,15 @@ const refreshToken = (myToken: string) => {
       if((!result.Message && !!result.Token && result.Token.length > 10)) {
           //console.log('Token refreshed.');
           jwtToken = result.Token;          
+          /* eslint-disable-next-line no-restricted-globals */
+          self.postMessage(result);
       } else {
         jwtToken = '';        
         clearInterval(tokenIntervalRef);
       }
   });        
 }, 45000);
-
+  }
 }
 
 let notificationIntervalRef: ReturnType<typeof setInterval>;
@@ -56,10 +59,10 @@ self.addEventListener('message', (event: MessageEvent) => {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}`},            
   };
   /* eslint-disable-next-line no-restricted-globals */
-    self.fetch(msgData.newNotificationUrl, requestOptions).then(result => result.json()).then(resulJson => {
-      if(!!resulJson && resulJson?.length > 0) {
+    self.fetch(msgData.newNotificationUrl, requestOptions).then(result => result.json()).then(resultJson => {
+      if(!!resultJson && resultJson?.length > 0) {
         /* eslint-disable-next-line no-restricted-globals */
-        self.postMessage(resulJson);
+        self.postMessage(resultJson);
         //Push Heading/Message
       }
     });

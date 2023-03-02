@@ -33,6 +33,10 @@ const GlobalState = {
     targetPriceModalState: atom({
         key: 'targetPriceModalState',
         default: false
+    }),
+    webWorkerRefState: atom<null|Worker>({
+        key: 'webWorkerRefState',    
+        default: null
     })
 }
 export default GlobalState;

@@ -63,13 +63,14 @@ const LoginModal = () => {
    const setGlobalUuid = useSetRecoilState(GlobalState.userUuidState);
    const setGlobalJwtToken = useSetRecoilState(GlobalState.jwtTokenState);
    const setGlobalUserDataState = useSetRecoilState(GlobalState.userDataState);
+   const setGlobalWebWorkderRefState = useSetRecoilState(GlobalState.webWorkerRefState);
    const [userName, setUserName] = useState('');
    const [password1, setPassword1] = useState('');
    const [password2, setPassword2] = useState('');
    const [responseMsg, setResponseMsg] = useState('');
    const [open, setOpen] = useState(true);
    const [activeTab, setActiveTab] = useState(0);
-   let jwtToken = "";
+   //let jwtToken = "";
 
    const handleChangeUsername: React.ChangeEventHandler<HTMLInputElement> = (event) => {
       setUserName(event.currentTarget.value as string);      
@@ -81,6 +82,7 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
     setPassword2(event.currentTarget.value as string);      
 };
 
+/*
 const refreshToken = () => {
   const myInterval = setInterval(() => {
   const requestOptions = {
@@ -101,6 +103,7 @@ const refreshToken = () => {
 }, 45000);
 
 }
+*/
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();      
@@ -117,17 +120,21 @@ const refreshToken = () => {
       setGlobalUserName(userName);  
       setGlobalJwtToken(userResponse.Token);  
       setGlobalUuid(userResponse.Uuid);
-      jwtToken = userResponse.Token;  
+      //jwtToken = userResponse.Token;  
       setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius,
         TargetDiesel: userResponse.TargetDiesel, TargetE10: userResponse.TargetE10, TargetE5: userResponse.TargetE5} as UserDataState);
       setUserName('');
       setOpen(false);   
-      refreshToken();    
+      //refreshToken();    
       const worker = new Worker(new URL('../webpush/dedicated-worker.js', import.meta.url));        
       worker.postMessage({jwtToken: userResponse.Token, newNotificationUrl: `/usernotification/new/${userResponse.Uuid}`} as MsgData);
       worker.addEventListener('message', (event: MessageEvent) => { 
         console.log(event.data);
+        if(!!event.data?.Token && event.data.Token?.length > 10) {
+          setGlobalJwtToken(event.data.Token);
+        }
       });
+      setGlobalWebWorkderRefState(worker);
     } else if(!!userResponse?.Message) {
       setResponseMsg(userResponse.Message);
     }
