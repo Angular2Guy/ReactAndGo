@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+/* eslint-disable-next-line no-restricted-globals */
 declare var self: DedicatedWorkerGlobalScope;
 export {};
 
@@ -38,6 +39,7 @@ const refreshToken = (myToken: string) => {
 }
 
 let notificationIntervalRef: ReturnType<typeof setInterval>;
+/* eslint-disable-next-line no-restricted-globals */
 self.addEventListener('message', (event: MessageEvent) => { 
   const msgData = event.data as MsgData;   
   refreshToken(msgData.jwtToken);
@@ -51,10 +53,12 @@ self.addEventListener('message', (event: MessageEvent) => {
     }
     const requestOptions = {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${msgData.jwtToken}`},            
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}`},            
   };
+  /* eslint-disable-next-line no-restricted-globals */
     self.fetch(msgData.newNotificationUrl, requestOptions).then(result => result.json()).then(resulJson => {
       if(!!resulJson && resulJson?.length > 0) {
+        /* eslint-disable-next-line no-restricted-globals */
         self.postMessage(resulJson);
         //Push Heading/Message
       }

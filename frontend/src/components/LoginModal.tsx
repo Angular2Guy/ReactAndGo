@@ -29,6 +29,11 @@ export interface UserResponse {
 	TargetE10?: number
 }
 
+interface MsgData {
+  jwtToken: string;
+  newNotificationUrl: string;  
+}
+
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -117,7 +122,12 @@ const refreshToken = () => {
         TargetDiesel: userResponse.TargetDiesel, TargetE10: userResponse.TargetE10, TargetE5: userResponse.TargetE5} as UserDataState);
       setUserName('');
       setOpen(false);   
-      refreshToken();            
+      refreshToken();    
+      const worker = new Worker(new URL('../webpush/dedicated-worker.js', import.meta.url));        
+      worker.postMessage({jwtToken: userResponse.Token, newNotificationUrl: `/usernotification/new/${userResponse.Uuid}`} as MsgData);
+      worker.addEventListener('message', (event: MessageEvent) => { 
+        console.log(event.data);
+      });
     } else if(!!userResponse?.Message) {
       setResponseMsg(userResponse.Message);
     }
