@@ -1,4 +1,4 @@
-import { useSetRecoilState } from "recoil";
+import { useSetRecoilState,useRecoilState } from "recoil";
 import styles from './modal.module.scss';
 import GlobalState from "../GlobalState";
 import {UserDataState} from "../GlobalState";
@@ -63,7 +63,7 @@ const LoginModal = () => {
    const setGlobalUuid = useSetRecoilState(GlobalState.userUuidState);
    const setGlobalJwtToken = useSetRecoilState(GlobalState.jwtTokenState);
    const setGlobalUserDataState = useSetRecoilState(GlobalState.userDataState);
-   const setGlobalWebWorkderRefState = useSetRecoilState(GlobalState.webWorkerRefState);
+   const [globalWebWorkerRefState, setGlobalWebWorkerRefState] = useRecoilState(GlobalState.webWorkerRefState);
    const [userName, setUserName] = useState('');
    const [password1, setPassword1] = useState('');
    const [password2, setPassword2] = useState('');
@@ -100,19 +100,28 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
         TargetDiesel: userResponse.TargetDiesel, TargetE10: userResponse.TargetE10, TargetE5: userResponse.TargetE5} as UserDataState);
       setUserName('');
       setOpen(false);    
-      const worker = new Worker(new URL('../webpush/dedicated-worker.js', import.meta.url));        
-      worker.postMessage({jwtToken: userResponse.Token, newNotificationUrl: `/usernotification/new/${userResponse.Uuid}`} as MsgData);
-      worker.addEventListener('message', (event: MessageEvent) => { 
-        console.log(event.data);
-        if(!!event.data?.Token && event.data.Token?.length > 10) {
-          setGlobalJwtToken(event.data.Token);
-        }
-      });
-      setGlobalWebWorkderRefState(worker);
+      initWebWorker(userResponse);
     } else if(!!userResponse?.Message) {
       setResponseMsg(userResponse.Message);
     }
   }
+
+  const initWebWorker = (userResponse: UserResponse) => {
+    if(!globalWebWorkerRefState) {
+    const worker = new Worker(new URL('../webpush/dedicated-worker.js', import.meta.url));        
+    worker.addEventListener('message', (event: MessageEvent) => { 
+      console.log(event.data);
+      if(!!event.data?.Token && event.data.Token?.length > 10) {
+        setGlobalJwtToken(event.data.Token);
+      }
+    });
+    worker.postMessage({jwtToken: userResponse.Token, newNotificationUrl: `/usernotification/new/${userResponse.Uuid}`} as MsgData);
+    setGlobalWebWorkerRefState(worker);
+  } else {
+    globalWebWorkerRefState.postMessage({jwtToken: userResponse.Token, newNotificationUrl: `/usernotification/new/${userResponse.Uuid}`} as MsgData);
+  }
+  };
+
   const handleCancel = (event: React.FormEvent) => {
    event.preventDefault();
       setUserName('');
