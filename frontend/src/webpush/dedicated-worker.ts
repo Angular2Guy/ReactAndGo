@@ -63,7 +63,7 @@ self.addEventListener('message', (event: MessageEvent) => {
         /* eslint-disable-next-line no-restricted-globals */
         self.postMessage(resultJson);
         //Notification
-        console.log(Notification.permission);
+        //console.log(Notification.permission);
         if (Notification.permission === 'granted') { 
           if(resultJson?.length > 0 && resultJson[0]?.Message?.length > 1 && resultJson[0]?.Title?.length > 1) {            
             for(let value of resultJson) {

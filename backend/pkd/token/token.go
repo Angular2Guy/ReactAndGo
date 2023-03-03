@@ -70,7 +70,7 @@ func CreateToken(tokenUser TokenUser) (string, error) {
 }
 
 func CheckToken(c *gin.Context) {
-	log.Printf("Check token: %v\n", c.Request.Header.Get(HeaderAuth))
+	//log.Printf("Check token: %v\n", c.Request.Header.Get(HeaderAuth))
 
 	tokenStr := c.Request.Header.Get(HeaderAuth)
 	tokenStrs := strings.Split(tokenStr, " ")
