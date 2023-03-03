@@ -30,16 +30,16 @@ export interface UserResponse {
 }
 
 interface MsgData {
-  jwtToken: string;
-  newNotificationUrl: string;  
+  jwtToken?: string;
+  newNotificationUrl?: string;  
 }
 
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
     value: number;
-  }
-  
+}
+
   function TabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
   
@@ -58,7 +58,7 @@ interface TabPanelProps {
     );
   }
 
-const LoginModal = () => {
+const LoginModal = () => {   
    const setGlobalUserName = useSetRecoilState(GlobalState.userNameState);
    const setGlobalUuid = useSetRecoilState(GlobalState.userUuidState);
    const setGlobalJwtToken = useSetRecoilState(GlobalState.jwtTokenState);
@@ -82,7 +82,8 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
 };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();      
+      event.preventDefault();  
+      Notification.requestPermission();      
       const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json'},
@@ -106,20 +107,34 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
     }
   }
 
-  const initWebWorker = (userResponse: UserResponse) => {
+  const initWebWorker = async (userResponse: UserResponse) => {
+    let result = null;
     if(!globalWebWorkerRefState) {
-    const worker = new Worker(new URL('../webpush/dedicated-worker.js', import.meta.url));        
+    const worker = new Worker(new URL('../webpush/dedicated-worker.js', import.meta.url));           
+    if (!!worker) {
     worker.addEventListener('message', (event: MessageEvent) => { 
       console.log(event.data);
-      if(!!event.data?.Token && event.data.Token?.length > 10) {
+      if(!!event?.data?.Token && event?.data.Token?.length > 10) {
         setGlobalJwtToken(event.data.Token);
-      }
+      }    
+      /*  
+      if(event?.data?.length > 0 && event?.data[0]?.Message?.length > 1 && event?.data[0]?.Title?.length > 1) {
+        console.log(event);
+        for(let value of event.data) {
+        new Notification(value?.Title, {body: value?.Message});
+        }
+      } 
+      */     
     });
     worker.postMessage({jwtToken: userResponse.Token, newNotificationUrl: `/usernotification/new/${userResponse.Uuid}`} as MsgData);
     setGlobalWebWorkerRefState(worker);
+    result = worker;
+  }
   } else {
     globalWebWorkerRefState.postMessage({jwtToken: userResponse.Token, newNotificationUrl: `/usernotification/new/${userResponse.Uuid}`} as MsgData);
+    result = globalWebWorkerRefState;
   }
+  return result;
   };
 
   const handleCancel = (event: React.FormEvent) => {
