@@ -7,12 +7,14 @@ const Header = () => {
     const setLocationModalState = useSetRecoilState(GlobalState.locationModalState);
     const setTargetPriceModalState = useSetRecoilState(GlobalState.targetPriceModalState);    
     const setJwtTokenState = useSetRecoilState(GlobalState.jwtTokenState);   
+    const setGlobalLoginModal = useSetRecoilState(GlobalState.loginModalState);
     const globalWebWorkerRefState = useRecoilValue(GlobalState.webWorkerRefState); 
 
     const logout = (event: React.FormEvent) => {
         console.log("Logout ",event);
         setJwtTokenState('');    
         globalWebWorkerRefState?.postMessage({jwtToken: '', newNotificationUrl: ''});
+        setGlobalLoginModal(true);
     }
     const location = (event: React.FormEvent) => {
         //console.log("Location ",event);

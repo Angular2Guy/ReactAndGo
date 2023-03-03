@@ -68,7 +68,7 @@ const LoginModal = () => {
    const [password1, setPassword1] = useState('');
    const [password2, setPassword2] = useState('');
    const [responseMsg, setResponseMsg] = useState('');
-   const [open, setOpen] = useState(true);
+   const [globalLoginModal, setGlobalLoginModal] = useRecoilState(GlobalState.loginModalState);
    const [activeTab, setActiveTab] = useState(0);
 
    const handleChangeUsername: React.ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -99,9 +99,11 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
       setGlobalUuid(userResponse.Uuid);      
       setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius,
         TargetDiesel: userResponse.TargetDiesel, TargetE10: userResponse.TargetE10, TargetE5: userResponse.TargetE5} as UserDataState);
-      setUserName('');
-      setOpen(false);    
-      initWebWorker(userResponse);
+        setGlobalLoginModal(false);    
+        initWebWorker(userResponse);
+        setUserName('');
+        setPassword1('');
+        setPassword2('');
     } else if(!!userResponse?.Message) {
       setResponseMsg(userResponse.Message);
     }
@@ -157,7 +159,7 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
       'aria-controls': `simple-tabpanel-${index}`,
     };
   }
-     return (<Dialog open={open} onClose={handleClose} className="backDrop">
+     return (<Dialog open={globalLoginModal} onClose={handleClose} className="backDrop">
         <DialogContent>
         <Tabs value={activeTab} onChange={handleTabChange} aria-label="basic tabs example">
           <Tab label="Login" {...a11yProps(0)} />
