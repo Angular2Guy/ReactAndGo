@@ -1,7 +1,7 @@
 import { useRecoilState,useRecoilValue } from "recoil";
 import GlobalState from "../GlobalState";
 import {UserDataState} from "../GlobalState";
-import { useMemo,useEffect,useState } from "react";
+import { useMemo,useEffect,useState,FormEvent,ChangeEvent,SyntheticEvent } from "react";
 import {Box,TextField,Button,Dialog,DialogContent, Autocomplete} from '@mui/material';
 import {UserRequest, UserResponse} from "./LoginModal";
 
@@ -32,7 +32,7 @@ const LocationModal = () => {
         }            
       }, [open]);      
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         //console.log("Submit: ",event);
         const requestOptions = {
@@ -51,7 +51,7 @@ const LocationModal = () => {
         setGlobalLocationModalState(false);        
     } 
 */
-    const handleChange = async (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = async (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         event.preventDefault();
         if(!event?.currentTarget?.value) {
             setOptions([]);
@@ -67,13 +67,13 @@ const LocationModal = () => {
         //console.log(locations);
     }
 
-    const handleSearchRadiusChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleSearchRadiusChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         //console.log(event?.currentTarget?.value);
         const mySearchRadius = parseFloat(event?.currentTarget?.value);
         setSearchRadius(Number.isNaN(mySearchRadius) ? searchRadius : mySearchRadius);
     }
 
-    const handleOptionChange = (event: React.SyntheticEvent<Element, Event>, value: string) =>{               
+    const handleOptionChange = (event: SyntheticEvent<Element, Event>, value: string) =>{               
         const filteredOptions = options.filter(option => option.Label === value);
         //console.log(filteredOptions);
         if(filteredOptions.length > 0) {

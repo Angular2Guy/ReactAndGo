@@ -1,5 +1,6 @@
 import styles from "./header.module.scss";
 import {Button} from '@mui/material';
+import {FormEvent} from 'react';
 import { useSetRecoilState,useRecoilValue } from "recoil";
 import GlobalState from "../GlobalState";
 
@@ -10,17 +11,17 @@ const Header = () => {
     const setGlobalLoginModal = useSetRecoilState(GlobalState.loginModalState);
     const globalWebWorkerRefState = useRecoilValue(GlobalState.webWorkerRefState); 
 
-    const logout = (event: React.FormEvent) => {
+    const logout = (event: FormEvent) => {
         console.log("Logout ",event);
         setJwtTokenState('');    
         globalWebWorkerRefState?.postMessage({jwtToken: '', newNotificationUrl: ''});
         setGlobalLoginModal(true);
     }
-    const location = (event: React.FormEvent) => {
+    const location = (event: FormEvent) => {
         //console.log("Location ",event);
         setLocationModalState(true)
     }
-    const targetPrice = (event: React.FormEvent) => {
+    const targetPrice = (event: FormEvent) => {
         setTargetPriceModalState(true);    
     }
 

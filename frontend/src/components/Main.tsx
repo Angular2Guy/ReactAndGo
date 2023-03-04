@@ -124,6 +124,7 @@ export default function Main() {
     };
   }
 
+  // eslint-disable-next-line
   useEffect(() => {
     if (globalJwtTokenState?.length > 10 && globalUserUuidState?.length > 10 && first) {
       setTimeout(() => handleTabChange({} as unknown as SyntheticEvent, value), 3000);

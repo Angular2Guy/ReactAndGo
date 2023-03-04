@@ -1,7 +1,7 @@
 import { useRecoilState,useRecoilValue } from "recoil";
 import GlobalState from "../GlobalState";
 import {Box,TextField,Button,Dialog,DialogContent} from '@mui/material';
-import {useState,useMemo} from "react";
+import {useState,useMemo,ChangeEventHandler,FormEvent } from "react";
 import { UserRequest, UserResponse } from "./LoginModal";
 
 const TargetPriceModal = () => {
@@ -20,22 +20,22 @@ const TargetPriceModal = () => {
         return globalTargetPriceModalState;
     }, [globalTargetPriceModalState, globalUserDataState.TargetDiesel, globalUserDataState.TargetE10, globalUserDataState.TargetE5]);    
 
-    const handleTargetDieselChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    const handleTargetDieselChange: ChangeEventHandler<HTMLInputElement> = (event) => {
         event.preventDefault();
         setTargetDiesel(event.currentTarget.value);
     }
 
-    const handleTargetE10Change: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    const handleTargetE10Change: ChangeEventHandler<HTMLInputElement> = (event) => {
         event.preventDefault();
         setTargetE10(event.currentTarget.value);
     }
 
-    const handleTargetE5Change: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    const handleTargetE5Change: ChangeEventHandler<HTMLInputElement> = (event) => {
         event.preventDefault();
         setTargetE5(event.currentTarget.value);
     }
 
-    const handleSubmit = async (event: React.FormEvent) => {
+    const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
         const requestOptions = {
             method: 'POST',
@@ -50,7 +50,7 @@ const TargetPriceModal = () => {
         //console.log(result.TargetDiesel+' '+result.TargetE10+' '+result.TargetE5);        
     };
 
-    const handleCancel = (event: React.FormEvent) => {
+    const handleCancel = (event: FormEvent) => {
         event.preventDefault();
         setGlobalTargetPriceModalState(false);
         setTargetDiesel('0');

@@ -2,7 +2,7 @@ import { useSetRecoilState,useRecoilState } from "recoil";
 import styles from './modal.module.scss';
 import GlobalState from "../GlobalState";
 import {UserDataState} from "../GlobalState";
-import { useState } from "react";
+import { useState,ChangeEventHandler,FormEvent,BaseSyntheticEvent } from "react";
 import {Box,TextField,Button,Tab,Tabs,Dialog,DialogContent} from '@mui/material';
 //import { Token } from "@mui/icons-material";
 
@@ -71,17 +71,17 @@ const LoginModal = () => {
    const [globalLoginModal, setGlobalLoginModal] = useRecoilState(GlobalState.loginModalState);
    const [activeTab, setActiveTab] = useState(0);
 
-   const handleChangeUsername: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+   const handleChangeUsername: ChangeEventHandler<HTMLInputElement> = (event) => {
       setUserName(event.currentTarget.value as string);      
   };
-  const handleChangePassword1: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+  const handleChangePassword1: ChangeEventHandler<HTMLInputElement> = (event) => {
     setPassword1(event.currentTarget.value as string);      
 };
-const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+const handleChangePassword2: ChangeEventHandler<HTMLInputElement> = (event) => {
     setPassword2(event.currentTarget.value as string);      
 };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();  
       Notification.requestPermission();      
       const requestOptions = {
@@ -115,7 +115,7 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
     const worker = new Worker(new URL('../webpush/dedicated-worker.js', import.meta.url));           
     if (!!worker) {
     worker.addEventListener('message', (event: MessageEvent) => { 
-      console.log(event.data);
+      //console.log(event.data);
       if(!!event?.data?.Token && event?.data.Token?.length > 10) {
         setGlobalJwtToken(event.data.Token);
       }    
@@ -139,7 +139,7 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
   return result;
   };
 
-  const handleCancel = (event: React.FormEvent) => {
+  const handleCancel = (event: FormEvent) => {
    event.preventDefault();
       setUserName('');
       setPassword1('');
@@ -149,7 +149,7 @@ const handleChangePassword2: React.ChangeEventHandler<HTMLInputElement> = (event
   const handleClose = () => {
     //setOpen(false);
   };
-  const handleTabChange = (event: React.BaseSyntheticEvent, newValue: number) => {
+  const handleTabChange = (event: BaseSyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
     setResponseMsg('');
   };
