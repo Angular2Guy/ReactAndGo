@@ -10,6 +10,7 @@ export interface TableDataRow {
 
 interface DataTableProps {
     location: string;
+    time: string;
     e5: string;
     e10: string;
     diesel: string;
@@ -23,6 +24,7 @@ export default function DataTable(props: DataTableProps) {
             <TableHead>
               <TableRow>
                 <TableCell>{props.location}</TableCell>
+                <TableCell>{props.time}</TableCell>
                 <TableCell align="right">{props.e5}</TableCell>
                 <TableCell align="right">{props.e10}</TableCell>
                 <TableCell align="right">{props.diesel}</TableCell>                
@@ -37,6 +39,8 @@ export default function DataTable(props: DataTableProps) {
                   <TableCell component="th" scope="row">
                     {row.location}
                   </TableCell>
+                  <TableCell>{row.date.toISOString().replace('T',' ').split('.')[0]}</TableCell>
+                  <TableCell align="right">{row.e5}</TableCell>
                   <TableCell align="right">{row.e5}</TableCell>
                   <TableCell align="right">{row.e10}</TableCell>
                   <TableCell align="right">{row.diesel}</TableCell>                  

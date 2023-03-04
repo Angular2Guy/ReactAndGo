@@ -24,7 +24,7 @@ interface GasPrice {
 	E5:           number;
 	E10:          number;
 	Diesel:       number;
-	Date:         Date;
+	Date:         string;
 	Changed:      number;
 }
 
@@ -34,6 +34,21 @@ interface Notification {
 	Title:            string;
 	Message:          string;
 	DataJson:         string;
+}
+
+interface MyDataJson {
+  StationName: string;
+  Brand: string;
+  Street: string;
+  Place: string;
+  HouseNumber: string;
+  PostCode: string;
+  Latitude: number;
+  Longitude: number;
+  E5: number;
+  E10: number;
+  Diesel: number;
+  Timestamp: string;
 }
 
 interface TabPanelProps {
@@ -85,16 +100,20 @@ export default function Main() {
           const myResult = await fetch('/gasstation/search/location', requestOptions2);
           const myJson = await myResult.json() as GasStation[];  
           setRows(myJson.filter(value => value?.GasPrices?.length > 0).map(value => ({ location: value.Place + ' ' + value.Brand + ' ' + value.Street + ' ' + value.HouseNumber, e5: value.GasPrices[0].E5, 
-            e10: value.GasPrices[0].E10, diesel: value.GasPrices[0].Diesel, date: value.GasPrices[0].Date } as TableDataRow)));
+            e10: value.GasPrices[0].E10, diesel: value.GasPrices[0].Diesel, date: new Date(Date.parse(value.GasPrices[0].Date)) } as TableDataRow)));
         } else {
           const myResult = await fetch(`/usernotification/current/${globalUserUuidState}`, requestOptions1);
           const myJson = await myResult.json() as Notification[];
-          console.log(myJson);
-          /*
-          setRows(myJson.map(value => ({ location: value.Message, e5: value?.GasPrices?.length > 0 ? value.GasPrices[0].E5 : 0, 
-            e10: value?.GasPrices?.length > 0 ? value.GasPrices[0].E10 : 0, diesel: value?.GasPrices?.length > 0 ? value.GasPrices[0].Diesel : 0, date: value?.GasPrices?.length > 0 ? value.GasPrices[0].Date : new Date() } as TableDataRow)));
-            */
-           setRows([]);
+          //console.log(myJson);
+          const result = myJson.map(value => {
+            //console.log(JSON.parse(value?.DataJson));
+            return (JSON.parse(value?.DataJson) as MyDataJson[])?.map(value2 => {
+              console.log(value2);
+              return {location: value2.Place + ' ' + value2.Brand + ' ' + value2.Street + ' ' + value2.HouseNumber, 
+            e5: value2.E5, e10: value2.E10, diesel: value2.Diesel, date: new Date(Date.parse(value2.Timestamp))} as TableDataRow;
+          });
+        })?.flat();
+           setRows(result);
         }        
     };    
 
@@ -104,10 +123,10 @@ export default function Main() {
             <Tab label="Last Price changes"/>
         </Tabs>
         <TabPanel value={value} index={0}>
-        <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' rows={rows}></DataTable>
+        <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' time='Time' rows={rows}></DataTable>
       </TabPanel>
       <TabPanel value={value} index={1}>
-      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' rows={rows}></DataTable>
+      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' time='Time' rows={rows}></DataTable>
       </TabPanel>
     </Box>);
 }
