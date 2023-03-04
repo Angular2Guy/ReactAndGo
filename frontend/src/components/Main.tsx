@@ -1,5 +1,6 @@
 import {Tabs,Tab, Box} from '@mui/material';
 import {useState, SyntheticEvent} from 'react';
+import DataTable, { TableDataRow } from './DataTable';
 import styles from './main.module.scss';
 
 interface TabPanelProps {
@@ -34,17 +35,29 @@ export default function Main() {
         setValue(newValue);
         console.log(newValue);
     };
+    const rows1 = [{
+      diesel: 1.75,
+      e10: 1.80,
+      e5: 1.85,
+      location: 'Bremen'
+    } as TableDataRow];
+    const rows2 = [{
+      diesel: 1.70,
+      e10: 1.75,
+      e5: 1.80,
+      location: 'Berlin'
+    } as TableDataRow];
 
     return (<Box sx={{ width: '100%' }}>
         <Tabs value={value} onChange={handleTabChange} >
-            <Tab label="Item One"/>
-            <Tab label="Item Two"/>
+            <Tab label="Current Prices"/>
+            <Tab label="Last Price changes"/>
         </Tabs>
         <TabPanel value={value} index={0}>
-        Item One
+        <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' rows={rows1}></DataTable>
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Item Two
+      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' rows={rows2}></DataTable>
       </TabPanel>
     </Box>);
 }
