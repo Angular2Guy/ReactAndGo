@@ -41,7 +41,7 @@ func LoadNotifications(userUuid string, newNotifications bool) []unmodel.UserNot
 		})
 	} else {
 		database.DB.Transaction(func(tx *gorm.DB) error {
-			tx.Where("user_uuid = ?", userUuid, newNotifications).Order("timestamp desc").Find(&userNotifications)
+			tx.Where("user_uuid = ?", userUuid).Order("timestamp desc").Find(&userNotifications)
 			var myUserNotifications []unmodel.UserNotification
 			for index, userNotification := range userNotifications {
 				if index < 10 {

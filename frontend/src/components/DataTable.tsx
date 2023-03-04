@@ -5,6 +5,7 @@ export interface TableDataRow {
     e5: number;
     e10: number;
     diesel: number;
+    date: Date;
 }
 
 interface DataTableProps {
