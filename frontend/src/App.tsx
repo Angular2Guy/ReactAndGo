@@ -24,7 +24,7 @@ function App() {
       <LoginModal/>
       <LocationModal/>
       <TargetPriceModal/>
-      <Main></Main>
+      <Main/>
       {/*
       <Form todo={todo} setTodo={setTodo} todoList={todoList} setTodoList={setTodoList}></Form>
       <TodoList todoList={todoList} setTodoList={setTodoList}></TodoList>

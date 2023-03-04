@@ -1,4 +1,5 @@
 import {TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody} from '@mui/material';
+import { nanoid } from 'nanoid';
 
 export interface TableDataRow {
     location: string;
@@ -31,16 +32,15 @@ export default function DataTable(props: DataTableProps) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {props.rows.map((row,index) => (
+              {props.rows.map((row) => (
                 <TableRow
-                  key={index}
+                  key={nanoid()}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
                     {row.location}
                   </TableCell>
-                  <TableCell>{row.date.toISOString().replace('T',' ').split('.')[0]}</TableCell>
-                  <TableCell align="right">{row.e5}</TableCell>
+                  <TableCell>{row.date.toISOString().replace('T',' ').split('.')[0]}</TableCell>                  
                   <TableCell align="right">{row.e5}</TableCell>
                   <TableCell align="right">{row.e10}</TableCell>
                   <TableCell align="right">{row.diesel}</TableCell>                  
