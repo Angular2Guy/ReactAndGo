@@ -29,7 +29,11 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prebuild": "rimraf ./build && mkdirp ./build",
+    "postbuild": "npm run deploy",
+    "predeploy": "rimraf ../backend/public/**",
+    "deploy": "cpy './build/**' ../backend/public/"
   },
   "eslintConfig": {
     "extends": [
@@ -49,5 +53,10 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:3000"
+  "proxy": "http://localhost:3000",
+  "devDependencies": {
+    "cpy-cli": "^4.2.0",
+    "mkdirp": "^2.1.5",
+    "rimraf": "^4.3.0"
+  }
 }
