@@ -1,6 +1,8 @@
 package main
 
 import (
+	"embed"
+	"io/fs"
 	"log"
 	"os"
 	"os/signal"
@@ -13,6 +15,9 @@ import (
 	"syscall"
 	"time"
 )
+
+//go:embed public
+var embeddedFiles embed.FS
 
 func init() {
 	config.LoadEnvVariables()
@@ -28,8 +33,7 @@ func main() {
 	// kill -2 is syscall.SIGINT
 	// kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-
-	go controller.Start()
+	go controller.Start(getPublicFolder(embeddedFiles))
 
 	<-quit
 	log.Println("Shutting down server...")
@@ -38,4 +42,12 @@ func main() {
 	time.Sleep(2 * time.Second)
 
 	log.Println("Server exiting")
+}
+
+func getPublicFolder(myEmbeddedFiles embed.FS) fs.FS {
+	result, err := fs.Sub(embeddedFiles, "public")
+	if err != nil {
+		log.Fatalf("%v\n", err)
+	}
+	return result
 }
