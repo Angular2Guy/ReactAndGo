@@ -92,7 +92,7 @@ const handleChangePassword2: ChangeEventHandler<HTMLInputElement> = (event) => {
     setResponseMsg('');
     const httpResponse = activeTab === 0 ? await fetch('/appuser/login', requestOptions) : await fetch('/appuser/signin', requestOptions);
     const userResponse = await httpResponse.json() as UserResponse;
-    console.log(userResponse);
+    //console.log(userResponse);
     if(!userResponse?.Message && !!userResponse?.Token && userResponse.Token?.length > 10 && !!userResponse?.Uuid && userResponse.Uuid?.length > 10) {
       setGlobalUserName(userName);  
       setGlobalJwtToken(userResponse.Token);  
