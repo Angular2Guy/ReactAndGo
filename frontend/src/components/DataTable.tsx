@@ -40,7 +40,7 @@ export default function DataTable(props: DataTableProps) {
                   <TableCell component="th" scope="row">
                     {row.location}
                   </TableCell>
-                  <TableCell>{row.date.toISOString().replace('T',' ').split('.')[0]}</TableCell>                  
+                  <TableCell>{row.date.toISOString().split('T')[0]+' '+row.date.toTimeString().split(' ')[0]}</TableCell>                  
                   <TableCell align="right">{row.e5}</TableCell>
                   <TableCell align="right">{row.e10}</TableCell>
                   <TableCell align="right">{row.diesel}</TableCell>                  
