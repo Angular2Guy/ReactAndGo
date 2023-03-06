@@ -4,6 +4,7 @@ import {UserDataState} from "../GlobalState";
 import { useMemo,useEffect,useState,FormEvent,ChangeEvent,SyntheticEvent } from "react";
 import {Box,TextField,Button,Dialog,DialogContent, Autocomplete} from '@mui/material';
 import {UserRequest, UserResponse} from "./LoginModal";
+import styles from './modal.module.scss';
 
 interface PostCodeLocation {
     Message: string;
@@ -89,10 +90,21 @@ const LocationModal = () => {
         setGlobalLocationModalState(false);
     }
 
+    const handleGetLocation = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {        
+        if(!!navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(result => {
+                if(!!result?.coords?.longitude && !!result?.coords?.latitude) {
+                setLongitude(result.coords.longitude);
+                setLatitude(result.coords.latitude);
+                }
+            });
+        }
+    }
+
     let dialogOpen = useMemo(() => {        
-        //console.log(globalUserDataState.Longitude+' '+globalUserDataState.Latitude);
+        //console.log(globalUserDataState.Longitude+' '+globalUserDataState.Latitude);        
         setLongitude(globalUserDataState.Longitude);
-        setLatitude(globalUserDataState.Latitude);      
+        setLatitude(globalUserDataState.Latitude);              
         setSearchRadius(globalUserDataState.SearchRadius);           
         return globalLocationModalState;
     }, [globalLocationModalState, globalUserDataState.Longitude, globalUserDataState.Latitude, globalUserDataState.SearchRadius]);    
@@ -133,7 +145,8 @@ const LocationModal = () => {
             variant="standard"/>      
           <div>
             <Button type="submit">Ok</Button>
-            <Button onClick={handleCancel}>Cancel</Button>  
+            <Button onClick={handleCancel}>Cancel</Button>              
+            <Button className={styles.toright} onClick={handleGetLocation}>Get Location</Button>  
           </div>
     </Box>
     </DialogContent>
