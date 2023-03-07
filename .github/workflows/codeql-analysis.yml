@@ -15,7 +15,7 @@ jobs:
           go-version: 1.19
 
       - name: Build
-        run: cd backend && go build -v ./...
+        run: make full-build
 
       - name: Test
         run: cd backend && go test -v ./...
