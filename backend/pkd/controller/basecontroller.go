@@ -3,9 +3,12 @@ package controller
 import (
 	"io/fs"
 	"net/http"
+	"os"
 	gsclient "react-and-go/pkd/controller/client"
 	token "react-and-go/pkd/token"
+	"strings"
 
+	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,5 +32,10 @@ func Start(embeddedFiles fs.FS) {
 	router.StaticFS("/public", http.FS(embeddedFiles))
 	//router.Static("/public", "./public")
 	router.NoRoute(func(c *gin.Context) { c.Redirect(http.StatusTemporaryRedirect, "/public") })
-	router.Run() // listen and serve on 0.0.0.0:3000
+	httpsUrl := strings.TrimSpace(os.Getenv("HTTPS_URL"))
+	if len(httpsUrl) < 2 {
+		router.Run() // listen and serve on 0.0.0.0:3000
+	} else {
+		autotls.Run(router, httpsUrl)
+	}
 }
