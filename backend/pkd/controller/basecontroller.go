@@ -34,9 +34,10 @@ func Start(embeddedFiles fs.FS) {
 	router.NoRoute(func(c *gin.Context) { c.Redirect(http.StatusTemporaryRedirect, "/public") })
 	absolutePathKeyFile := strings.TrimSpace(os.Getenv("ABSOLUTE_PATH_KEY_FILE"))
 	absolutePathCertFile := strings.TrimSpace(os.Getenv("ABSOLUTE_PATH_CERT_FILE"))
-	if len(absolutePathCertFile) < 2 || len(absolutePathKeyFile) < 2 {
+	myPort := strings.TrimSpace(os.Getenv("PORT"))
+	if len(absolutePathCertFile) < 2 || len(absolutePathKeyFile) < 2 || len(myPort) < 2 {
 		router.Run() // listen and serve on 0.0.0.0:3000
 	} else {
-		log.Fatal(router.RunTLS("0.0.0.0", absolutePathCertFile, absolutePathKeyFile))
+		log.Fatal(router.RunTLS(":"+myPort, absolutePathCertFile, absolutePathKeyFile))
 	}
 }

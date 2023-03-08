@@ -1,5 +1,7 @@
 curl -X GET http://localhost:3000/gasstation/33d6adbc-e6f5-4c4e-f7a5-a132626d3736 -H 'Content-Type: application/json'  -H 'Authorization: Bearer injectJwtTokenString'
 
+curl -X GET http://localhost:3000/config/updatepc?filename=plz-5stellig.geojson.gz -H 'Content-Type: application/json'  -H 'Authorization: Bearer injectJwtTokenString'
+
 curl -X POST http://localhost:3000/gasstation/search/place -H 'Content-Type: application/json' -H 'Authorization: Bearer injectJwtTokenString' -d '{"StationName": "Berlin"}'
 
 curl -X POST http://localhost:3000/gasstation/search/place -H 'Content-Type: application/json' -H 'Authorization: Bearer injectJwtTokenString' -d '{"StationName": "Berlin", "PostCode": "13088"}'
