@@ -12,7 +12,7 @@ For development 2 test messages are provided that are send to an Apache Artemis 
 
 The frontend provides a login/signin dialog that uses React and MUI components.
 
-A combined build is still open.
+The combined build is implemented with a MakeFile
 
 ## Articles
 [The ReactAndGo Architecture and Gorm DB access](https://angular2guy.wordpress.com/2023/02/26/the-reactandgo-architecture-and-gorm-db-access/)
