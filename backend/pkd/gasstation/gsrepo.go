@@ -252,8 +252,8 @@ func FindBySearchPlace(searchPlace gsbody.SearchPlaceBody) []gsmodel.GasStation 
 	if len(strings.TrimSpace(searchPlace.StationName)) >= 2 {
 		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(searchPlace.StationName)+"%")
 	}
-	query.Limit(200).Preload("GasPrices", func(db *gorm.DB) *gorm.DB {
-		return db.Order("date DESC").Limit(20)
+	query.Preload("GasPrices", func(db *gorm.DB) *gorm.DB {
+		return db.Order("date DESC").Limit(50)
 	}).Find(&gasStations)
 	return gasStations
 }
@@ -281,7 +281,7 @@ func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasSta
 	//fmt.Printf("WestLat: %v, WestLng: %v\n", westLat, westLng)
 	//fmt.Printf("MinLat: %v, MinLng: %v, MaxLat: %v, MaxLng: %v\n", minMax.MinLat, minMax.MinLng, minMax.MaxLat, minMax.MaxLng)
 	database.DB.Where("lat >= ? and lat <= ? and lng >= ? and lng <= ?", minMax.MinLat, minMax.MaxLat, minMax.MinLng, minMax.MaxLng).Preload("GasPrices", func(db *gorm.DB) *gorm.DB {
-		return db.Order("date DESC").Limit(20)
+		return db.Order("date DESC").Limit(50)
 	}).Find(&gasStations)
 	//filter for stations in circle
 	filteredGasStations := []gsmodel.GasStation{}
