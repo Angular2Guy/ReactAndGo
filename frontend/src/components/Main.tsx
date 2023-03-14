@@ -78,35 +78,42 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export default function Main() {
+  let controller: AbortController | null = null;
   const [value, setValue] = useState(0);
   const [first, setFirst] = useState(true);
   const [rows, setRows] = useState([] as TableDataRow[]);
   const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
   const globalUserUuidState = useRecoilValue(GlobalState.userUuidState);
-  const globalUserDataState = useRecoilValue(GlobalState.userDataState);
+  const globalUserDataState = useRecoilValue(GlobalState.userDataState);  
 
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
     if (globalJwtTokenState?.length < 10 || globalUserUuidState?.length < 10) {
       return;
-    }
+    }    
     //console.log(newValue);        
+    if(!!controller) {
+      controller.abort();
+    }
+    controller = new AbortController();
     const requestOptions1 = {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` },
+      signal: controller.signal
     }
     const requestOptions2 = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` },
-      body: JSON.stringify({ Longitude: globalUserDataState.Longitude, Latitude: globalUserDataState.Latitude, Radius: globalUserDataState.SearchRadius })
+      body: JSON.stringify({ Longitude: globalUserDataState.Longitude, Latitude: globalUserDataState.Latitude, Radius: globalUserDataState.SearchRadius }),
+      signal: controller.signal
     }
-    if (newValue === 0) {
+    if (newValue === 0) {      
       fetch('/gasstation/search/location', requestOptions2).then(myResult => myResult.json() as Promise<GasStation[]>).then(myJson => setRows(myJson.filter(value => value?.GasPrices?.length > 0).map(value => ({
         location: value.Place + ' ' + value.Brand + ' ' + value.Street + ' ' + value.HouseNumber, e5: value.GasPrices[0].E5,
         e10: value.GasPrices[0].E10, diesel: value.GasPrices[0].Diesel, date: new Date(Date.parse(value.GasPrices[0].Date))
-      } as TableDataRow))));
-    } else {
+      } as TableDataRow)))).then(() => controller = null);
+    } else {     
       fetch(`/usernotification/current/${globalUserUuidState}`, requestOptions1).then(myResult => myResult.json() as Promise<Notification[]>).then(myJson => {
         //console.log(myJson);
         const result = myJson.map(value => {
@@ -120,7 +127,7 @@ export default function Main() {
           });
         })?.flat();
         setRows(result);
-      });
+      }).then(() => controller = null);
     };
   }
 
