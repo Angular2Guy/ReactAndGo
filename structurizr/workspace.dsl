@@ -49,7 +49,7 @@ workspace "ReactAndGo" "This is project to explore the integration of a React Fr
     }
 
     views {
-        systemContext gasPriceFinderSystem "ContextDiagram" {
+        systemContext gasPriceFinderSystem "SystemContext" {
             include *
             autoLayout
         }
