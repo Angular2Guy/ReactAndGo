@@ -17,6 +17,7 @@ interface PostCodeLocation {
 }
 
 const LocationModal = () => {
+    let controller: AbortController | null = null;
     const [open, setOpen] = useState(false);
     const [searchRadius, setSearchRadius] = useState(0);
     const [longitude, setLongitude] = useState(0);
@@ -35,6 +36,9 @@ const LocationModal = () => {
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if(!!controller) {
+            controller.abort();
+        }
         //console.log("Submit: ",event);
         const requestOptions = {
             method: 'POST',
@@ -43,6 +47,7 @@ const LocationModal = () => {
         };
         const response = await fetch('/appuser/locationradius', requestOptions);
         const userResponse = response.json() as UserResponse;
+        controller = null;
         setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius, 
             TargetDiesel: globalUserDataState.TargetDiesel, TargetE10: globalUserDataState.TargetE10, TargetE5: globalUserDataState.TargetE5} as UserDataState);
         setGlobalLocationModalState(false);

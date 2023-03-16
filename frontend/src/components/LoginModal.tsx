@@ -59,6 +59,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const LoginModal = () => {
+  let controller: AbortController | null = null;
   const setGlobalUserName = useSetRecoilState(GlobalState.userNameState);
   const setGlobalUuid = useSetRecoilState(GlobalState.userUuidState);
   const setGlobalJwtToken = useSetRecoilState(GlobalState.jwtTokenState);
@@ -84,14 +85,19 @@ const LoginModal = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     Notification.requestPermission();
+    if(!!controller) {
+      controller.abort();
+    }
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ Username: userName, Password: password1 } as UserRequest)
     };
     setResponseMsg('');
+    controller = new AbortController();
     const httpResponse = activeTab === 0 ? await fetch('/appuser/login', requestOptions) : await fetch('/appuser/signin', requestOptions);
     const userResponse = await httpResponse.json() as UserResponse;
+    controller = null;
     //console.log(userResponse);
     if (!userResponse?.Message && !!userResponse?.Token && userResponse.Token?.length > 10 && !!userResponse?.Uuid && userResponse.Uuid?.length > 10) {
       setGlobalUserName(userName);
