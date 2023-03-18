@@ -1,6 +1,6 @@
 #!/bin/bash
 export GOGC=off
-export GOMEMLIMIT=64MiB
+export GOMEMLIMIT=96MiB
 export GODEBUG=gctrace=1
 #to support differen libc versions
 export CGO_ENABLED=0
