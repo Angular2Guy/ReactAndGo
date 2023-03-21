@@ -41,6 +41,7 @@ const refreshToken = (myToken: string) => {
   }
 }
 
+let firstNotRequest = true;
 let notificationIntervalRef: ReturnType<typeof setInterval>;
 /* eslint-disable-next-line no-restricted-globals */
 self.addEventListener('message', (event: MessageEvent) => {
@@ -52,6 +53,7 @@ self.addEventListener('message', (event: MessageEvent) => {
   notificationIntervalRef = setInterval(() => {
     if (!jwtToken) {
       clearInterval(notificationIntervalRef);
+      firstNotRequest = true;
     }
     const requestOptions = {
       method: 'GET',
@@ -64,12 +66,14 @@ self.addEventListener('message', (event: MessageEvent) => {
         self.postMessage(resultJson);
         //Notification
         //console.log(Notification.permission);
-        if (Notification.permission === 'granted') { 
+        if (Notification.permission === 'granted' && !firstNotRequest) { 
           if(resultJson?.length > 0 && resultJson[0]?.Message?.length > 1 && resultJson[0]?.Title?.length > 1) {            
             for(let value of resultJson) {
             new Notification(value?.Title, {body: value?.Message});
             }
           }                
+        } else if(!!firstNotRequest) {
+          firstNotRequest = false;
         }
       }
     });
