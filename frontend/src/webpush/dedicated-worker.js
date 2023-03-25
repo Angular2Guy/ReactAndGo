@@ -26,6 +26,7 @@ const refreshToken = (myToken) => {
         }, 45000);
     }
 };
+let firstNotRequest = true;
 let notificationIntervalRef;
 /* eslint-disable-next-line no-restricted-globals */
 self.addEventListener('message', (event) => {
@@ -37,6 +38,7 @@ self.addEventListener('message', (event) => {
     notificationIntervalRef = setInterval(() => {
         if (!jwtToken) {
             clearInterval(notificationIntervalRef);
+            firstNotRequest = true;
         }
         const requestOptions = {
             method: 'GET',
@@ -50,12 +52,15 @@ self.addEventListener('message', (event) => {
                 self.postMessage(resultJson);
                 //Notification
                 //console.log(Notification.permission);
-                if (Notification.permission === 'granted') {
+                if (Notification.permission === 'granted' && !firstNotRequest) {
                     if ((resultJson === null || resultJson === void 0 ? void 0 : resultJson.length) > 0 && ((_b = (_a = resultJson[0]) === null || _a === void 0 ? void 0 : _a.Message) === null || _b === void 0 ? void 0 : _b.length) > 1 && ((_d = (_c = resultJson[0]) === null || _c === void 0 ? void 0 : _c.Title) === null || _d === void 0 ? void 0 : _d.length) > 1) {
                         for (let value of resultJson) {
                             new Notification(value === null || value === void 0 ? void 0 : value.Title, { body: value === null || value === void 0 ? void 0 : value.Message });
                         }
                     }
+                }
+                else if (!!firstNotRequest) {
+                    firstNotRequest = false;
                 }
             }
         });

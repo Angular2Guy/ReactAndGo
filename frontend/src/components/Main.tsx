@@ -142,7 +142,7 @@ export default function Main() {
   return (<Box sx={{ width: '100%' }}>
     <Tabs value={value} onChange={handleTabChange} >
       <Tab label="Current Prices" />
-      <Tab label="Last Price changes" />
+      <Tab label="Last Price matches" />
     </Tabs>
     <TabPanel value={value} index={0}>
       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' time='Time' rows={rows}></DataTable>
