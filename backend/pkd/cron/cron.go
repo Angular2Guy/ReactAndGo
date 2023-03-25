@@ -115,6 +115,7 @@ func sendTestPriceMsgs(msgFiles []string) {
 			log.Fatalf("file not found: %v", value)
 		}
 		messaging.SendMsg(string(jsonFile))
+		//log.Printf("Msg send: %v", string(jsonFile))
 		time.Sleep(10 * time.Second)
 	}
 }

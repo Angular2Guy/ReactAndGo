@@ -10,7 +10,11 @@ export interface GsValue {
 
 }
 
-export default function GsMap(gsValues: GsValue[]) {
+interface InputProps {
+    gsValues: GsValue[];
+}
 
-    return <div className={style.MyStyle}></div>;
+export default function GsMap(inputProps: InputProps) {
+
+    return <div className={style.MyStyle}>Hello</div>;
 }

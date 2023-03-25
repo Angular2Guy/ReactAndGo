@@ -4,6 +4,7 @@ import DataTable, { TableDataRow } from './DataTable';
 import { useRecoilValue } from 'recoil';
 import GlobalState from '../GlobalState';
 import styles from './main.module.scss';
+import GsMap from './GsMap';
 
 interface GasStation {
   StationName: string;
@@ -143,12 +144,16 @@ export default function Main() {
     <Tabs value={value} onChange={handleTabChange} >
       <Tab label="Current Prices" />
       <Tab label="Last Price matches" />
+      <Tab label="Current Prices Map" />
     </Tabs>
     <TabPanel value={value} index={0}>
       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' time='Time' rows={rows}></DataTable>
     </TabPanel>
     <TabPanel value={value} index={1}>
       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' time='Time' rows={rows}></DataTable>
+    </TabPanel>
+    <TabPanel value={value} index={2}>
+      <GsMap gsValues={[]}></GsMap>      
     </TabPanel>
   </Box>);
 }
