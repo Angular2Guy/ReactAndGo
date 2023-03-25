@@ -153,7 +153,7 @@ export default function Main() {
       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' time='Time' rows={rows}></DataTable>
     </TabPanel>
     <TabPanel value={value} index={2}>
-      <GsMap gsValues={[]}></GsMap>      
+      <GsMap gsValues={[]} center={globalUserDataState}></GsMap>      
     </TabPanel>
   </Box>);
 }
