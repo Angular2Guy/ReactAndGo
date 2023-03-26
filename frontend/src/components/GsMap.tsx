@@ -35,7 +35,7 @@ interface InputProps {
 export default function GsMap(inputProps: InputProps) {           
     let map: Map;
     let overlays: Overlay[];
-    let currentOverlay: Overlay | null = null;
+    let currentOverlay: Overlay | null = null;    
       useEffect(() => {        
         if(!!map) {
             map.setView(new View({

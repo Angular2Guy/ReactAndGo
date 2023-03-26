@@ -1,10 +1,10 @@
 import { Tabs, Tab, Box } from '@mui/material';
 import { useEffect, useState, SyntheticEvent } from 'react';
 import DataTable, { TableDataRow } from './DataTable';
+import GsMap, { GsValue } from './GsMap';
 import { useRecoilValue } from 'recoil';
 import GlobalState from '../GlobalState';
 import styles from './main.module.scss';
-import GsMap from './GsMap';
 
 interface GasStation {
   StationName: string;
@@ -83,6 +83,7 @@ export default function Main() {
   const [value, setValue] = useState(0);
   const [first, setFirst] = useState(true);
   const [rows, setRows] = useState([] as TableDataRow[]);
+  const [gsValues, setGsValues] = useState([] as GsValue[]);
   const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
   const globalUserUuidState = useRecoilValue(GlobalState.userUuidState);
   const globalUserDataState = useRecoilValue(GlobalState.userDataState);  
@@ -109,11 +110,15 @@ export default function Main() {
       body: JSON.stringify({ Longitude: globalUserDataState.Longitude, Latitude: globalUserDataState.Latitude, Radius: globalUserDataState.SearchRadius }),
       signal: controller.signal
     }
-    if (newValue === 0 || newValue === 2) {      
-      fetch('/gasstation/search/location', requestOptions2).then(myResult => myResult.json() as Promise<GasStation[]>).then(myJson => setRows(myJson.filter(value => value?.GasPrices?.length > 0).map(value => ({
-        location: value.Place + ' ' + value.Brand + ' ' + value.Street + ' ' + value.HouseNumber, e5: value.GasPrices[0].E5,
-        e10: value.GasPrices[0].E10, diesel: value.GasPrices[0].Diesel, date: new Date(Date.parse(value.GasPrices[0].Date)), longitude: value.Longitude, latitude: value.Latitude
-      } as TableDataRow)))).then(() => controller = null);
+    if (newValue === 0 || newValue === 2) {           
+      fetch('/gasstation/search/location', requestOptions2).then(myResult => myResult.json() as Promise<GasStation[]>).then(myJson => {
+        const myResult = myJson.filter(value => value?.GasPrices?.length > 0).map(value => ({
+          location: value.Place + ' ' + value.Brand + ' ' + value.Street + ' ' + value.HouseNumber, e5: value.GasPrices[0].E5,
+          e10: value.GasPrices[0].E10, diesel: value.GasPrices[0].Diesel, date: new Date(Date.parse(value.GasPrices[0].Date)), longitude: value.Longitude, latitude: value.Latitude
+        } as TableDataRow));
+        setRows(myResult);
+        setGsValues(myResult);
+      }).then(() => controller = null);
     } else {     
       fetch(`/usernotification/current/${globalUserUuidState}`, requestOptions1).then(myResult => myResult.json() as Promise<Notification[]>).then(myJson => {
         //console.log(myJson);
@@ -153,7 +158,7 @@ export default function Main() {
       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' time='Time' rows={rows}></DataTable>
     </TabPanel>
     <TabPanel value={value} index={2}>
-      <GsMap gsValues={rows} center={globalUserDataState}></GsMap>      
+      <GsMap gsValues={gsValues} center={globalUserDataState}></GsMap>      
     </TabPanel>
   </Box>);
 }
