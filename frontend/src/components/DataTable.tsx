@@ -7,6 +7,8 @@ export interface TableDataRow {
     e10: number;
     diesel: number;
     date: Date;
+    longitude: number;
+    latitude: number;
 }
 
 interface DataTableProps {

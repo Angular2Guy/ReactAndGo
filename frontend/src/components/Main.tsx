@@ -109,10 +109,10 @@ export default function Main() {
       body: JSON.stringify({ Longitude: globalUserDataState.Longitude, Latitude: globalUserDataState.Latitude, Radius: globalUserDataState.SearchRadius }),
       signal: controller.signal
     }
-    if (newValue === 0) {      
+    if (newValue === 0 || newValue === 2) {      
       fetch('/gasstation/search/location', requestOptions2).then(myResult => myResult.json() as Promise<GasStation[]>).then(myJson => setRows(myJson.filter(value => value?.GasPrices?.length > 0).map(value => ({
         location: value.Place + ' ' + value.Brand + ' ' + value.Street + ' ' + value.HouseNumber, e5: value.GasPrices[0].E5,
-        e10: value.GasPrices[0].E10, diesel: value.GasPrices[0].Diesel, date: new Date(Date.parse(value.GasPrices[0].Date))
+        e10: value.GasPrices[0].E10, diesel: value.GasPrices[0].Diesel, date: new Date(Date.parse(value.GasPrices[0].Date)), longitude: value.Longitude, latitude: value.Latitude
       } as TableDataRow)))).then(() => controller = null);
     } else {     
       fetch(`/usernotification/current/${globalUserUuidState}`, requestOptions1).then(myResult => myResult.json() as Promise<Notification[]>).then(myJson => {
@@ -123,7 +123,7 @@ export default function Main() {
             //console.log(value2);
             return {
               location: value2.Place + ' ' + value2.Brand + ' ' + value2.Street + ' ' + value2.HouseNumber,
-              e5: value2.E5, e10: value2.E10, diesel: value2.Diesel, date: new Date(Date.parse(value2.Timestamp))
+              e5: value2.E5, e10: value2.E10, diesel: value2.Diesel, date: new Date(Date.parse(value2.Timestamp)), longitude: 0, latitude: 0
             } as TableDataRow;
           });
         })?.flat();
@@ -153,7 +153,7 @@ export default function Main() {
       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' time='Time' rows={rows}></DataTable>
     </TabPanel>
     <TabPanel value={value} index={2}>
-      <GsMap gsValues={[]} center={globalUserDataState}></GsMap>      
+      <GsMap gsValues={rows} center={globalUserDataState}></GsMap>      
     </TabPanel>
   </Box>);
 }
