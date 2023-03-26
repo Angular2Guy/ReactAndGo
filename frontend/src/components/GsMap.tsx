@@ -5,7 +5,7 @@ import VectorSource from 'ol/source/Vector';
 import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
 import View from 'ol/View';
-import { Overlay } from 'ol';
+import { MapBrowserEvent, Overlay } from 'ol';
 import {fromLonLat} from 'ol/proj';
 import myStyle from './gsmap.module.scss';
 import {Icon, Style} from 'ol/style.js';
@@ -35,13 +35,14 @@ interface InputProps {
 export default function GsMap(inputProps: InputProps) {           
     let map: Map;
     let overlays: Overlay[];
+    let currentOverlay: Overlay | null = null;
       useEffect(() => {        
         if(!!map) {
             map.setView(new View({
                 center: fromLonLat([inputProps.center.Longitude,inputProps.center.Latitude]),
                 zoom: 12,
             }));               
-            overlays = inputProps.gsValues.map(gsValue => {
+            overlays = inputProps.gsValues.map((gsValue, index) => {
                 const element = document.createElement('div');
                 element.id = nanoid();   
                 element.innerHTML = `${gsValue.location}<br/>E5: ${gsValue.e5}<br/>E10: ${gsValue.e10}<br/>Diesel: ${gsValue.diesel}`;                                
@@ -59,14 +60,13 @@ export default function GsMap(inputProps: InputProps) {
                 //map.addOverlay(overlay);                 
                 const iconFeature = new Feature({
                     geometry: new Point(fromLonLat([gsValue.longitude, gsValue.latitude])),
-                    name: 'Null Island',
-                    population: 4000,
-                    rainfall: 500,
+                    ttId: element.id,
+                    ttIndex: index                    
                   });
                   
                   const iconStyle = new Style({
                     image: new Icon({
-                      anchor: [50,50],
+                      anchor: [20,20],
                       anchorXUnits: 'pixels',
                       anchorYUnits: 'pixels',
                       src: '/public/assets/map-pin.png',
@@ -82,6 +82,21 @@ export default function GsMap(inputProps: InputProps) {
                   });
                 map.addLayer(vectorLayer);
                 return overlay;
+            });
+            map.on('click', (event: MapBrowserEvent<UIEvent>) => {
+                const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => {                    
+                    return feature;
+                  });
+                  if(!!currentOverlay) {
+                    map.removeOverlay(currentOverlay);
+                    currentOverlay = null;
+                }                    
+                //console.log(feature);
+                //console.log(feature?.get('ttId') + ' ' + feature?.get('ttIndex'));
+                if(!!feature?.get('ttIndex')) {                    
+                    currentOverlay = overlays[feature?.get('ttIndex')];
+                    map.addOverlay(currentOverlay);
+                }
             });
         }
         map = !map ?  new Map({
