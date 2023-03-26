@@ -48,7 +48,7 @@ export default function GsMap(inputProps: InputProps) {
                 element.innerHTML = `${gsValue.location}<br/>E5: ${gsValue.e5}<br/>E10: ${gsValue.e10}<br/>Diesel: ${gsValue.diesel}`;                                
                 const overlay = new Overlay({
                     element: element,
-                    offset: [0, -15],
+                    offset: [-5, 0],
                     positioning: 'bottom-center',
                     className: 'ol-tooltip-measure ol-tooltip .ol-tooltip-static'
                 });
