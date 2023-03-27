@@ -15,9 +15,9 @@ The frontend provides a login/signin dialog that uses React and MUI components.
 The combined build is implemented with a MakeFile
 
 ## Articles
-[The ReactAndGo Architecture and Gorm DB access](https://angular2guy.wordpress.com/2023/02/26/the-reactandgo-architecture-and-gorm-db-access/)
-
-[Notifications from React frontend to Go/Gin/Gorm backend](https://angular2guy.wordpress.com/2023/03/09/notifications-from-react-frontend-to-go-gin-gorm-backend/)
+* [Cron Jobs and MQTT Messaging in Go](https://angular2guy.wordpress.com/2023/03/27/cron-jobs-and-mqtt-messaging-in-go/)
+* [The ReactAndGo Architecture and Gorm DB access](https://angular2guy.wordpress.com/2023/02/26/the-reactandgo-architecture-and-gorm-db-access/)
+* [Notifications from React frontend to Go/Gin/Gorm backend](https://angular2guy.wordpress.com/2023/03/09/notifications-from-react-frontend-to-go-gin-gorm-backend/)
 
 ## C4 Architecture Diagrams
 The project has a [System Context Diagram](structurizr/diagrams/structurizr-1-SystemContext.svg), a [Container Diagram](structurizr/diagrams/structurizr-1-Containers.svg) and a [Component Diagram](structurizr/diagrams/structurizr-1-Components.svg). The Diagrams have been created with Structurizr. The file runStructurizr.sh contains the commands to use Structurizr and the directory structurizr contains the dsl file.
