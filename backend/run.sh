@@ -2,6 +2,7 @@
 export GOGC=off
 export GOMEMLIMIT=96MiB
 export GODEBUG=gctrace=1
+export GOMAXPROCS=12
 #to support differen libc versions
 export CGO_ENABLED=0
 #echo $GOGC $GOMEMLIMIT $GODEBUG $CGO_ENABLED

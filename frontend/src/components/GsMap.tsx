@@ -9,7 +9,7 @@ import { MapBrowserEvent, Overlay } from 'ol';
 import { fromLonLat } from 'ol/proj';
 import myStyle from './gsmap.module.scss';
 import { Icon, Style } from 'ol/style.js';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { nanoid } from 'nanoid';
 
 export interface GsValue {
@@ -66,31 +66,43 @@ export default function GsMap(inputProps: InputProps) {
         myStyle.display = 'block';
       }
       //map.addOverlay(overlay);                 
-      const iconFeature = new Feature({
-        geometry: new Point(fromLonLat([gsValue.longitude, gsValue.latitude])),
-        ttId: element.id,
-        ttIndex: index
-      });
-
-      const iconStyle = new Style({
-        image: new Icon({
-          anchor: [20, 20],
-          anchorXUnits: 'pixels',
-          anchorYUnits: 'pixels',
-          src: '/public/assets/map-pin.png',
-        }),
-      });
-      iconFeature.setStyle(iconStyle);
-      const vectorSource = new VectorSource({
-        features: [iconFeature],
-      });
-
-      const vectorLayer = new VectorLayer({
-        source: vectorSource,
-      });
-      map.addLayer(vectorLayer);
+      addPins(gsValue, element, index);
       return overlay;
     });
+    addClickListener(myOverlays);
+    map.setView(new View({
+      center: fromLonLat([inputProps.center.Longitude, inputProps.center.Latitude]),
+      zoom: 12,
+    }));
+  }, []);
+
+  function addPins(gsValue: GsValue, element: HTMLDivElement, index: number) {
+    const iconFeature = new Feature({
+      geometry: new Point(fromLonLat([gsValue.longitude, gsValue.latitude])),
+      ttId: element.id,
+      ttIndex: index
+    });
+
+    const iconStyle = new Style({
+      image: new Icon({
+        anchor: [20, 20],
+        anchorXUnits: 'pixels',
+        anchorYUnits: 'pixels',
+        src: '/public/assets/map-pin.png',
+      }),
+    });
+    iconFeature.setStyle(iconStyle);
+    const vectorSource = new VectorSource({
+      features: [iconFeature],
+    });
+
+    const vectorLayer = new VectorLayer({
+      source: vectorSource,
+    });
+    map.addLayer(vectorLayer);
+  }
+
+  function addClickListener(myOverlays: Overlay[]) {
     map.on('click', (event: MapBrowserEvent<UIEvent>) => {
       const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => {
         return feature;
@@ -107,13 +119,10 @@ export default function GsMap(inputProps: InputProps) {
         map.addOverlay(currentOverlay as Overlay);
       }
     });
-    map.setView(new View({
-      center: fromLonLat([inputProps.center.Longitude, inputProps.center.Latitude]),
-      zoom: 12,
-    }));
-  }, []);
+  }
 
   return (<div className={myStyle.MyStyle}>
     <div id="map" className={myStyle.gsMap}></div>
   </div>);
+
 }

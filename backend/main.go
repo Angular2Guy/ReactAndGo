@@ -12,6 +12,7 @@ import (
 	"react-and-go/pkd/database"
 	"react-and-go/pkd/database/dbmigrate"
 	"react-and-go/pkd/messaging"
+	"runtime"
 	"syscall"
 	"time"
 )
@@ -28,6 +29,7 @@ func init() {
 }
 
 func main() {
+	updateThreadPoolSize()
 	quit := make(chan os.Signal, 1)
 	// kill (no param) default send syscall.SIGTERM
 	// kill -2 is syscall.SIGINT
@@ -50,4 +52,10 @@ func getPublicFolder(myEmbeddedFiles embed.FS) fs.FS {
 		log.Fatalf("%v\n", err)
 	}
 	return result
+}
+
+func updateThreadPoolSize() {
+	if runtime.NumCPU() < 12 {
+		runtime.GOMAXPROCS(12)
+	}
 }
