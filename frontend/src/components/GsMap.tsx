@@ -37,7 +37,7 @@ export default function GsMap(inputProps: InputProps) {
   let currentOverlay: Overlay | null = null;
   useEffect(() => {
     if (!map) {
-      // eslint-disable-next-line no-use-before-define
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       map = new Map({
         layers: [
           new TileLayer({
@@ -110,14 +110,14 @@ export default function GsMap(inputProps: InputProps) {
       });
       if (!!currentOverlay) {
         map.removeOverlay(currentOverlay);
-        // eslint-disable-next-line no-use-before-define
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         currentOverlay = null;
       }
       //console.log(feature);
       //console.log(feature?.get('ttId') + ' ' + feature?.get('ttIndex'));
       if (!!feature?.get('ttIndex')) {
         //console.log(myOverlays[feature?.get('ttIndex')]);
-        // eslint-disable-next-line no-use-before-define
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         currentOverlay = myOverlays[feature?.get('ttIndex')];
         map.addOverlay(currentOverlay as Overlay);
       }
