@@ -51,7 +51,16 @@ export default function GsMap(inputProps: InputProps) {
         }),
       });
     }
-    const myOverlays = inputProps.gsValues.map((gsValue, index) => {
+    const myOverlays = createOverlays();
+    addClickListener(myOverlays);
+    map.setView(new View({
+      center: fromLonLat([inputProps.center.Longitude, inputProps.center.Latitude]),
+      zoom: 12,
+    }));
+  }, []);
+
+  function createOverlays(): Overlay[] {
+    return inputProps.gsValues.map((gsValue, index) => {
       const element = document.createElement('div');
       element.id = nanoid();
       element.innerHTML = `${gsValue.location}<br/>E5: ${gsValue.e5}<br/>E10: ${gsValue.e10}<br/>Diesel: ${gsValue.diesel}`;
@@ -70,12 +79,7 @@ export default function GsMap(inputProps: InputProps) {
       addPins(gsValue, element, index);
       return overlay;
     });
-    addClickListener(myOverlays);
-    map.setView(new View({
-      center: fromLonLat([inputProps.center.Longitude, inputProps.center.Latitude]),
-      zoom: 12,
-    }));
-  }, []);
+  }
 
   function addPins(gsValue: GsValue, element: HTMLDivElement, index: number) {
     const iconFeature = new Feature({
