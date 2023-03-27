@@ -98,7 +98,8 @@ func HandlePriceUpdate(msgArr []byte, topicName string) {
 	var priceUpdateRawMap map[string]json.RawMessage
 	if err := json.Unmarshal(msgArr, &priceUpdateRawMap); err != nil {
 		log.Printf("Message: %s received on topic: %s size: %d\n", msgArr, topicName, len(msgArr))
-		log.Fatalf("Unmarshal failed: %v\n", err.Error())
+		log.Printf("Unmarshal failed: %v\n", err.Error())
+		return
 	}
 	priceUpdateMap := make(map[string]PriceUpdates)
 	for key, value := range priceUpdateRawMap {
