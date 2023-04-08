@@ -11,7 +11,7 @@ frontend-build:
 backend-build: 
 	cd backend
 	export GOGC=off
-	export GOMEMLIMIT=96MiB
+	export GOMEMLIMIT=128MiB
 	#to support differen libc versions
 	export CGO_ENABLED=0
 	go build	
