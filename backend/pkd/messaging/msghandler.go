@@ -43,7 +43,8 @@ var gasPriceMsgHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.M
 	//fmt.Printf("Message: %s received on topic: %s size: %d\n", msg.Payload(), msg.Topic(), len(msg.Payload()))
 	startTime := time.Now()
 	fmt.Printf("Message received on topic: %s size: %d\n", msg.Topic(), len(msg.Payload()))
-	HandlePriceUpdate(msg.Payload(), msg.Topic())
+	ptr := msg.Payload()
+	HandlePriceUpdate(&ptr, msg.Topic())
 	fmt.Printf("Message processed in: %v on topic: %s size: %d\n", time.Since(startTime), msg.Topic(), len(msg.Payload()))
 }
 
@@ -106,10 +107,10 @@ func ConnectionCheck() {
 	//log.Printf("ConnectionCheck() done.\n")
 }
 
-func HandlePriceUpdate(msgArr []byte, topicName string) {
+func HandlePriceUpdate(msgArr *[]byte, topicName string) {
 	var priceUpdateRawMap map[string]json.RawMessage
-	if err := json.Unmarshal(msgArr, &priceUpdateRawMap); err != nil {
-		log.Printf("Message: %s received on topic: %s size: %d\n", msgArr, topicName, len(msgArr))
+	if err := json.Unmarshal(*msgArr, &priceUpdateRawMap); err != nil {
+		log.Printf("Message: %s received on topic: %s size: %d\n", msgArr, topicName, len(*msgArr))
 		log.Printf("Unmarshal failed: %v\n", err.Error())
 		return
 	}
@@ -138,7 +139,7 @@ func HandlePriceUpdate(msgArr []byte, topicName string) {
 	}
 	//log.Printf("GasStationPrices: %v", myGasStationPrices)
 	log.Printf("Priceupdates received: %v", len(myGasStationPrices))
-	gasstation.UpdatePrice(myGasStationPrices)
+	gasstation.UpdatePrice(&myGasStationPrices)
 }
 
 func subscribeToTopic(topicName string) {

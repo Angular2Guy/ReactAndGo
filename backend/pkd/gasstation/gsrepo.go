@@ -57,9 +57,9 @@ type GasStationImport struct {
 	OpeningTimesJson string
 }
 
-func UpdateGasStations(gasStations []GasStationImport) {
+func UpdateGasStations(gasStations *[]GasStationImport) {
 	gasStationImportMap := make(map[string]GasStationImport)
-	for _, value := range gasStations {
+	for _, value := range *gasStations {
 		gasStationImportMap[value.Uuid] = value
 	}
 	fmt.Printf("GasStations found: %v\n", len(gasStationImportMap))
@@ -119,15 +119,15 @@ func createNewGasStation(value GasStationImport) gsmodel.GasStation {
 	return resultGs
 }
 
-func UpdatePrice(gasStationPrices []GasStationPrices) {
+func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 	stationPricesMap := make(map[string]GasStationPrices)
 	var stationPricesKeys []string
-	for _, value := range gasStationPrices {
+	for _, value := range *gasStationPrices {
 		stationPricesMap[value.GasStationID] = value
 		stationPricesKeys = append(stationPricesKeys, value.GasStationID)
 	}
 	gasPriceUpdateMap := make(map[string]gsmodel.GasPrice)
-	stationPricesDb := FindPricesByStids(stationPricesKeys)
+	stationPricesDb := FindPricesByStids(&stationPricesKeys)
 	log.Printf("StationPricesKeys: %v StationPricesDb: %v", len(stationPricesKeys), len(stationPricesDb))
 	for _, value := range stationPricesDb {
 		if _, found := gasPriceUpdateMap[value.GasStationID]; !found {
@@ -161,7 +161,7 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 		for _, stationPrice := range stationPricesMap {
 			stationIds = append(stationIds, stationPrice.GasStationID)
 		}
-		myGasStations := findByIds(stationIds)
+		myGasStations := findByIds(&stationIds)
 		for _, gasStation := range myGasStations {
 			value := stationPricesMap[gasStation.ID]
 			gasPriceUpdateMap[value.GasStationID] = gsmodel.GasPrice{GasStationID: value.GasStationID, E5: stationPricesMap[value.GasStationID].E5, E10: stationPricesMap[value.GasStationID].E10,
@@ -181,32 +181,32 @@ func UpdatePrice(gasStationPrices []GasStationPrices) {
 		return nil
 	})
 	log.Printf("Prices updated: %v\n", len(gasPriceUpdateMap))
-	go sendNotifications(gasPriceUpdateMap)
+	go sendNotifications(&gasPriceUpdateMap)
 }
 
-func sendNotifications(gasStationIDToGasPriceMap map[string]gsmodel.GasPrice) {
+func sendNotifications(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) {
 	var gasStationIds []string
-	for key, _ := range gasStationIDToGasPriceMap {
+	for key, _ := range *gasStationIDToGasPriceMap {
 		gasStationIds = append(gasStationIds, key)
 	}
-	gasStations := findByIds(gasStationIds)
+	gasStations := findByIds(&gasStationIds)
 	notification.SendNotifications(gasStationIDToGasPriceMap, gasStations)
 }
 
-func createChunks(ids []string) [][]string {
+func createChunks(ids *[]string) [][]string {
 	cunckedSelects := strings.ToLower(strings.TrimSpace(os.Getenv("DB_CHUNKED_SELECTS")))
 	chunkSize := 10000
 	if cunckedSelects == "true" {
 		chunkSize = 999
 	}
-	chuncks := chunkSlice(ids, chunkSize)
+	chuncks := chunkSlice(*ids, chunkSize)
 	if len(chuncks) > 1 {
 		log.Printf("Number of Chunks: %v\n", len(chuncks))
 	}
 	return chuncks
 }
 
-func findByIds(ids []string) []gsmodel.GasStation {
+func findByIds(ids *[]string) []gsmodel.GasStation {
 	var result []gsmodel.GasStation
 	chuncks := createChunks(ids)
 	database.DB.Transaction(func(tx *gorm.DB) error {
@@ -228,7 +228,7 @@ func FindById(id string) gsmodel.GasStation {
 	return myGasStation
 }
 
-func FindPricesByStids(stids []string) []gsmodel.GasPrice {
+func FindPricesByStids(stids *[]string) []gsmodel.GasPrice {
 	var myGasPrice []gsmodel.GasPrice
 	oneMonthAgo := time.Now().Add(time.Hour * -720)
 	dateStr := fmt.Sprintf("%04d-%02d-%02d", oneMonthAgo.Year(), oneMonthAgo.Month(), oneMonthAgo.Day())

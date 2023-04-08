@@ -28,9 +28,9 @@ type NotificationMsg struct {
 	DataJson string
 }
 
-func StoreNotifications(notificationMsgs []NotificationMsg) {
+func StoreNotifications(notificationMsgs *[]NotificationMsg) {
 	database.DB.Transaction(func(tx *gorm.DB) error {
-		for _, notificationMsg := range notificationMsgs {
+		for _, notificationMsg := range *notificationMsgs {
 			log.Printf("%v\n", notificationMsg.Title)
 			myUserNotification := unmodel.UserNotification{Timestamp: time.Now(), UserUuid: notificationMsg.UserUuid,
 				Title: notificationMsg.Title, Message: notificationMsg.Message, DataJson: notificationMsg.DataJson, NotificationSend: false}

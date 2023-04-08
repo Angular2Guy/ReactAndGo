@@ -42,10 +42,11 @@ type NotificationData struct {
 	Timestamp    time.Time
 }
 
-func SendNotifications(gasStationIDToGasPriceMap map[string]gsmodel.GasPrice, gasStations []gsmodel.GasStation) {
+func SendNotifications(gasStationIDToGasPriceMapPtr *map[string]gsmodel.GasPrice, gasStations []gsmodel.GasStation) {
 	gasStationWithPricesMap := make(map[string]gasStationWithPrice)
 	for _, gasStation := range gasStations {
 		myGasStationWithPrice := gasStationWithPrice{}
+		gasStationIDToGasPriceMap := *gasStationIDToGasPriceMapPtr
 		myGasStationWithPrice.gasPrice = gasStationIDToGasPriceMap[gasStation.ID]
 		myGasStationWithPrice.gasStation = gasStation
 		gasStationWithPricesMap[gasStation.ID] = myGasStationWithPrice
@@ -92,5 +93,5 @@ func SendNotifications(gasStationIDToGasPriceMap map[string]gsmodel.GasPrice, ga
 			myNotificationMsgs = append(myNotificationMsgs, myNotificationMsg)
 		}
 	}
-	StoreNotifications(myNotificationMsgs)
+	StoreNotifications(&myNotificationMsgs)
 }

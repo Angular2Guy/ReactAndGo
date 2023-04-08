@@ -69,17 +69,17 @@ func UpdateGasStations(c *gin.Context) {
 	if err != nil {
 		log.Println("Cannot read request body:", err)
 	}
-	gasStationImports := convertCsvToGasStationImports(rows)
+	gasStationImports := convertCsvToGasStationImports(&rows)
 	log.Default().Printf("Result: %v\n", len(gasStationImports))
 	//log.Default().Fatalf("Result: GasStationImport {\nUuid: %v\nStationName: %v\nBrand: %v\nStreet: %v\nHouseNumber: %v\nPostCode: %v\nCity: %v\nLatitude: %v\nLongitude: %v\nFirstActive: %v\nOpeningTimesJson: %v\n",
 	//	gasStationImports[0].Uuid, gasStationImports[0].StationName, gasStationImports[0].Brand, gasStationImports[0].Street, gasStationImports[0].HouseNumber, gasStationImports[0].PostCode, gasStationImports[0].City,
 	//	gasStationImports[0].Latitude, gasStationImports[0].Longitude, gasStationImports[0].FirstActive, gasStationImports[0].OpeningTimesJson)
-	gasstation.UpdateGasStations(gasStationImports)
+	gasstation.UpdateGasStations(&gasStationImports)
 }
 
-func convertCsvToGasStationImports(rows [][]string) []gasstation.GasStationImport {
+func convertCsvToGasStationImports(rows *[][]string) []gasstation.GasStationImport {
 	var result []gasstation.GasStationImport
-	for _, row := range rows {
+	for _, row := range *rows {
 		//ignore header
 		if strings.ToLower(row[0]) == "uuid" {
 			continue
@@ -146,7 +146,7 @@ func UpdateGsPrices(latitude float64, longitude float64, radiusKM float64, apike
 		gasPriceUpdates = append(gasPriceUpdates, value)
 	}
 	fmt.Printf("Number of Price updates: %v\n", len(gasPriceUpdates))
-	gasstation.UpdatePrice(gasPriceUpdates)
+	gasstation.UpdatePrice(&gasPriceUpdates)
 	/*
 		body, err := ioutil.ReadAll(response.Body)
 		if err != nil {
