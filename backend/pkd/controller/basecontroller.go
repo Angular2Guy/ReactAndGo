@@ -19,8 +19,10 @@ import (
 	"os"
 	gsclient "react-and-go/pkd/controller/client"
 	token "react-and-go/pkd/token"
+	"strconv"
 	"strings"
 
+	"github.com/angular2guy/go-actuator"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,12 +43,23 @@ func Start(embeddedFiles fs.FS) {
 	router.POST("/gasstation/search/location", token.CheckToken, searchGasStationLocation)
 	router.GET("/usernotification/new/:useruuid", token.CheckToken, getNewUserNotifications)
 	router.GET("/usernotification/current/:useruuid", token.CheckToken, getCurrentUserNotifications)
+
+	myPort := strings.TrimSpace(os.Getenv("PORT"))
+	portNum, err := strconv.ParseInt(myPort, 10, 0)
+	if err != nil {
+		log.Fatal("Failed to parse port to int: " + myPort)
+	}
+	actuatorHandler := actuator.GetActuatorHandler(&actuator.Config{Port: int(portNum)})
+	ginActuatorHandler := func(ctx *gin.Context) {
+		actuatorHandler(ctx.Writer, ctx.Request)
+	}
+	router.GET("/actuator/*endpoint", ginActuatorHandler)
+
 	router.StaticFS("/public", http.FS(embeddedFiles))
 	//router.Static("/public", "./public")
 	router.NoRoute(func(c *gin.Context) { c.Redirect(http.StatusTemporaryRedirect, "/public") })
 	absolutePathKeyFile := strings.TrimSpace(os.Getenv("ABSOLUTE_PATH_KEY_FILE"))
 	absolutePathCertFile := strings.TrimSpace(os.Getenv("ABSOLUTE_PATH_CERT_FILE"))
-	myPort := strings.TrimSpace(os.Getenv("PORT"))
 	if len(absolutePathCertFile) < 2 || len(absolutePathKeyFile) < 2 || len(myPort) < 2 {
 		router.Run() // listen and serve on 0.0.0.0:3000
 	} else {
