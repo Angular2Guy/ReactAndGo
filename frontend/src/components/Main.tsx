@@ -14,7 +14,7 @@ import { Tabs, Tab, Box } from '@mui/material';
 import { useEffect, useState, SyntheticEvent } from 'react';
 import DataTable, { TableDataRow } from './DataTable';
 import GsMap, { GsValue } from './GsMap';
-import { useRecoilValue } from 'recoil';
+import { useRecoilSnapshot, useRecoilValue } from 'recoil';
 import GlobalState from '../GlobalState';
 import styles from './main.module.scss';
 
@@ -100,6 +100,7 @@ export default function Main() {
   const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
   const globalUserUuidState = useRecoilValue(GlobalState.userUuidState);
   const globalUserDataState = useRecoilValue(GlobalState.userDataState);  
+  const recoilSnapshot = useRecoilSnapshot();
 
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
@@ -117,7 +118,8 @@ export default function Main() {
     if(!!controller) {
       controller.abort();
     }
-    setController(new AbortController());
+    setController(new AbortController());   
+    console.log(recoilSnapshot.map);   
     if (newValue === 0 || newValue === 2) {           
       fetchSearchLocation();
     } else {     
@@ -125,7 +127,7 @@ export default function Main() {
     };
   }
 
-  const fetchSearchLocation = () => {
+  const fetchSearchLocation = () => {    
     const requestOptions2 = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` },
@@ -142,7 +144,7 @@ export default function Main() {
     }).then(() => setController(null));
   }
 
-  const fetchLastMatches = () => {
+  const fetchLastMatches = () => {    
     const requestOptions1 = {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` },
