@@ -3,7 +3,7 @@ module react-and-go
 go 1.19
 
 require (
-	github.com/angular2guy/go-actuator v0.9.4
+	github.com/angular2guy/go-actuator v0.9.5
 	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-co-op/gocron v1.19.0
