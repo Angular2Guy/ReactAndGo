@@ -90,8 +90,9 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-export default function Main() {
-  let controller: AbortController | null = null;
+export default function Main() {  
+  const [controller, setController] = useState(null as AbortController | null);
+  const [timer, setTimer] = useState(undefined as undefined | NodeJS.Timer);
   const [value, setValue] = useState(0);
   const [first, setFirst] = useState(true);
   const [rows, setRows] = useState([] as TableDataRow[]);
@@ -103,50 +104,64 @@ export default function Main() {
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
+    clearInterval(timer);
+    getData(newValue);
+    setTimer(setInterval(() => getData(newValue), 10000));
+  }
+
+  const getData = (newValue: number) => {
     if (globalJwtTokenState?.length < 10 || globalUserUuidState?.length < 10) {
       return;
     }    
-    //console.log(newValue);        
+    //console.log(newValue); 
     if(!!controller) {
       controller.abort();
     }
-    controller = new AbortController();
-    const requestOptions1 = {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` },
-      signal: controller.signal
-    }
+    setController(new AbortController());
+    if (newValue === 0 || newValue === 2) {           
+      fetchSearchLocation();
+    } else {     
+      fetchLastMatches();
+    };
+  }
+
+  const fetchSearchLocation = () => {
     const requestOptions2 = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` },
       body: JSON.stringify({ Longitude: globalUserDataState.Longitude, Latitude: globalUserDataState.Latitude, Radius: globalUserDataState.SearchRadius }),
-      signal: controller.signal
+      signal: controller?.signal
     }
-    if (newValue === 0 || newValue === 2) {           
-      fetch('/gasstation/search/location', requestOptions2).then(myResult => myResult.json() as Promise<GasStation[]>).then(myJson => {
-        const myResult = myJson.filter(value => value?.GasPrices?.length > 0).map(value => ({
-          location: value.Place + ' ' + value.Brand + ' ' + value.Street + ' ' + value.HouseNumber, e5: value.GasPrices[0].E5,
-          e10: value.GasPrices[0].E10, diesel: value.GasPrices[0].Diesel, date: new Date(Date.parse(value.GasPrices[0].Date)), longitude: value.Longitude, latitude: value.Latitude
-        } as TableDataRow));
-        setRows(myResult);
-        setGsValues(myResult);
-      }).then(() => controller = null);
-    } else {     
-      fetch(`/usernotification/current/${globalUserUuidState}`, requestOptions1).then(myResult => myResult.json() as Promise<Notification[]>).then(myJson => {
-        //console.log(myJson);
-        const result = myJson.map(value => {
-          //console.log(JSON.parse(value?.DataJson));
-          return (JSON.parse(value?.DataJson) as MyDataJson[])?.map(value2 => {
-            //console.log(value2);
-            return {
-              location: value2.Place + ' ' + value2.Brand + ' ' + value2.Street + ' ' + value2.HouseNumber,
-              e5: value2.E5, e10: value2.E10, diesel: value2.Diesel, date: new Date(Date.parse(value2.Timestamp)), longitude: 0, latitude: 0
-            } as TableDataRow;
-          });
-        })?.flat();
-        setRows(result);
-      }).then(() => controller = null);
-    };
+    fetch('/gasstation/search/location', requestOptions2).then(myResult => myResult.json() as Promise<GasStation[]>).then(myJson => {
+      const myResult = myJson.filter(value => value?.GasPrices?.length > 0).map(value => ({
+        location: value.Place + ' ' + value.Brand + ' ' + value.Street + ' ' + value.HouseNumber, e5: value.GasPrices[0].E5,
+        e10: value.GasPrices[0].E10, diesel: value.GasPrices[0].Diesel, date: new Date(Date.parse(value.GasPrices[0].Date)), longitude: value.Longitude, latitude: value.Latitude
+      } as TableDataRow));
+      setRows(myResult);
+      setGsValues(myResult);
+    }).then(() => setController(null));
+  }
+
+  const fetchLastMatches = () => {
+    const requestOptions1 = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` },
+      signal: controller?.signal
+    }
+    fetch(`/usernotification/current/${globalUserUuidState}`, requestOptions1).then(myResult => myResult.json() as Promise<Notification[]>).then(myJson => {
+      //console.log(myJson);
+      const result = myJson.map(value => {
+        //console.log(JSON.parse(value?.DataJson));
+        return (JSON.parse(value?.DataJson) as MyDataJson[])?.map(value2 => {
+          //console.log(value2);
+          return {
+            location: value2.Place + ' ' + value2.Brand + ' ' + value2.Street + ' ' + value2.HouseNumber,
+            e5: value2.E5, e10: value2.E10, diesel: value2.Diesel, date: new Date(Date.parse(value2.Timestamp)), longitude: 0, latitude: 0
+          } as TableDataRow;
+        });
+      })?.flat();
+      setRows(result);
+    }).then(() => setController(null));
   }
 
   // eslint-disable-next-line
