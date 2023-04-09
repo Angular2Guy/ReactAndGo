@@ -10,7 +10,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import {RecoilState, RecoilValueReadOnly, atom, selector} from 'recoil';
+import {atom} from 'recoil';
 
 export interface UserDataState {
     Longitude: number
@@ -21,18 +21,8 @@ export interface UserDataState {
 	TargetE10: number
 }
 
-interface MyGlobalState {
-    userNameState: RecoilState<string>;
-    userUuidState: RecoilState<string>;
-    userDataState: RecoilState<UserDataState>;
-    jwtTokenState: RecoilState<string>;
-    locationModalState: RecoilState<boolean>;
-    targetPriceModalState: RecoilState<boolean>;
-    loginModalState: RecoilState<boolean>;
-    webWorkerRefState: RecoilState<null|Worker>;    
-}
-
-const GlobalState: MyGlobalState = {
+const GlobalState = {
+    jwtToken: '',
     userNameState: atom({
         key: 'userNameState',
         default: '',

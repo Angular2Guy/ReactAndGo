@@ -14,7 +14,7 @@ import { Tabs, Tab, Box } from '@mui/material';
 import { useEffect, useState, SyntheticEvent } from 'react';
 import DataTable, { TableDataRow } from './DataTable';
 import GsMap, { GsValue } from './GsMap';
-import { useRecoilSnapshot, useRecoilValue } from 'recoil';
+import { useRecoilRefresher_UNSTABLE, useRecoilValue } from 'recoil';
 import GlobalState from '../GlobalState';
 import styles from './main.module.scss';
 
@@ -99,8 +99,8 @@ export default function Main() {
   const [gsValues, setGsValues] = useState([] as GsValue[]);
   const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
   const globalUserUuidState = useRecoilValue(GlobalState.userUuidState);
-  const globalUserDataState = useRecoilValue(GlobalState.userDataState);  
-  const recoilSnapshot = useRecoilSnapshot();
+  const globalUserDataState = useRecoilValue(GlobalState.userDataState);    
+  const refreshJwtTokenState = useRecoilRefresher_UNSTABLE(GlobalState.jwtTokenState);  
 
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
@@ -118,19 +118,21 @@ export default function Main() {
     if(!!controller) {
       controller.abort();
     }
-    setController(new AbortController());   
-    console.log(recoilSnapshot.map);   
+    setController(new AbortController()); 
+    refreshJwtTokenState();  
+    // jwtToken = globalJwtTokenState; //When recoil makes refresh work.
+    const jwtToken = GlobalState.jwtToken;  
     if (newValue === 0 || newValue === 2) {           
-      fetchSearchLocation();
+      fetchSearchLocation(jwtToken);
     } else {     
-      fetchLastMatches();
+      fetchLastMatches(jwtToken);
     };
   }
 
-  const fetchSearchLocation = () => {    
+  const fetchSearchLocation = (jwtToken: string) => {    
     const requestOptions2 = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
       body: JSON.stringify({ Longitude: globalUserDataState.Longitude, Latitude: globalUserDataState.Latitude, Radius: globalUserDataState.SearchRadius }),
       signal: controller?.signal
     }
@@ -144,10 +146,10 @@ export default function Main() {
     }).then(() => setController(null));
   }
 
-  const fetchLastMatches = () => {    
+  const fetchLastMatches = (jwtToken: string) => {    
     const requestOptions1 = {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
       signal: controller?.signal
     }
     fetch(`/usernotification/current/${globalUserUuidState}`, requestOptions1).then(myResult => myResult.json() as Promise<Notification[]>).then(myJson => {

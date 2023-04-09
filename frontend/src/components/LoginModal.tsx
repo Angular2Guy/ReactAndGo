@@ -113,7 +113,7 @@ const LoginModal = () => {
     //console.log(userResponse);
     if (!userResponse?.Message && !!userResponse?.Token && userResponse.Token?.length > 10 && !!userResponse?.Uuid && userResponse.Uuid?.length > 10) {
       setGlobalUserName(userName);
-      setGlobalJwtToken(userResponse.Token);
+      setGlobalJwtToken(userResponse.Token);      
       setGlobalUuid(userResponse.Uuid);
       setGlobalUserDataState({
         Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius,
@@ -138,6 +138,7 @@ const LoginModal = () => {
           //console.log(event.data);
           if (!!event?.data?.Token && event?.data.Token?.length > 10) {
             setGlobalJwtToken(event.data.Token);
+            GlobalState.jwtToken = event.data.Token;
           }
         });
         worker.postMessage({ jwtToken: userResponse.Token, newNotificationUrl: `/usernotification/new/${userResponse.Uuid}` } as MsgData);
