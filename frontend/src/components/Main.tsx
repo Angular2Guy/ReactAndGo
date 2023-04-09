@@ -121,7 +121,7 @@ export default function Main() {
     setController(new AbortController()); 
     refreshJwtTokenState();  
     // jwtToken = globalJwtTokenState; //When recoil makes refresh work.
-    const jwtToken = GlobalState.jwtToken;  
+    const jwtToken = !!GlobalState.jwtToken ? GlobalState.jwtToken : globalJwtTokenState;  
     if (newValue === 0 || newValue === 2) {           
       fetchSearchLocation(jwtToken);
     } else {     
