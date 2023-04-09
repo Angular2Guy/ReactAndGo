@@ -4,6 +4,8 @@ github.com/angular2guy/go-actuator v0.9.0 h1:uZgeN0WEYWGaIHPE0FGJGZuBfEiPg7dQSGV
 github.com/angular2guy/go-actuator v0.9.0/go.mod h1:dxrRbOI7x6uOoOlC5LJmXcR0VwgcUQg/0Sjc+2S+jLU=
 github.com/angular2guy/go-actuator v0.9.1 h1:r7WRtw0Im6clatZOqm6/vOyvHpELymNdoK+IHBZokO0=
 github.com/angular2guy/go-actuator v0.9.1/go.mod h1:dxrRbOI7x6uOoOlC5LJmXcR0VwgcUQg/0Sjc+2S+jLU=
+github.com/angular2guy/go-actuator v0.9.2 h1:aUcUL0a/8k1OVh/P78Ig+CpQIjkDR7XKkjVSoQg7t6c=
+github.com/angular2guy/go-actuator v0.9.2/go.mod h1:dxrRbOI7x6uOoOlC5LJmXcR0VwgcUQg/0Sjc+2S+jLU=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.8.7 h1:d3sry5vGgVq/OpgozRUNP6xBsSo0mtNdwliApw+SAMQ=
 github.com/bytedance/sonic v1.8.7/go.mod h1:i736AoUSYt75HyZLoJW9ERYxcy6eaN6h4BZXU064P/U=
