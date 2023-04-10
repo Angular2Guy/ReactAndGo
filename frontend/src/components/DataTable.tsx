@@ -12,6 +12,8 @@
 */
 import {TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody} from '@mui/material';
 import { nanoid } from 'nanoid';
+import { useEffect, useMemo } from 'react';
+import styles from "./datatable.module.scss";
 
 export interface TableDataRow {
     location: string;
@@ -21,6 +23,9 @@ export interface TableDataRow {
     date: Date;
     longitude: number;
     latitude: number;
+    e5Class: string;
+    e10Class: string;
+    dieselClass: string;
 }
 
 interface DataTableProps {
@@ -33,6 +38,34 @@ interface DataTableProps {
 }
 
 export default function DataTable(props: DataTableProps) {    
+
+  useMemo(() => {   
+    if(props?.rows?.length < 4) {
+      return;
+    }  
+    const e5Arr = [...props.rows].filter(row => row.e5 > 10);
+    e5Arr.sort((a,b) => a.e5 - b.e5);
+    const e10Arr = [...props.rows].filter(row => row.e10 > 10);    
+    e10Arr.sort((a,b) => a.e10 - b.e10);
+    const dieselArr = [...props.rows].filter(row => row.diesel > 10);
+    dieselArr.sort((a,b) => a.diesel - b.diesel);
+    if(e5Arr?.length >= 3) {
+    e5Arr[0].e5Class = 'best-price';
+    e5Arr[1].e5Class = 'good-price';
+    e5Arr[2].e5Class = 'good-price';
+    }
+    if(e10Arr?.length >= 3) {
+    e10Arr[0].e10Class = 'best-price';
+    e10Arr[1].e10Class = 'good-price';
+    e10Arr[2].e10Class = 'good-price';
+    }
+    if(dieselArr?.length >= 3) {
+    dieselArr[0].dieselClass = 'best-price';
+    dieselArr[1].dieselClass = 'good-price';
+    dieselArr[2].dieselClass = 'good-price';      
+    }
+  },[props.rows]);
+
     return (
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: '100%' }}>
@@ -55,9 +88,9 @@ export default function DataTable(props: DataTableProps) {
                     {row.location}
                   </TableCell>
                   <TableCell>{row.date.toISOString().split('T')[0]+' '+row.date.toTimeString().split(' ')[0]}</TableCell>                  
-                  <TableCell align="right">{row.e5}</TableCell>
-                  <TableCell align="right">{row.e10}</TableCell>
-                  <TableCell align="right">{row.diesel}</TableCell>                  
+                  <TableCell align="right" className={styles[row.e5Class]}>{row.e5}</TableCell>
+                  <TableCell align="right" className={styles[row.e10Class]}>{row.e10}</TableCell>
+                  <TableCell align="right" className={styles[row.dieselClass]}>{row.diesel}</TableCell>                  
                 </TableRow>
               ))}
             </TableBody>
