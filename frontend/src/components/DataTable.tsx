@@ -12,7 +12,7 @@
 */
 import {TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody} from '@mui/material';
 import { nanoid } from 'nanoid';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import styles from "./datatable.module.scss";
 
 export interface TableDataRow {
