@@ -316,12 +316,9 @@ func chunkSlice[T any](mySlice []T, chunkSize int) (s [][]T) {
 	numberOfChunks := len(mySlice)/chunkSize + 1
 	var result [][]T
 	for i := 0; i < numberOfChunks; i++ {
-
 		min := (i * len(mySlice) / numberOfChunks)
 		max := ((i + 1) * len(mySlice)) / numberOfChunks
-
 		result = append(result, mySlice[min:max])
-
 	}
 	return result
 }
