@@ -272,24 +272,11 @@ func FindBySearchPlace(searchPlace gsbody.SearchPlaceBody) []gsmodel.GasStation 
 
 func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasStation {
 	var gasStations []gsmodel.GasStation
-	minMax := minMaxSquare{MinLat: 1000.0, MinLng: 1000.0, MaxLat: 0.0, MaxLng: 0.0}
-	//fmt.Printf("StartLat: %v, StartLng: %v Radius: %v\n", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Radius)
-	//max supported radius 20km and add 0.1 for floation point side effects
 	myRadius := searchLocation.Radius + 0.1
 	if myRadius > 20.0 {
 		myRadius = 20.1
 	}
-	northLat, northLng := gsmodel.CalcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 0.0)
-	minMax = updateMinMaxSquare(northLat, northLng, minMax)
-	//fmt.Printf("NorthLat: %v, NorthLng: %v\n", northLat, northLng)
-	eastLat, eastLng := gsmodel.CalcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 90.0)
-	minMax = updateMinMaxSquare(eastLat, eastLng, minMax)
-	//fmt.Printf("EastLat: %v, EastLng: %v\n", eastLat, eastLng)
-	southLat, southLng := gsmodel.CalcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 180.0)
-	minMax = updateMinMaxSquare(southLat, southLng, minMax)
-	//fmt.Printf("SouthLat: %v, SouthLng: %v\n", southLat, southLng)
-	westLat, westLng := gsmodel.CalcLocation(searchLocation.Latitude, searchLocation.Longitude, myRadius, 270.0)
-	minMax = updateMinMaxSquare(westLat, westLng, minMax)
+	minMax := calcMinMaxSquare(searchLocation.Longitude, searchLocation.Latitude, myRadius)
 	//fmt.Printf("WestLat: %v, WestLng: %v\n", westLat, westLng)
 	//fmt.Printf("MinLat: %v, MinLng: %v, MaxLat: %v, MaxLng: %v\n", minMax.MinLat, minMax.MinLng, minMax.MaxLat, minMax.MaxLng)
 	database.DB.Where("lat >= ? and lat <= ? and lng >= ? and lng <= ?", minMax.MinLat, minMax.MaxLat, minMax.MinLng, minMax.MaxLng).Preload("GasPrices", func(db *gorm.DB) *gorm.DB {
@@ -305,6 +292,24 @@ func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasSta
 		}
 	}
 	return filteredGasStations
+}
+
+func calcMinMaxSquare(longitude float64, latitude float64, radius float64) minMaxSquare {
+	minMax := minMaxSquare{MinLat: 1000.0, MinLng: 1000.0, MaxLat: 0.0, MaxLng: 0.0}
+	//fmt.Printf("StartLat: %v, StartLng: %v Radius: %v\n", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Radius)
+	//max supported radius 20km and add 0.1 for floation point side effects
+	northLat, northLng := gsmodel.CalcLocation(latitude, longitude, radius, 0.0)
+	minMax = updateMinMaxSquare(northLat, northLng, minMax)
+	//fmt.Printf("NorthLat: %v, NorthLng: %v\n", northLat, northLng)
+	eastLat, eastLng := gsmodel.CalcLocation(latitude, longitude, radius, 90.0)
+	minMax = updateMinMaxSquare(eastLat, eastLng, minMax)
+	//fmt.Printf("EastLat: %v, EastLng: %v\n", eastLat, eastLng)
+	southLat, southLng := gsmodel.CalcLocation(latitude, longitude, radius, 180.0)
+	minMax = updateMinMaxSquare(southLat, southLng, minMax)
+	//fmt.Printf("SouthLat: %v, SouthLng: %v\n", southLat, southLng)
+	westLat, westLng := gsmodel.CalcLocation(latitude, longitude, radius, 270.0)
+	minMax = updateMinMaxSquare(westLat, westLng, minMax)
+	return minMax
 }
 
 func chunkSlice[T any](mySlice []T, chunkSize int) (s [][]T) {
