@@ -232,6 +232,10 @@ func ImportPostCodeData(postCodeData []PostCodeData) {
 	log.Printf("PostCodeLocations saved: %v\n", len(postCodeLocations))
 }
 
+func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]string) {
+
+}
+
 func mapToPostCodeLocation(postCodeData []PostCodeData) []aumodel.PostCodeLocation {
 	result := []aumodel.PostCodeLocation{}
 	for _, myPostCodeData := range postCodeData {

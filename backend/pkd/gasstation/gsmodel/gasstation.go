@@ -29,6 +29,8 @@ type GasStation struct {
 	Place                   string `gorm:"index:idx_gas_station_place"`
 	HouseNumber             string
 	PostCode                string  `gorm:"index:idx_gas_station_post_code"`
+	State                   string  `gorm:"size:256;index:idx_gas_station_state"`
+	County                  string  `gorm:"size:256;index:idx_gas_station_county"`
 	Latitude                float64 `gorm:"column:lat;index:idx_lat"`
 	Longitude               float64 `gorm:"column:lng;index:idx_lng"`
 	PublicHolidayIdentifier string

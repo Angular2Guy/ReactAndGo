@@ -37,6 +37,7 @@ func Start(embeddedFiles fs.FS) {
 	router.POST("/appuser/targetprices", token.CheckToken, postTargetPrices)
 	router.GET("/config/updategs", token.CheckToken, gsclient.UpdateGasStations)
 	router.GET("/config/updatepc", token.CheckToken, getPostCodeCoordinates)
+	router.GET("/config/updatestatescounties", token.CheckToken, getStateCountyData)
 	router.GET("/gasprice/:id", token.CheckToken, getGasPriceByGasStationId)
 	router.GET("/gasstation/:id", token.CheckToken, getGasStationById)
 	router.POST("/gasstation/search/place", token.CheckToken, searchGasStationPlace)

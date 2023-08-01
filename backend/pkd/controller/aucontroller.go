@@ -19,8 +19,8 @@ import (
 	"net/http"
 	"react-and-go/pkd/appuser"
 	"react-and-go/pkd/appuser/aumodel"
-	aufile "react-and-go/pkd/appuser/file"
 	aubody "react-and-go/pkd/controller/aumodel"
+	fileim "react-and-go/pkd/fileimport"
 	token "react-and-go/pkd/token"
 
 	"github.com/gin-gonic/gin"
@@ -89,7 +89,12 @@ func mapToPostCodeLocation(postCodeLocations []aumodel.PostCodeLocation) []aubod
 
 func getPostCodeCoordinates(c *gin.Context) {
 	filePath := c.Query("filename")
-	aufile.UpdatePostCodeCoordinates(filePath)
+	fileim.UpdatePostCodeCoordinates(filePath)
+}
+
+func getStateCountyData(c *gin.Context) {
+	filePath := c.Query("filename")
+	fileim.UpdateStatesAndCounties(filePath)
 }
 
 func postSignin(c *gin.Context) {

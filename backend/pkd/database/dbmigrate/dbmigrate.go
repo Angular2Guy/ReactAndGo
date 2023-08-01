@@ -39,5 +39,12 @@ func MigrateDB() {
 	if !database.DB.Migrator().HasTable(&unmodel.UserNotification{}) {
 		database.DB.AutoMigrate(&unmodel.UserNotification{})
 	}
+
+	database.DB.Migrator().AddColumn(&aumodel.PostCodeLocation{}, "State")
+	database.DB.Migrator().AddColumn(&aumodel.PostCodeLocation{}, "County")
+
+	database.DB.Migrator().AddColumn(&gsmodel.GasStation{}, "State")
+	database.DB.Migrator().AddColumn(&gsmodel.GasStation{}, "County")
+
 	log.Printf("DB Migration Done.")
 }

@@ -294,6 +294,10 @@ func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasSta
 	return filteredGasStations
 }
 
+func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]string) {
+
+}
+
 func calcMinMaxSquare(longitude float64, latitude float64, radius float64) minMaxSquare {
 	minMax := minMaxSquare{MinLat: 1000.0, MinLng: 1000.0, MaxLat: 0.0, MaxLng: 0.0}
 	//fmt.Printf("StartLat: %v, StartLng: %v Radius: %v\n", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Radius)

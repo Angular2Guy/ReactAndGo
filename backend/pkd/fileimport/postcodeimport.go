@@ -20,6 +20,7 @@ import (
 	"log"
 	"os"
 	appuser "react-and-go/pkd/appuser"
+	gasstation "react-and-go/pkd/gasstation"
 	"strings"
 )
 
@@ -46,20 +47,13 @@ type plzContainer struct {
 }
 
 func UpdatePostCodeCoordinates(fileName string) {
-	filePath := strings.TrimSpace(os.Getenv("PLZ_IMPORT_PATH"))
-	log.Printf("File: %v%v", filePath, fileName)
-	file, err := os.Open(fmt.Sprintf("%v%v", filePath, strings.TrimSpace(fileName)))
-	defer file.Close()
-	if err != nil {
-		log.Printf("Failed to open file: %v, %v\n", fmt.Sprintf("%v%v", filePath, strings.TrimSpace(fileName)), err.Error())
-		return
-	}
-	gzReader, err := gzip.NewReader(bufio.NewReader(file))
-	if err != nil {
-		log.Printf("Failed to create buffered gzip reader: %v, %v\n", fmt.Sprintf("%v%v", filePath, strings.TrimSpace(fileName)), err.Error())
-		return
-	}
+	gzReader, file, err := createReader(fileName)
 	defer gzReader.Close()
+	defer file.Close()
+
+	if err != nil {
+		return
+	}
 
 	jsonDecoder := json.NewDecoder(gzReader)
 	plzContainerNumber := 0
@@ -77,6 +71,59 @@ func UpdatePostCodeCoordinates(fileName string) {
 	jsonDecoder.Token()
 	//log.Printf("Number of postcodes: %v\n", plzContainerNumber)
 	appuser.ImportPostCodeData(result)
+}
+
+func UpdateStatesAndCounties(fileName string) {
+	gzReader, file, err := createReader(fileName)
+
+	if err != nil {
+		return
+	}
+
+	defer gzReader.Close()
+	defer file.Close()
+
+	stateToAmount := make(map[string]int)
+	plzToState := make(map[string]string)
+	plzToCounty := make(map[string]string)
+	lineId := 0
+	scanner := bufio.NewScanner(gzReader)
+	for scanner.Scan() {
+		line := scanner.Text()
+		lineTokens := strings.Split(line, ",")
+		if len(lineTokens) >= 5 {
+			continue
+		}
+		plzToCounty[lineTokens[3]] = lineTokens[4]
+		plzToState[lineTokens[3]] = lineTokens[5]
+		if _, ok := stateToAmount[lineTokens[5]]; ok {
+			stateToAmount[lineTokens[5]] = stateToAmount[lineTokens[5]] + 1
+		} else {
+			stateToAmount[lineTokens[5]] = 1
+		}
+		lineId += 1
+	}
+
+	appuser.UpdateStatesCounties(plzToState, plzToCounty)
+	gasstation.UpdateStatesCounties(plzToState, plzToCounty)
+}
+
+func createReader(fileName string) (*gzip.Reader, *os.File, error) {
+	filePath := strings.TrimSpace(os.Getenv("PLZ_IMPORT_PATH"))
+	log.Printf("File: %v%v", filePath, fileName)
+	file, err := os.Open(fmt.Sprintf("%v%v", filePath, strings.TrimSpace(fileName)))
+	if err != nil {
+		log.Printf("Failed to open file: %v, %v\n", fmt.Sprintf("%v%v", filePath, strings.TrimSpace(fileName)), err.Error())
+		return nil, nil, err
+	}
+	gzReader, err := gzip.NewReader(bufio.NewReader(file))
+	if err != nil {
+		file.Close()
+		log.Printf("Failed to create buffered gzip reader: %v, %v\n", fmt.Sprintf("%v%v", filePath, strings.TrimSpace(fileName)), err.Error())
+		return nil, nil, err
+	}
+
+	return gzReader, file, nil
 }
 
 func createPostCode(plzContainer *plzContainer) appuser.PostCodeData {
