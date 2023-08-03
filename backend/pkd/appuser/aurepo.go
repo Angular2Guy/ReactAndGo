@@ -233,7 +233,27 @@ func ImportPostCodeData(postCodeData []PostCodeData) {
 }
 
 func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]string) {
+	var pcLocations []aumodel.PostCodeLocation
+	database.DB.Find(&pcLocations)
+	//log.Printf("%d pcLocations.", len(pcLocations))
+	log.Printf("%s, %s", plzToCounty[formatPostCode(1159)], plzToState[formatPostCode(1159)])
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		for _, pcLocation := range pcLocations {
+			pcLocation.County = plzToCounty[formatPostCode(pcLocation.PostCode)]
+			pcLocation.State = plzToState[formatPostCode(pcLocation.PostCode)]
+			tx.Save(&pcLocation)
+		}
+		return nil
+	})
+	log.Printf("UpdateStatesCounties updated: %v\n", len(pcLocations))
+}
 
+func formatPostCode(postCode int32) string {
+	pcStr := strconv.Itoa(int(postCode))
+	for len(pcStr) < 5 {
+		pcStr = "0" + pcStr
+	}
+	return pcStr
 }
 
 func mapToPostCodeLocation(postCodeData []PostCodeData) []aumodel.PostCodeLocation {

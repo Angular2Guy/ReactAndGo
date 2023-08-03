@@ -75,7 +75,6 @@ func UpdatePostCodeCoordinates(fileName string) {
 
 func UpdateStatesAndCounties(fileName string) {
 	gzReader, file, err := createReader(fileName)
-
 	if err != nil {
 		return
 	}
@@ -91,9 +90,11 @@ func UpdateStatesAndCounties(fileName string) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		lineTokens := strings.Split(line, ",")
-		if len(lineTokens) >= 5 {
+		if lineId == 0 || len(lineTokens) < 5 {
+			lineId += 1
 			continue
 		}
+		//log.Printf(line)
 		plzToCounty[lineTokens[3]] = lineTokens[4]
 		plzToState[lineTokens[3]] = lineTokens[5]
 		if _, ok := stateToAmount[lineTokens[5]]; ok {
