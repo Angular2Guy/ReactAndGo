@@ -295,7 +295,19 @@ func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasSta
 }
 
 func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]string) {
-
+	var gasStations []gsmodel.GasStation
+	database.DB.Find(&gasStations)
+	//log.Printf("%d gasStations.", len(gasStations))
+	//log.Printf("%s, %s", plzToCounty[formatPostCode(1159)], plzToState[formatPostCode(1159)])
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		for _, gasStation := range gasStations {
+			gasStation.County = plzToCounty[gasStation.PostCode]
+			gasStation.State = plzToState[gasStation.PostCode]
+			tx.Save(&gasStation)
+		}
+		return nil
+	})
+	log.Printf("UpdateStatesCounties updated: %v\n", len(gasStations))
 }
 
 func calcMinMaxSquare(longitude float64, latitude float64, radius float64) minMaxSquare {

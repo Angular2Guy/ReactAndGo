@@ -236,7 +236,7 @@ func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]s
 	var pcLocations []aumodel.PostCodeLocation
 	database.DB.Find(&pcLocations)
 	//log.Printf("%d pcLocations.", len(pcLocations))
-	log.Printf("%s, %s", plzToCounty[formatPostCode(1159)], plzToState[formatPostCode(1159)])
+	//log.Printf("%s, %s", plzToCounty[formatPostCode(1159)], plzToState[formatPostCode(1159)])
 	database.DB.Transaction(func(tx *gorm.DB) error {
 		for _, pcLocation := range pcLocations {
 			pcLocation.County = plzToCounty[formatPostCode(pcLocation.PostCode)]
