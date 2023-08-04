@@ -240,14 +240,14 @@ func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]s
 	//log.Printf("%s, %s", plzToCounty[formatPostCode(1159)], plzToState[formatPostCode(1159)])
 	database.DB.Transaction(func(tx *gorm.DB) error {
 		for _, pcLocation := range pcLocations {
-			if &pcLocation.CountyData == nil {
+			if &pcLocation.CountyData == nil || pcLocation.CountyDataID == 0 {
 				myCountyData := pcmodel.CountyData{}
-				tx.Save(&myCountyData)
+				//tx.Save(&myCountyData)
 				pcLocation.CountyData = myCountyData
 			}
-			if &pcLocation.StateData == nil {
+			if &pcLocation.StateData == nil || pcLocation.StateDataID == 0 {
 				myStateData := pcmodel.StateData{}
-				tx.Save(&myStateData)
+				//tx.Save(&myStateData)
 				pcLocation.StateData = myStateData
 			}
 			pcLocation.CountyData.County = plzToCounty[formatPostCode(pcLocation.PostCode)]
