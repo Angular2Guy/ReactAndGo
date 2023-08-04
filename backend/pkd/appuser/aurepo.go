@@ -248,6 +248,7 @@ func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]s
 					myCountyData = *mapValue
 				} else {
 					countyMap[plzToCounty[formatPostCode(pcLocation.PostCode)]] = &myCountyData
+					myCountyData.County = plzToCounty[formatPostCode(pcLocation.PostCode)]
 					tx.Save(&myCountyData)
 				}
 				pcLocation.CountyData = myCountyData
@@ -258,6 +259,7 @@ func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]s
 					myStateData = *myMapValue
 				} else {
 					stateMap[plzToState[formatPostCode(pcLocation.PostCode)]] = &myStateData
+					myStateData.State = plzToState[formatPostCode(pcLocation.PostCode)]
 					tx.Save(&myStateData)
 				}
 				pcLocation.StateData = myStateData
