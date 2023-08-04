@@ -18,7 +18,7 @@ import (
 	"math"
 	"net/http"
 	"react-and-go/pkd/appuser"
-	"react-and-go/pkd/appuser/aumodel"
+	pcmodel "react-and-go/pkd/appuser/pcmodel"
 	aubody "react-and-go/pkd/controller/aumodel"
 	fileim "react-and-go/pkd/fileimport"
 	token "react-and-go/pkd/token"
@@ -69,7 +69,7 @@ func getLocation(c *gin.Context) {
 	c.JSON(http.StatusOK, myPostCodeLocations)
 }
 
-func mapToPostCodeLocation(postCodeLocations []aumodel.PostCodeLocation) []aubody.CodeLocationResponse {
+func mapToPostCodeLocation(postCodeLocations []pcmodel.PostCodeLocation) []aubody.CodeLocationResponse {
 	result := []aubody.CodeLocationResponse{}
 	for _, postCodeLocation := range postCodeLocations {
 		if !math.IsNaN(postCodeLocation.CenterLatitude) && !math.IsNaN(postCodeLocation.CenterLongitude) && !math.IsNaN(float64(postCodeLocation.SquareKM)) {

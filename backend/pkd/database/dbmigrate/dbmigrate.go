@@ -15,6 +15,7 @@ package dbmigrate
 import (
 	"log"
 	"react-and-go/pkd/appuser/aumodel"
+	pcmodel "react-and-go/pkd/appuser/pcmodel"
 	database "react-and-go/pkd/database"
 	"react-and-go/pkd/gasstation/gsmodel"
 	unmodel "react-and-go/pkd/notification/model"
@@ -33,18 +34,23 @@ func MigrateDB() {
 	if !database.DB.Migrator().HasTable(&aumodel.LoggedOutUser{}) {
 		database.DB.AutoMigrate(&aumodel.LoggedOutUser{})
 	}
-	if !database.DB.Migrator().HasTable(&aumodel.PostCodeLocation{}) {
-		database.DB.AutoMigrate(&aumodel.PostCodeLocation{})
+	if !database.DB.Migrator().HasTable(&pcmodel.PostCodeLocation{}) {
+		database.DB.AutoMigrate(&pcmodel.PostCodeLocation{})
 	}
 	if !database.DB.Migrator().HasTable(&unmodel.UserNotification{}) {
 		database.DB.AutoMigrate(&unmodel.UserNotification{})
 	}
-
-	database.DB.Migrator().AddColumn(&aumodel.PostCodeLocation{}, "State")
-	database.DB.Migrator().AddColumn(&aumodel.PostCodeLocation{}, "County")
-
-	database.DB.Migrator().AddColumn(&gsmodel.GasStation{}, "State")
-	database.DB.Migrator().AddColumn(&gsmodel.GasStation{}, "County")
-
+	if !database.DB.Migrator().HasColumn(&pcmodel.PostCodeLocation{}, "StateDataID") {
+		database.DB.Migrator().AddColumn(&pcmodel.PostCodeLocation{}, "StateDataID")
+	}
+	if !database.DB.Migrator().HasColumn(&pcmodel.PostCodeLocation{}, "CountyDataID") {
+		database.DB.Migrator().AddColumn(&pcmodel.PostCodeLocation{}, "CountyDataID")
+	}
+	if !database.DB.Migrator().HasTable(&pcmodel.CountyData{}) {
+		database.DB.AutoMigrate(&pcmodel.CountyData{})
+	}
+	if !database.DB.Migrator().HasTable(&pcmodel.StateData{}) {
+		database.DB.AutoMigrate(&pcmodel.StateData{})
+	}
 	log.Printf("DB Migration Done.")
 }

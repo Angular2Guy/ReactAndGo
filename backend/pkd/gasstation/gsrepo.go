@@ -299,14 +299,16 @@ func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]s
 	database.DB.Find(&gasStations)
 	//log.Printf("%d gasStations.", len(gasStations))
 	//log.Printf("%s, %s", plzToCounty[formatPostCode(1159)], plzToState[formatPostCode(1159)])
-	database.DB.Transaction(func(tx *gorm.DB) error {
-		for _, gasStation := range gasStations {
-			gasStation.County = plzToCounty[gasStation.PostCode]
-			gasStation.State = plzToState[gasStation.PostCode]
-			tx.Save(&gasStation)
-		}
-		return nil
-	})
+	/*
+		database.DB.Transaction(func(tx *gorm.DB) error {
+			for _, gasStation := range gasStations {
+				gasStation.County = plzToCounty[gasStation.PostCode]
+				gasStation.State = plzToState[gasStation.PostCode]
+				tx.Save(&gasStation)
+			}
+			return nil
+		})
+	*/
 	log.Printf("UpdateStatesCounties updated: %v\n", len(gasStations))
 }
 

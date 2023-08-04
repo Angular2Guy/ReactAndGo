@@ -16,7 +16,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"react-and-go/pkd/appuser/aumodel"
+	aumodel "react-and-go/pkd/appuser/aumodel"
+	pcmodel "react-and-go/pkd/appuser/pcmodel"
 	"react-and-go/pkd/database"
 	token "react-and-go/pkd/token"
 	"strconv"
@@ -90,8 +91,8 @@ func StoreUserLogout(username string, uuid string) []token.LoggedOutUserOut {
 	return results
 }
 
-func FindLocation(locationStr string) []aumodel.PostCodeLocation {
-	result := []aumodel.PostCodeLocation{}
+func FindLocation(locationStr string) []pcmodel.PostCodeLocation {
+	result := []pcmodel.PostCodeLocation{}
 	database.DB.Where("lower(label) like ?", fmt.Sprintf("%%%v%%", strings.ToLower(strings.TrimSpace(locationStr)))).Limit(20).Find(&result)
 	//log.Printf("Select: %v failed. %v", fmt.Sprintf("%%%v%%", strings.ToLower(strings.TrimSpace(locationStr))), err)
 	return result
@@ -206,9 +207,9 @@ func StoreTargetPrices(appTargetIn AppTargetIn) DbResult {
 
 func ImportPostCodeData(postCodeData []PostCodeData) {
 	postCodeLocations := mapToPostCodeLocation(postCodeData)
-	var oriPostCodeLocations []aumodel.PostCodeLocation
+	var oriPostCodeLocations []pcmodel.PostCodeLocation
 	database.DB.Find(&oriPostCodeLocations)
-	postCodeLocationsMap := make(map[int32]aumodel.PostCodeLocation)
+	postCodeLocationsMap := make(map[int32]pcmodel.PostCodeLocation)
 	for _, oriPostCodeLocation := range oriPostCodeLocations {
 		postCodeLocationsMap[oriPostCodeLocation.PostCode] = oriPostCodeLocation
 	}
@@ -233,18 +234,20 @@ func ImportPostCodeData(postCodeData []PostCodeData) {
 }
 
 func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]string) {
-	var pcLocations []aumodel.PostCodeLocation
+	var pcLocations []pcmodel.PostCodeLocation
 	database.DB.Find(&pcLocations)
 	//log.Printf("%d pcLocations.", len(pcLocations))
 	//log.Printf("%s, %s", plzToCounty[formatPostCode(1159)], plzToState[formatPostCode(1159)])
-	database.DB.Transaction(func(tx *gorm.DB) error {
-		for _, pcLocation := range pcLocations {
-			pcLocation.County = plzToCounty[formatPostCode(pcLocation.PostCode)]
-			pcLocation.State = plzToState[formatPostCode(pcLocation.PostCode)]
-			tx.Save(&pcLocation)
-		}
-		return nil
-	})
+	/*
+		database.DB.Transaction(func(tx *gorm.DB) error {
+			for _, pcLocation := range pcLocations {
+				pcLocation.County = plzToCounty[formatPostCode(pcLocation.PostCode)]
+				pcLocation.State = plzToState[formatPostCode(pcLocation.PostCode)]
+				tx.Save(&pcLocation)
+			}
+			return nil
+		})
+	*/
 	log.Printf("UpdateStatesCounties updated: %v\n", len(pcLocations))
 }
 
@@ -256,10 +259,10 @@ func formatPostCode(postCode int32) string {
 	return pcStr
 }
 
-func mapToPostCodeLocation(postCodeData []PostCodeData) []aumodel.PostCodeLocation {
-	result := []aumodel.PostCodeLocation{}
+func mapToPostCodeLocation(postCodeData []PostCodeData) []pcmodel.PostCodeLocation {
+	result := []pcmodel.PostCodeLocation{}
 	for _, myPostCodeData := range postCodeData {
-		myPostCodeLocation := aumodel.PostCodeLocation{}
+		myPostCodeLocation := pcmodel.PostCodeLocation{}
 		myPostCodeLocation.Label = myPostCodeData.Label
 		myPostCodeLocation.PostCode = myPostCodeData.PostCode
 		myPostCodeLocation.Population = myPostCodeData.Population

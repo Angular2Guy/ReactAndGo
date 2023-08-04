@@ -19,8 +19,10 @@ type PostCodeLocation struct {
 	Label           string `gorm:"size:256;not null;index:idx_post_code_location_label"`
 	PostCode        int32  `gorm:"index:idx_post_code_location_post_code"`
 	Population      int32
-	State           string `gorm:"size:256;index:idx_post_code_location_state"`
-	County          string `gorm:"size:256"`
+	StateDataID     uint
+	StateData       StateData
+	CountyDataID    uint
+	CountyData      CountyData
 	SquareKM        float32
 	CenterLongitude float64 `gorm:"index:idx_post_code_location_center_logitude"`
 	CenterLatitude  float64 `gorm:"index:idx_post_code_location_center_latitude"`
