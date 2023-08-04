@@ -235,19 +235,27 @@ func ImportPostCodeData(postCodeData []PostCodeData) {
 
 func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]string) {
 	var pcLocations []pcmodel.PostCodeLocation
-	database.DB.Find(&pcLocations)
+	database.DB.Preload("StateData").Preload("CountyData").Find(&pcLocations)
 	//log.Printf("%d pcLocations.", len(pcLocations))
 	//log.Printf("%s, %s", plzToCounty[formatPostCode(1159)], plzToState[formatPostCode(1159)])
-	/*
-		database.DB.Transaction(func(tx *gorm.DB) error {
-			for _, pcLocation := range pcLocations {
-				pcLocation.County = plzToCounty[formatPostCode(pcLocation.PostCode)]
-				pcLocation.State = plzToState[formatPostCode(pcLocation.PostCode)]
-				tx.Save(&pcLocation)
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		for _, pcLocation := range pcLocations {
+			if &pcLocation.CountyData == nil {
+				myCountyData := pcmodel.CountyData{}
+				tx.Save(&myCountyData)
+				pcLocation.CountyData = myCountyData
 			}
-			return nil
-		})
-	*/
+			if &pcLocation.StateData == nil {
+				myStateData := pcmodel.StateData{}
+				tx.Save(&myStateData)
+				pcLocation.StateData = myStateData
+			}
+			pcLocation.CountyData.County = plzToCounty[formatPostCode(pcLocation.PostCode)]
+			pcLocation.StateData.State = plzToState[formatPostCode(pcLocation.PostCode)]
+			tx.Save(&pcLocation)
+		}
+		return nil
+	})
 	log.Printf("UpdateStatesCounties updated: %v\n", len(pcLocations))
 }
 

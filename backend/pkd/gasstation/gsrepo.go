@@ -309,7 +309,7 @@ func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]s
 			return nil
 		})
 	*/
-	log.Printf("UpdateStatesCounties updated: %v\n", len(gasStations))
+	//log.Printf("UpdateStatesCounties updated: %v\n", len(gasStations))
 }
 
 func calcMinMaxSquare(longitude float64, latitude float64, radius float64) minMaxSquare {
