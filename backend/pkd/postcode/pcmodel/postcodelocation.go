@@ -10,18 +10,20 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-package aumodel
+package postcode
 
-import (
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
-type CountyData struct {
+type PostCodeLocation struct {
 	gorm.Model
-	County            string `gorm:"size:256"`
-	GasStationNum     int
-	AvgE5             int
-	AvgE10            int
-	AvgDiesel         int
-	PostCodeLocations []PostCodeLocation `gorm:"foreignKey:CountyDataID"`
+	Label           string `gorm:"size:256;not null;index:idx_post_code_location_label"`
+	PostCode        int32  `gorm:"index:idx_post_code_location_post_code"`
+	Population      int32
+	StateDataID     uint
+	StateData       StateData
+	CountyDataID    uint
+	CountyData      CountyData
+	SquareKM        float32
+	CenterLongitude float64 `gorm:"index:idx_post_code_location_center_logitude"`
+	CenterLatitude  float64 `gorm:"index:idx_post_code_location_center_latitude"`
 }

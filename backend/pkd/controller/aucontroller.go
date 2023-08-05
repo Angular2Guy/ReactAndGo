@@ -18,9 +18,10 @@ import (
 	"math"
 	"net/http"
 	"react-and-go/pkd/appuser"
-	pcmodel "react-and-go/pkd/appuser/pcmodel"
 	aubody "react-and-go/pkd/controller/aumodel"
 	fileim "react-and-go/pkd/fileimport"
+	postcode "react-and-go/pkd/postcode"
+	pcmodel "react-and-go/pkd/postcode/pcmodel"
 	token "react-and-go/pkd/token"
 
 	"github.com/gin-gonic/gin"
@@ -63,7 +64,7 @@ func getRefreshToken(c *gin.Context) {
 
 func getLocation(c *gin.Context) {
 	locationStr := c.Query("location")
-	postCodeLocations := appuser.FindLocation(locationStr)
+	postCodeLocations := postcode.FindLocation(locationStr)
 	//log.Printf("Locations: %v", postCodeLocations)
 	myPostCodeLocations := mapToPostCodeLocation(postCodeLocations)
 	c.JSON(http.StatusOK, myPostCodeLocations)

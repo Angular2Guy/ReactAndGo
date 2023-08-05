@@ -19,8 +19,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	appuser "react-and-go/pkd/appuser"
-	gasstation "react-and-go/pkd/gasstation"
+	postcode "react-and-go/pkd/postcode"
 	"strings"
 )
 
@@ -57,7 +56,7 @@ func UpdatePostCodeCoordinates(fileName string) {
 
 	jsonDecoder := json.NewDecoder(gzReader)
 	plzContainerNumber := 0
-	result := []appuser.PostCodeData{}
+	result := []postcode.PostCodeData{}
 
 	jsonDecoder.Token()
 	for jsonDecoder.More() {
@@ -70,7 +69,7 @@ func UpdatePostCodeCoordinates(fileName string) {
 	}
 	jsonDecoder.Token()
 	//log.Printf("Number of postcodes: %v\n", plzContainerNumber)
-	appuser.ImportPostCodeData(result)
+	postcode.ImportPostCodeData(result)
 }
 
 func UpdateStatesAndCounties(fileName string) {
@@ -105,8 +104,7 @@ func UpdateStatesAndCounties(fileName string) {
 		lineId += 1
 	}
 
-	appuser.UpdateStatesCounties(plzToState, plzToCounty)
-	gasstation.UpdateStatesCounties(plzToState, plzToCounty)
+	postcode.UpdateStatesCounties(plzToState, plzToCounty)
 }
 
 func createReader(fileName string) (*gzip.Reader, *os.File, error) {
@@ -127,8 +125,8 @@ func createReader(fileName string) (*gzip.Reader, *os.File, error) {
 	return gzReader, file, nil
 }
 
-func createPostCode(plzContainer *plzContainer) appuser.PostCodeData {
-	postCodeData := appuser.PostCodeData{}
+func createPostCode(plzContainer *plzContainer) postcode.PostCodeData {
+	postCodeData := postcode.PostCodeData{}
 	postCodeData.Label = plzContainer.Properties.Label
 	postCodeData.PostCode = plzContainer.Properties.Plz
 	postCodeData.SquareKM = plzContainer.Properties.SquareKM

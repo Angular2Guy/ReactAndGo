@@ -15,10 +15,10 @@ package dbmigrate
 import (
 	"log"
 	"react-and-go/pkd/appuser/aumodel"
-	pcmodel "react-and-go/pkd/appuser/pcmodel"
 	database "react-and-go/pkd/database"
 	"react-and-go/pkd/gasstation/gsmodel"
 	unmodel "react-and-go/pkd/notification/model"
+	pcmodel "react-and-go/pkd/postcode/pcmodel"
 )
 
 func MigrateDB() {
