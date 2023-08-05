@@ -251,6 +251,10 @@ func FindPricesByStids(stids *[]string) []gsmodel.GasPrice {
 	return myGasPrice
 }
 
+func FindByPostCodes(postcodes []string) []gsmodel.GasStation {
+	return nil
+}
+
 func FindPricesByStid(stid string) []gsmodel.GasPrice {
 	var myGasPrice []gsmodel.GasPrice
 	database.DB.Where("stid = ?", stid).Order("date desc").Find(&myGasPrice)

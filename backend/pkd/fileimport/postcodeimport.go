@@ -19,7 +19,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	postcode "react-and-go/pkd/postcode"
+	"react-and-go/pkd/gasstation"
+	"react-and-go/pkd/postcode"
 	"strings"
 )
 
@@ -105,6 +106,7 @@ func UpdateStatesAndCounties(fileName string) {
 	}
 
 	postcode.UpdateStatesCounties(plzToState, plzToCounty)
+	go updateCountyStatePrices()
 }
 
 func createReader(fileName string) (*gzip.Reader, *os.File, error) {
@@ -168,4 +170,10 @@ func calcPolygonArea(plzContainer *plzContainer) float64 {
 	}
 	polygonArea = polygonArea / 2
 	return polygonArea
+}
+
+func updateCountyStatePrices() {
+	var myPostCodes []string
+	myGasStations := gasstation.FindByPostCodes(myPostCodes)
+	log.Printf("Gasstations: %v", len(myGasStations))
 }
