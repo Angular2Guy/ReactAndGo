@@ -127,7 +127,7 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 		stationPricesKeys = append(stationPricesKeys, value.GasStationID)
 	}
 	gasPriceUpdateMap := make(map[string]gsmodel.GasPrice)
-	stationPricesDb := FindPricesByStids(&stationPricesKeys)
+	stationPricesDb := FindPricesByStids(&stationPricesKeys, 0)
 	log.Printf("StationPricesKeys: %v StationPricesDb: %v", len(stationPricesKeys), len(stationPricesDb))
 	for _, value := range stationPricesDb {
 		if _, found := gasPriceUpdateMap[value.GasStationID]; !found {
@@ -233,7 +233,7 @@ func FindById(id string) gsmodel.GasStation {
 	return myGasStation
 }
 
-func FindPricesByStids(stids *[]string) []gsmodel.GasPrice {
+func FindPricesByStids(stids *[]string, resultLimit int) []gsmodel.GasPrice {
 	var myGasPrice []gsmodel.GasPrice
 	oneMonthAgo := time.Now().Add(time.Hour * -720)
 	dateStr := fmt.Sprintf("%04d-%02d-%02d", oneMonthAgo.Year(), oneMonthAgo.Month(), oneMonthAgo.Day())
@@ -243,7 +243,11 @@ func FindPricesByStids(stids *[]string) []gsmodel.GasPrice {
 		for _, chunk := range chuncks {
 			var values []gsmodel.GasPrice
 			//log.Printf("Chunk: %v\n", chunk)
-			tx.Where("stid IN ? and date >= date(?) ", chunk, dateStr).Order("date desc").Find(&values)
+			myQuery := tx.Where("stid IN ? and date >= date(?) ", chunk, dateStr).Order("date desc")
+			if resultLimit > 0 {
+				myQuery.Limit(resultLimit)
+			}
+			myQuery.Find(&values)
 			myGasPrice = append(myGasPrice, values...)
 		}
 		return nil

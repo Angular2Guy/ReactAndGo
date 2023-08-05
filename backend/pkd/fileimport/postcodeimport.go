@@ -20,6 +20,7 @@ import (
 	"log"
 	"os"
 	"react-and-go/pkd/gasstation"
+	"react-and-go/pkd/gasstation/gsmodel"
 	"react-and-go/pkd/postcode"
 	"strings"
 )
@@ -85,6 +86,7 @@ func UpdateStatesAndCounties(fileName string) {
 	stateToAmount := make(map[string]int)
 	plzToState := make(map[string]string)
 	plzToCounty := make(map[string]string)
+	var plzs []string
 	lineId := 0
 	scanner := bufio.NewScanner(gzReader)
 	for scanner.Scan() {
@@ -97,6 +99,7 @@ func UpdateStatesAndCounties(fileName string) {
 		//log.Printf(line)
 		plzToCounty[lineTokens[3]] = lineTokens[4]
 		plzToState[lineTokens[3]] = lineTokens[5]
+		plzs = append(plzs, lineTokens[3])
 		if _, ok := stateToAmount[lineTokens[5]]; ok {
 			stateToAmount[lineTokens[5]] = stateToAmount[lineTokens[5]] + 1
 		} else {
@@ -106,7 +109,7 @@ func UpdateStatesAndCounties(fileName string) {
 	}
 
 	postcode.UpdateStatesCounties(plzToState, plzToCounty)
-	go updateCountyStatePrices()
+	go updateCountyStatePrices(plzs)
 }
 
 func createReader(fileName string) (*gzip.Reader, *os.File, error) {
@@ -172,8 +175,19 @@ func calcPolygonArea(plzContainer *plzContainer) float64 {
 	return polygonArea
 }
 
-func updateCountyStatePrices() {
-	var myPostCodes []string
-	myGasStations := gasstation.FindByPostCodes(myPostCodes)
+func updateCountyStatePrices(plzs []string) {
+	myGasStations := gasstation.FindByPostCodes(plzs)
 	log.Printf("Gasstations: %v", len(myGasStations))
+	plzGasStation := make(map[string][]gsmodel.GasStation)
+	var gasStationStids []string
+	for _, myGasStation := range myGasStations {
+		gasStationStids = append(gasStationStids, myGasStation.ID)
+		plzGasStation[myGasStation.PostCode] = append(plzGasStation[myGasStation.PostCode], myGasStation)
+	}
+	myGasPrices := gasstation.FindPricesByStids(&gasStationStids, 5)
+	gasStationIdGasPrices := make(map[string][]gsmodel.GasPrice)
+	for _, myGasPrice := range myGasPrices {
+		gasStationIdGasPrices[myGasPrice.GasStationID] = append(gasStationIdGasPrices[myGasPrice.GasStationID], myGasPrice)
+	}
+
 }
