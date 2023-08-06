@@ -107,6 +107,26 @@ func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]s
 	log.Printf("UpdateStatesCounties updated: %v\n", len(pcLocations))
 }
 
+func FindByPlzs(plzs []string) *[]pcmodel.PostCodeLocation {
+	var pcLocations []pcmodel.PostCodeLocation
+	var plzInts = plzsToPlzInts(plzs)
+	database.DB.Where("post_code in ?", plzInts).Preload("StateData").Preload("CountyData").Find(&pcLocations)
+	return &pcLocations
+}
+
+func plzsToPlzInts(plzs []string) []int {
+	var plzInts []int
+	for _, myPlz := range plzs {
+		myPlzInt, err := strconv.Atoi(myPlz)
+		if err != nil {
+			log.Printf("Failed to parse: %v", myPlz)
+		} else {
+			plzInts = append(plzInts, myPlzInt)
+		}
+	}
+	return plzInts
+}
+
 func formatPostCode(postCode int32) string {
 	pcStr := strconv.Itoa(int(postCode))
 	for len(pcStr) < 5 {

@@ -22,6 +22,7 @@ import (
 	"react-and-go/pkd/gasstation"
 	"react-and-go/pkd/gasstation/gsmodel"
 	"react-and-go/pkd/postcode"
+	"react-and-go/pkd/postcode/pcmodel"
 	"strings"
 )
 
@@ -189,5 +190,29 @@ func updateCountyStatePrices(plzs []string) {
 	for _, myGasPrice := range myGasPrices {
 		gasStationIdGasPrices[myGasPrice.GasStationID] = append(gasStationIdGasPrices[myGasPrice.GasStationID], myGasPrice)
 	}
+	postCodeLocations := postcode.FindByPlzs(plzs)
+	var stateDatas []pcmodel.StateData
+	for _, myPostCodeLocation := range *postCodeLocations {
+		stateDatas = append(stateDatas, myPostCodeLocation.StateData)
+
+	}
+	var countyDatas []pcmodel.CountyData
+	for _, myPostCodeLocations := range *postCodeLocations {
+		countyDatas = append(countyDatas, myPostCodeLocations.CountyData)
+	}
+
+	for _, myStateData := range stateDatas {
+		calcStateValues(myStateData, plzGasStation, gasStationIdGasPrices)
+	}
+	for _, myCountyData := range countyDatas {
+		calcCountyValues(myCountyData, plzGasStation, gasStationIdGasPrices)
+	}
+}
+
+func calcStateValues(stateData pcmodel.StateData, plzGasStation map[string][]gsmodel.GasStation, gasStationIdGasPrices map[string][]gsmodel.GasPrice) {
+
+}
+
+func calcCountyValues(countyData pcmodel.CountyData, plzGasStation map[string][]gsmodel.GasStation, gasStationIdGasPrices map[string][]gsmodel.GasPrice) {
 
 }
