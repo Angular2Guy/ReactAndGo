@@ -185,8 +185,19 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 	go updateCountyStatePrices(&gasPriceUpdateMap)
 }
 
-func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) {
-
+func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) int {
+	var gasStationIDs []string
+	for gasStationID, _ := range *gasStationIDToGasPriceMap {
+		gasStationIDs = append(gasStationIDs, gasStationID)
+	}
+	gasStationIDChunks := createChunks(&gasStationIDs)
+	var gasStations []gsmodel.GasStation
+	for gasStationIDChunk := range gasStationIDChunks {
+		var values []gsmodel.GasStation
+		database.DB.Where("ID IN ?", gasStationIDChunk).Find(&values)
+		gasStations = append(gasStations, values...)
+	}
+	return len(gasStations)
 }
 
 func sendNotifications(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) {
