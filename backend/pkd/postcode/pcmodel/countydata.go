@@ -20,8 +20,8 @@ type CountyData struct {
 	gorm.Model
 	County            string `gorm:"size:256"`
 	GasStationNum     int
-	AvgE5             int
-	AvgE10            int
-	AvgDiesel         int
+	AvgE5             float64
+	AvgE10            float64
+	AvgDiesel         float64
 	PostCodeLocations []PostCodeLocation `gorm:"foreignKey:CountyDataID"`
 }

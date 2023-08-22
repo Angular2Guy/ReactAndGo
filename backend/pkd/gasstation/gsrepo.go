@@ -21,6 +21,7 @@ import (
 	"react-and-go/pkd/gasstation/gsmodel"
 	"react-and-go/pkd/notification"
 	"react-and-go/pkd/postcode/pcmodel"
+	"strconv"
 	"strings"
 	"time"
 
@@ -183,28 +184,58 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 	})
 	log.Printf("Prices updated: %v\n", len(gasPriceUpdateMap))
 	go sendNotifications(&gasPriceUpdateMap)
-	go updateCountyStatePrices(&gasPriceUpdateMap)
+	//go updateCountyStatePrices(&gasPriceUpdateMap)
 }
 
 func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) (int, int) {
 	var gasStationIDs []string
-	for gasStationID, _ := range *gasStationIDToGasPriceMap {
+	for gasStationID := range *gasStationIDToGasPriceMap {
 		gasStationIDs = append(gasStationIDs, gasStationID)
 	}
 	gasStationIDChunks := createChunks(&gasStationIDs)
-	var postcodes []pcmodel.PostCodeLocation
+	postcodeGasPriceMap := make(map[string]gsmodel.GasStation)
 	for _, gasStationIDChunk := range gasStationIDChunks {
+		var values []gsmodel.GasStation
+		database.DB.Where("ID IN ?", gasStationIDChunk).Find(&values)
+		for _, myGasStation := range values {
+			postcodeGasPriceMap[myGasStation.PostCode] = myGasStation
+		}
+	}
+	var postcodes []string
+	for myPostcode, _ := range postcodeGasPriceMap {
+		postcodes = append(postcodes, myPostcode)
+	}
+	//var postcodeLocations []pcmodel.PostCodeLocation
+	postcodePostcodeLocationMap := make(map[int]pcmodel.PostCodeLocation)
+	postcodeChunks := createChunks(&postcodes)
+	for _, myPostcode := range postcodeChunks {
 		var values []pcmodel.PostCodeLocation
-		database.DB.Where("ID IN ?", gasStationIDChunk).Preload("StateData").Preload("CountyData").Find(&values)
-		postcodes = append(postcodes, values...)
+		database.DB.Where("PostCode IN ?", myPostcode).Preload("StateData").Preload("CountyData").Find(&values)
+		//postcodeLocations = append(postcodeLocations, values...)
+		for _, myValue := range values {
+			postcodePostcodeLocationMap[int(myValue.PostCode)] = myValue
+		}
 	}
-	idCountyMap := make(map[uint]pcmodel.CountyData)
-	idStateMap := make(map[uint]pcmodel.StateData)
-	for _, myPostcode := range postcodes {
-		idCountyMap[myPostcode.ID] = myPostcode.CountyData
-		idStateMap[myPostcode.ID] = myPostcode.StateData
+	for myPostcode, myGasStation := range postcodeGasPriceMap {
+		myPostCodeInt, err := strconv.Atoi(myPostcode)
+		if err != nil {
+			continue
+		}
+		myPostcodeLocation := postcodePostcodeLocationMap[myPostCodeInt]
+		myGasStationIDToGasPriceMap := *gasStationIDToGasPriceMap
+		myGasprice := myGasStationIDToGasPriceMap[myGasStation.ID]
+		if myPostcodeLocation.CountyData.GasStationNum > 0 {
+			myPostcodeLocation.CountyData.AvgDiesel = float64(myGasprice.Diesel)/float64(myPostcodeLocation.CountyData.GasStationNum) - myPostcodeLocation.CountyData.AvgDiesel/float64(myPostcodeLocation.CountyData.GasStationNum)
+			myPostcodeLocation.CountyData.AvgE10 = float64(myGasprice.E10)/float64(myPostcodeLocation.CountyData.GasStationNum) - myPostcodeLocation.CountyData.AvgE10/float64(myPostcodeLocation.CountyData.GasStationNum)
+			myPostcodeLocation.CountyData.AvgE5 = float64(myGasprice.E5)/float64(myPostcodeLocation.CountyData.GasStationNum) - myPostcodeLocation.CountyData.AvgE5/float64(myPostcodeLocation.CountyData.GasStationNum)
+		}
+		if myPostcodeLocation.StateData.GasStationNum > 0 {
+			myPostcodeLocation.StateData.AvgDiesel = float64(myGasprice.Diesel)/float64(myPostcodeLocation.StateData.GasStationNum) - myPostcodeLocation.StateData.AvgDiesel/float64(myPostcodeLocation.StateData.GasStationNum)
+			myPostcodeLocation.StateData.AvgE10 = float64(myGasprice.E10)/float64(myPostcodeLocation.StateData.GasStationNum) - myPostcodeLocation.StateData.AvgE10/float64(myPostcodeLocation.StateData.GasStationNum)
+			myPostcodeLocation.StateData.AvgE5 = float64(myGasprice.E5)/float64(myPostcodeLocation.StateData.GasStationNum) - myPostcodeLocation.StateData.AvgE5/float64(myPostcodeLocation.StateData.GasStationNum)
+		}
 	}
-	return len(idCountyMap), len(idStateMap)
+	return len(postcodePostcodeLocationMap), len(postcodePostcodeLocationMap)
 }
 
 func sendNotifications(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) {
