@@ -20,6 +20,7 @@ import (
 	"react-and-go/pkd/database"
 	"react-and-go/pkd/gasstation/gsmodel"
 	"react-and-go/pkd/notification"
+	"react-and-go/pkd/postcode/pcmodel"
 	"strings"
 	"time"
 
@@ -185,19 +186,25 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 	go updateCountyStatePrices(&gasPriceUpdateMap)
 }
 
-func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) int {
+func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) (int, int) {
 	var gasStationIDs []string
 	for gasStationID, _ := range *gasStationIDToGasPriceMap {
 		gasStationIDs = append(gasStationIDs, gasStationID)
 	}
 	gasStationIDChunks := createChunks(&gasStationIDs)
-	var gasStations []gsmodel.GasStation
-	for gasStationIDChunk := range gasStationIDChunks {
-		var values []gsmodel.GasStation
-		database.DB.Where("ID IN ?", gasStationIDChunk).Find(&values)
-		gasStations = append(gasStations, values...)
+	var postcodes []pcmodel.PostCodeLocation
+	for _, gasStationIDChunk := range gasStationIDChunks {
+		var values []pcmodel.PostCodeLocation
+		database.DB.Where("ID IN ?", gasStationIDChunk).Preload("StateData").Preload("CountyData").Find(&values)
+		postcodes = append(postcodes, values...)
 	}
-	return len(gasStations)
+	idCountyMap := make(map[uint]pcmodel.CountyData)
+	idStateMap := make(map[uint]pcmodel.StateData)
+	for _, myPostcode := range postcodes {
+		idCountyMap[myPostcode.ID] = myPostcode.CountyData
+		idStateMap[myPostcode.ID] = myPostcode.StateData
+	}
+	return len(idCountyMap), len(idStateMap)
 }
 
 func sendNotifications(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) {
