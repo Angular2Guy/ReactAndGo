@@ -216,6 +216,8 @@ func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPr
 			postcodePostcodeLocationMap[int(myValue.PostCode)] = myValue
 		}
 	}
+	modifiedStatesMap := make(map[int]pcmodel.StateData)
+	modifiedCountiesMap := make(map[int]pcmodel.CountyData)
 	for myPostcode, myGasStation := range postcodeGasPriceMap {
 		myPostCodeInt, err := strconv.Atoi(myPostcode)
 		if err != nil {
@@ -225,16 +227,33 @@ func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPr
 		myGasStationIDToGasPriceMap := *gasStationIDToGasPriceMap
 		myGasprice := myGasStationIDToGasPriceMap[myGasStation.ID]
 		if myPostcodeLocation.CountyData.GasStationNum > 0 {
-			myPostcodeLocation.CountyData.AvgDiesel = float64(myGasprice.Diesel)/float64(myPostcodeLocation.CountyData.GasStationNum) - myPostcodeLocation.CountyData.AvgDiesel/float64(myPostcodeLocation.CountyData.GasStationNum)
-			myPostcodeLocation.CountyData.AvgE10 = float64(myGasprice.E10)/float64(myPostcodeLocation.CountyData.GasStationNum) - myPostcodeLocation.CountyData.AvgE10/float64(myPostcodeLocation.CountyData.GasStationNum)
-			myPostcodeLocation.CountyData.AvgE5 = float64(myGasprice.E5)/float64(myPostcodeLocation.CountyData.GasStationNum) - myPostcodeLocation.CountyData.AvgE5/float64(myPostcodeLocation.CountyData.GasStationNum)
+			if _, ok := modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)]; !ok {
+				modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)] = myPostcodeLocation.CountyData
+			}
+			myCountyData := modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)]
+			myCountyData.AvgDiesel = float64(myGasprice.Diesel)/float64(myCountyData.GasStationNum) - myCountyData.AvgDiesel/float64(myCountyData.GasStationNum)
+			myCountyData.AvgE10 = float64(myGasprice.E10)/float64(myCountyData.GasStationNum) - myCountyData.AvgE10/float64(myCountyData.GasStationNum)
+			myCountyData.AvgE5 = float64(myGasprice.E5)/float64(myCountyData.GasStationNum) - myCountyData.AvgE5/float64(myCountyData.GasStationNum)
 		}
 		if myPostcodeLocation.StateData.GasStationNum > 0 {
-			myPostcodeLocation.StateData.AvgDiesel = float64(myGasprice.Diesel)/float64(myPostcodeLocation.StateData.GasStationNum) - myPostcodeLocation.StateData.AvgDiesel/float64(myPostcodeLocation.StateData.GasStationNum)
-			myPostcodeLocation.StateData.AvgE10 = float64(myGasprice.E10)/float64(myPostcodeLocation.StateData.GasStationNum) - myPostcodeLocation.StateData.AvgE10/float64(myPostcodeLocation.StateData.GasStationNum)
-			myPostcodeLocation.StateData.AvgE5 = float64(myGasprice.E5)/float64(myPostcodeLocation.StateData.GasStationNum) - myPostcodeLocation.StateData.AvgE5/float64(myPostcodeLocation.StateData.GasStationNum)
+			if _, ok := modifiedStatesMap[int(myPostcodeLocation.StateData.ID)]; !ok {
+				modifiedStatesMap[int(myPostcodeLocation.StateData.ID)] = myPostcodeLocation.StateData
+			}
+			myStateData := modifiedStatesMap[int(myPostcodeLocation.StateData.ID)]
+			myStateData.AvgDiesel = float64(myGasprice.Diesel)/float64(myStateData.GasStationNum) - myStateData.AvgDiesel/float64(myStateData.GasStationNum)
+			myStateData.AvgE10 = float64(myGasprice.E10)/float64(myStateData.GasStationNum) - myStateData.AvgE10/float64(myStateData.GasStationNum)
+			myStateData.AvgE5 = float64(myGasprice.E5)/float64(myStateData.GasStationNum) - myStateData.AvgE5/float64(myStateData.GasStationNum)
 		}
 	}
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		for _, myStateData := range modifiedStatesMap {
+			tx.Save(myStateData)
+		}
+		for _, myCountyData := range modifiedCountiesMap {
+			tx.Save(myCountyData)
+		}
+		return nil
+	})
 	return len(postcodePostcodeLocationMap), len(postcodePostcodeLocationMap)
 }
 
