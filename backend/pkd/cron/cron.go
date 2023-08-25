@@ -17,6 +17,7 @@ import (
 	"log"
 	"os"
 	gsclient "react-and-go/pkd/controller/client"
+	"react-and-go/pkd/gasstation"
 	"react-and-go/pkd/messaging"
 	"strings"
 	"time"
@@ -113,6 +114,8 @@ func Start() {
 	})
 
 	scheduler.Every(60).Seconds().Tag("messaging").Do(messaging.ConnectionCheck)
+
+	scheduler.Every(1).Day().At("02:07").Tag("averages").Do(gasstation.ReCalcCountyStatePrices)
 
 	msgFileStr := os.Getenv("MSG_MESSAGES")
 	if len(strings.TrimSpace(msgFileStr)) > 3 {

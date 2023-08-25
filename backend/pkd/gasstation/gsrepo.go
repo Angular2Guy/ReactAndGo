@@ -187,7 +187,7 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 	//go updateCountyStatePrices(&gasPriceUpdateMap)
 }
 
-func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) (int, int) {
+func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) int {
 	var gasStationIDs []string
 	for gasStationID := range *gasStationIDToGasPriceMap {
 		gasStationIDs = append(gasStationIDs, gasStationID)
@@ -234,6 +234,7 @@ func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPr
 			myCountyData.AvgDiesel = float64(myGasprice.Diesel)/float64(myCountyData.GasStationNum) - myCountyData.AvgDiesel/float64(myCountyData.GasStationNum)
 			myCountyData.AvgE10 = float64(myGasprice.E10)/float64(myCountyData.GasStationNum) - myCountyData.AvgE10/float64(myCountyData.GasStationNum)
 			myCountyData.AvgE5 = float64(myGasprice.E5)/float64(myCountyData.GasStationNum) - myCountyData.AvgE5/float64(myCountyData.GasStationNum)
+			modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)] = myCountyData
 		}
 		if myPostcodeLocation.StateData.GasStationNum > 0 {
 			if _, ok := modifiedStatesMap[int(myPostcodeLocation.StateData.ID)]; !ok {
@@ -243,6 +244,7 @@ func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPr
 			myStateData.AvgDiesel = float64(myGasprice.Diesel)/float64(myStateData.GasStationNum) - myStateData.AvgDiesel/float64(myStateData.GasStationNum)
 			myStateData.AvgE10 = float64(myGasprice.E10)/float64(myStateData.GasStationNum) - myStateData.AvgE10/float64(myStateData.GasStationNum)
 			myStateData.AvgE5 = float64(myGasprice.E5)/float64(myStateData.GasStationNum) - myStateData.AvgE5/float64(myStateData.GasStationNum)
+			modifiedStatesMap[int(myPostcodeLocation.StateData.ID)] = myStateData
 		}
 	}
 	database.DB.Transaction(func(tx *gorm.DB) error {
@@ -254,7 +256,17 @@ func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPr
 		}
 		return nil
 	})
-	return len(postcodePostcodeLocationMap), len(postcodePostcodeLocationMap)
+	return len(postcodePostcodeLocationMap)
+}
+
+func ReCalcCountyStatePrices() {
+	log.Printf("recalcCountyStatePrices called.")
+	//1. find postcodelocations and put them in a map postcode->postcodeLocation
+	//2. find gasstations and put them in a map postcode->gasstation
+	//3. find the latest gasprices for the gasstations and put them in a map gasstationkey->gasprice
+	//4. create a maps for the statedata and the countydata id->state/county-data
+	//5. iterate the postcodelocations to sum up the gasprices for the counties and states and count gasstations
+	//6. iterate the countydata and statedate and divide the average sums by the gasstations counts and save the results to the db
 }
 
 func sendNotifications(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) {
