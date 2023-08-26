@@ -73,33 +73,33 @@ func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]s
 	stateMap := make(map[string]*pcmodel.StateData)
 	countyMap := make(map[string]*pcmodel.CountyData)
 	//log.Printf("%d pcLocations.", len(pcLocations))
-	//log.Printf("%s, %s", plzToCounty[formatPostCode(1159)], plzToState[formatPostCode(1159)])
+	//log.Printf("%s, %s", plzToCounty[FormatPostCode(1159)], plzToState[FormatPostCode(1159)])
 	database.DB.Transaction(func(tx *gorm.DB) error {
 		for _, pcLocation := range pcLocations {
 			if &pcLocation.CountyData == nil || pcLocation.CountyDataID == 0 {
 				myCountyData := pcmodel.CountyData{}
-				if mapValue, ok := countyMap[plzToCounty[formatPostCode(pcLocation.PostCode)]]; ok {
+				if mapValue, ok := countyMap[plzToCounty[FormatPostCode(pcLocation.PostCode)]]; ok {
 					myCountyData = *mapValue
 				} else {
-					countyMap[plzToCounty[formatPostCode(pcLocation.PostCode)]] = &myCountyData
-					myCountyData.County = plzToCounty[formatPostCode(pcLocation.PostCode)]
+					countyMap[plzToCounty[FormatPostCode(pcLocation.PostCode)]] = &myCountyData
+					myCountyData.County = plzToCounty[FormatPostCode(pcLocation.PostCode)]
 					tx.Save(&myCountyData)
 				}
 				pcLocation.CountyData = myCountyData
 			}
 			if &pcLocation.StateData == nil || pcLocation.StateDataID == 0 {
 				myStateData := pcmodel.StateData{}
-				if myMapValue, ok := stateMap[plzToState[formatPostCode(pcLocation.PostCode)]]; ok {
+				if myMapValue, ok := stateMap[plzToState[FormatPostCode(pcLocation.PostCode)]]; ok {
 					myStateData = *myMapValue
 				} else {
-					stateMap[plzToState[formatPostCode(pcLocation.PostCode)]] = &myStateData
-					myStateData.State = plzToState[formatPostCode(pcLocation.PostCode)]
+					stateMap[plzToState[FormatPostCode(pcLocation.PostCode)]] = &myStateData
+					myStateData.State = plzToState[FormatPostCode(pcLocation.PostCode)]
 					tx.Save(&myStateData)
 				}
 				pcLocation.StateData = myStateData
 			}
-			pcLocation.CountyData.County = plzToCounty[formatPostCode(pcLocation.PostCode)]
-			pcLocation.StateData.State = plzToState[formatPostCode(pcLocation.PostCode)]
+			pcLocation.CountyData.County = plzToCounty[FormatPostCode(pcLocation.PostCode)]
+			pcLocation.StateData.State = plzToState[FormatPostCode(pcLocation.PostCode)]
 			tx.Save(&pcLocation)
 		}
 		return nil
@@ -127,7 +127,7 @@ func plzsToPlzInts(plzs []string) []int {
 	return plzInts
 }
 
-func formatPostCode(postCode int32) string {
+func FormatPostCode(postCode int32) string {
 	pcStr := strconv.Itoa(int(postCode))
 	for len(pcStr) < 5 {
 		pcStr = "0" + pcStr
