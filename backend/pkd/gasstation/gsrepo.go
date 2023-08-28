@@ -29,7 +29,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const earthRadius = 6371.0
+//const earthRadius = 6371.0
 
 type minMaxSquare struct {
 	MinLat float64
@@ -203,7 +203,7 @@ func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPr
 		}
 	}
 	var postcodes []string
-	for myPostcode, _ := range postcodeGasPriceMap {
+	for myPostcode := range postcodeGasPriceMap {
 		postcodes = append(postcodes, myPostcode)
 	}
 	//var postcodeLocations []pcmodel.PostCodeLocation
@@ -347,7 +347,7 @@ func ReCalcCountyStatePrices() {
 
 func sendNotifications(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) {
 	var gasStationIds []string
-	for key, _ := range *gasStationIDToGasPriceMap {
+	for key := range *gasStationIDToGasPriceMap {
 		gasStationIds = append(gasStationIds, key)
 	}
 	gasStations := findByIds(&gasStationIds)
