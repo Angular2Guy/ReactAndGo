@@ -5,5 +5,5 @@ docker run --name local-postgres-reactandgo -e POSTGRES_PASSWORD=sven1 -e POSTGR
 # docker start local-postgres-reactandgo
 # docker stop local-postgres-reactandgo
 # docker exec -it local-postgres-reactandgo bash
-# pg_dump -h localhost -U sven1 -d reactandgo -c > reactandgo.sql
-# psql -h localhost -U sven1 -d reactandgo < reactandgo.sql
+# pg_dump -h localhost -U sven1 -d reactandgo -c | gzip > reactandgo.sql.gz
+# cat reactandgo.sql.gz | gunzip | psql -h localhost -U sven1 -d reactandgo

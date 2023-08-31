@@ -354,10 +354,9 @@ func sendNotifications(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) {
 	notification.SendNotifications(gasStationIDToGasPriceMap, gasStations)
 }
 
-func createChunks(ids *[]string) [][]string {
-	cunckedSelects := strings.ToLower(strings.TrimSpace(os.Getenv("DB_CHUNKED_SELECTS")))
+func createInChunks(ids *[]string, chunkedSelects bool) [][]string {
 	chunkSize := 10000
-	if cunckedSelects == "true" {
+	if chunkedSelects {
 		chunkSize = 999
 	}
 	chuncks := chunkSlice(*ids, chunkSize)
@@ -365,6 +364,11 @@ func createChunks(ids *[]string) [][]string {
 		log.Printf("Number of Chunks: %v\n", len(chuncks))
 	}
 	return chuncks
+}
+
+func createChunks(ids *[]string) [][]string {
+	cunckedSelects := strings.ToLower(strings.TrimSpace(os.Getenv("DB_CHUNKED_SELECTS")))
+	return createInChunks(ids, cunckedSelects == "true")
 }
 
 func findByIds(ids *[]string) []gsmodel.GasStation {
@@ -394,7 +398,7 @@ func FindPricesByStids(stids *[]string, resultLimit int) []gsmodel.GasPrice {
 	oneMonthAgo := time.Now().Add(time.Hour * -720)
 	dateStr := fmt.Sprintf("%04d-%02d-%02d", oneMonthAgo.Year(), oneMonthAgo.Month(), oneMonthAgo.Day())
 	//log.Printf("Cut off date: %v", dateStr)
-	chuncks := createChunks(stids)
+	chuncks := createInChunks(stids, true)
 	database.DB.Transaction(func(tx *gorm.DB) error {
 		for _, chunk := range chuncks {
 			var values []gsmodel.GasPrice
