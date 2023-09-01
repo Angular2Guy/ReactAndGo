@@ -416,7 +416,17 @@ func FindPricesByStids(stids *[]string, resultLimit int) []gsmodel.GasPrice {
 }
 
 func FindByPostCodes(postcodes []string) []gsmodel.GasStation {
-	return nil
+	chunks := createChunks(&postcodes)
+	var gasStations []gsmodel.GasStation
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		for _, chunk := range chunks {
+			var myGasStations []gsmodel.GasStation
+			tx.Where("post_code IN ?", chunk).Find(&myGasStations)
+			gasStations = append(gasStations, myGasStations...)
+		}
+		return nil
+	})
+	return gasStations
 }
 
 func FindPricesByStid(stid string) []gsmodel.GasPrice {
