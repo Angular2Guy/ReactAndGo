@@ -15,28 +15,16 @@ package gasstation
 import (
 	"fmt"
 	"log"
-	"os"
 	gsbody "react-and-go/pkd/controller/gsmodel"
 	"react-and-go/pkd/database"
 	"react-and-go/pkd/gasstation/gsmodel"
-	"react-and-go/pkd/notification"
 	"react-and-go/pkd/postcode"
 	"react-and-go/pkd/postcode/pcmodel"
-	"strconv"
 	"strings"
 	"time"
 
 	"gorm.io/gorm"
 )
-
-//const earthRadius = 6371.0
-
-type minMaxSquare struct {
-	MinLat float64
-	MinLng float64
-	MaxLat float64
-	MaxLng float64
-}
 
 type GasStationPrices struct {
 	GasStationID string `gorm:"column:stid"`
@@ -97,29 +85,6 @@ func UpdateGasStations(gasStations *[]GasStationImport) {
 		fmt.Printf("GasStations new: %v\n", len(gasStationImportMap))
 		return nil
 	})
-}
-
-func createNewGasStation(value GasStationImport) gsmodel.GasStation {
-	var resultGs gsmodel.GasStation
-	resultGs.ID = value.Uuid
-	resultGs.Brand = value.Brand
-	resultGs.FirstActive = value.FirstActive
-	resultGs.HouseNumber = value.HouseNumber
-	resultGs.Latitude = value.Latitude
-	resultGs.Longitude = value.Longitude
-	resultGs.OpenTs = 0
-	resultGs.OtJson = value.OpeningTimesJson
-	resultGs.Place = value.City
-	resultGs.PostCode = value.PostCode
-	resultGs.PriceChanged = time.Now()
-	resultGs.PriceInImport = time.Now()
-	//resultGs.PublicHolidayIdentifier = ""
-	resultGs.StationInImport = time.Now()
-	resultGs.StationName = value.StationName
-	resultGs.Street = value.Street
-	resultGs.Version = "1"
-	resultGs.VersionTime = time.Now()
-	return resultGs
 }
 
 func UpdatePrice(gasStationPrices *[]GasStationPrices) {
@@ -186,78 +151,6 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 	log.Printf("Prices updated: %v\n", len(gasPriceUpdateMap))
 	go sendNotifications(&gasPriceUpdateMap)
 	//go updateCountyStatePrices(&gasPriceUpdateMap)
-}
-
-func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) int {
-	var gasStationIDs []string
-	for gasStationID := range *gasStationIDToGasPriceMap {
-		gasStationIDs = append(gasStationIDs, gasStationID)
-	}
-	gasStationIDChunks := createChunks(&gasStationIDs)
-	postcodeGasPriceMap := make(map[string]gsmodel.GasStation)
-	for _, gasStationIDChunk := range gasStationIDChunks {
-		var values []gsmodel.GasStation
-		database.DB.Where("ID IN ?", gasStationIDChunk).Find(&values)
-		for _, myGasStation := range values {
-			postcodeGasPriceMap[myGasStation.PostCode] = myGasStation
-		}
-	}
-	var postcodes []string
-	for myPostcode := range postcodeGasPriceMap {
-		postcodes = append(postcodes, myPostcode)
-	}
-	//var postcodeLocations []pcmodel.PostCodeLocation
-	postcodePostcodeLocationMap := make(map[int]pcmodel.PostCodeLocation)
-	postcodeChunks := createChunks(&postcodes)
-	for _, myPostcode := range postcodeChunks {
-		var values []pcmodel.PostCodeLocation
-		database.DB.Where("PostCode IN ?", myPostcode).Preload("StateData").Preload("CountyData").Find(&values)
-		//postcodeLocations = append(postcodeLocations, values...)
-		for _, myValue := range values {
-			postcodePostcodeLocationMap[int(myValue.PostCode)] = myValue
-		}
-	}
-	modifiedStatesMap := make(map[int]pcmodel.StateData)
-	modifiedCountiesMap := make(map[int]pcmodel.CountyData)
-	for myPostcode, myGasStation := range postcodeGasPriceMap {
-		myPostCodeInt, err := strconv.Atoi(myPostcode)
-		if err != nil {
-			continue
-		}
-		myPostcodeLocation := postcodePostcodeLocationMap[myPostCodeInt]
-		myGasStationIDToGasPriceMap := *gasStationIDToGasPriceMap
-		myGasprice := myGasStationIDToGasPriceMap[myGasStation.ID]
-		if myPostcodeLocation.CountyData.GasStationNum > 0 {
-			if _, ok := modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)]; !ok {
-				modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)] = myPostcodeLocation.CountyData
-			}
-			myCountyData := modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)]
-			myCountyData.AvgDiesel = float64(myGasprice.Diesel)/float64(myCountyData.GasStationNum) - myCountyData.AvgDiesel/float64(myCountyData.GasStationNum)
-			myCountyData.AvgE10 = float64(myGasprice.E10)/float64(myCountyData.GasStationNum) - myCountyData.AvgE10/float64(myCountyData.GasStationNum)
-			myCountyData.AvgE5 = float64(myGasprice.E5)/float64(myCountyData.GasStationNum) - myCountyData.AvgE5/float64(myCountyData.GasStationNum)
-			modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)] = myCountyData
-		}
-		if myPostcodeLocation.StateData.GasStationNum > 0 {
-			if _, ok := modifiedStatesMap[int(myPostcodeLocation.StateData.ID)]; !ok {
-				modifiedStatesMap[int(myPostcodeLocation.StateData.ID)] = myPostcodeLocation.StateData
-			}
-			myStateData := modifiedStatesMap[int(myPostcodeLocation.StateData.ID)]
-			myStateData.AvgDiesel = float64(myGasprice.Diesel)/float64(myStateData.GasStationNum) - myStateData.AvgDiesel/float64(myStateData.GasStationNum)
-			myStateData.AvgE10 = float64(myGasprice.E10)/float64(myStateData.GasStationNum) - myStateData.AvgE10/float64(myStateData.GasStationNum)
-			myStateData.AvgE5 = float64(myGasprice.E5)/float64(myStateData.GasStationNum) - myStateData.AvgE5/float64(myStateData.GasStationNum)
-			modifiedStatesMap[int(myPostcodeLocation.StateData.ID)] = myStateData
-		}
-	}
-	database.DB.Transaction(func(tx *gorm.DB) error {
-		for _, myStateData := range modifiedStatesMap {
-			tx.Save(myStateData)
-		}
-		for _, myCountyData := range modifiedCountiesMap {
-			tx.Save(myCountyData)
-		}
-		return nil
-	})
-	return len(postcodePostcodeLocationMap)
 }
 
 func ReCalcCountyStatePrices() {
@@ -343,46 +236,6 @@ func ReCalcCountyStatePrices() {
 		return nil
 	})
 	log.Printf("recalcCountyStatePrices finished for %v states and %v counties.", len(idStateDataMap), len(idCountyDataMap))
-}
-
-func sendNotifications(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) {
-	var gasStationIds []string
-	for key := range *gasStationIDToGasPriceMap {
-		gasStationIds = append(gasStationIds, key)
-	}
-	gasStations := findByIds(&gasStationIds)
-	notification.SendNotifications(gasStationIDToGasPriceMap, gasStations)
-}
-
-func createInChunks(ids *[]string, chunkedSelects bool) [][]string {
-	chunkSize := 10000
-	if chunkedSelects {
-		chunkSize = 999
-	}
-	chuncks := chunkSlice(*ids, chunkSize)
-	if len(chuncks) > 1 {
-		log.Printf("Number of Chunks: %v\n", len(chuncks))
-	}
-	return chuncks
-}
-
-func createChunks(ids *[]string) [][]string {
-	cunckedSelects := strings.ToLower(strings.TrimSpace(os.Getenv("DB_CHUNKED_SELECTS")))
-	return createInChunks(ids, cunckedSelects == "true")
-}
-
-func findByIds(ids *[]string) []gsmodel.GasStation {
-	var result []gsmodel.GasStation
-	chuncks := createChunks(ids)
-	database.DB.Transaction(func(tx *gorm.DB) error {
-		for _, chunk := range chuncks {
-			var values []gsmodel.GasStation
-			tx.Where("id in ?", chunk).Find(&values)
-			result = append(result, values...)
-		}
-		return nil
-	})
-	return result
 }
 
 func FindById(id string) gsmodel.GasStation {
@@ -475,49 +328,4 @@ func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasSta
 		}
 	}
 	return filteredGasStations
-}
-
-func calcMinMaxSquare(longitude float64, latitude float64, radius float64) minMaxSquare {
-	minMax := minMaxSquare{MinLat: 1000.0, MinLng: 1000.0, MaxLat: 0.0, MaxLng: 0.0}
-	//fmt.Printf("StartLat: %v, StartLng: %v Radius: %v\n", searchLocation.Latitude, searchLocation.Longitude, searchLocation.Radius)
-	//max supported radius 20km and add 0.1 for floation point side effects
-	northLat, northLng := gsmodel.CalcLocation(latitude, longitude, radius, 0.0)
-	minMax = updateMinMaxSquare(northLat, northLng, minMax)
-	//fmt.Printf("NorthLat: %v, NorthLng: %v\n", northLat, northLng)
-	eastLat, eastLng := gsmodel.CalcLocation(latitude, longitude, radius, 90.0)
-	minMax = updateMinMaxSquare(eastLat, eastLng, minMax)
-	//fmt.Printf("EastLat: %v, EastLng: %v\n", eastLat, eastLng)
-	southLat, southLng := gsmodel.CalcLocation(latitude, longitude, radius, 180.0)
-	minMax = updateMinMaxSquare(southLat, southLng, minMax)
-	//fmt.Printf("SouthLat: %v, SouthLng: %v\n", southLat, southLng)
-	westLat, westLng := gsmodel.CalcLocation(latitude, longitude, radius, 270.0)
-	minMax = updateMinMaxSquare(westLat, westLng, minMax)
-	return minMax
-}
-
-func chunkSlice[T any](mySlice []T, chunkSize int) (s [][]T) {
-	numberOfChunks := len(mySlice)/chunkSize + 1
-	var result [][]T
-	for i := 0; i < numberOfChunks; i++ {
-		min := (i * len(mySlice) / numberOfChunks)
-		max := ((i + 1) * len(mySlice)) / numberOfChunks
-		result = append(result, mySlice[min:max])
-	}
-	return result
-}
-
-func updateMinMaxSquare(newLat float64, newLng float64, minMax minMaxSquare) minMaxSquare {
-	if newLat > minMax.MaxLat {
-		minMax.MaxLat = newLat
-	}
-	if newLat < minMax.MinLat {
-		minMax.MinLat = newLat
-	}
-	if newLng > minMax.MaxLng {
-		minMax.MaxLng = newLng
-	}
-	if newLng < minMax.MinLng {
-		minMax.MinLng = newLng
-	}
-	return minMax
 }
