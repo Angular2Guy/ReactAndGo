@@ -19,7 +19,6 @@ import (
 	"react-and-go/pkd/database"
 	"react-and-go/pkd/gasstation/gsmodel"
 	"react-and-go/pkd/postcode"
-	"react-and-go/pkd/postcode/pcmodel"
 	"strings"
 	"time"
 
@@ -155,49 +154,11 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 
 func ReCalcCountyStatePrices() {
 	log.Printf("recalcCountyStatePrices started.")
-	var postcodeLocations []pcmodel.PostCodeLocation
-	database.DB.Preload("StateData").Preload("CountyData").Find(&postcodeLocations)
-	postCodePostCodeLocationMap := make(map[int]pcmodel.PostCodeLocation)
-	idStateDataMap := make(map[int]pcmodel.StateData)
-	idCountyDataMap := make(map[int]pcmodel.CountyData)
-	for _, myPostcodeLocation := range postcodeLocations {
-		postCodePostCodeLocationMap[int(myPostcodeLocation.PostCode)] = myPostcodeLocation
-		idStateDataMap[int(myPostcodeLocation.StateData.ID)] = myPostcodeLocation.StateData
-		idCountyDataMap[int(myPostcodeLocation.CountyData.ID)] = myPostcodeLocation.CountyData
-	}
-	var gasStations []gsmodel.GasStation
-	database.DB.Find(&gasStations)
-	postCodeGasStationsMap := make(map[string][]gsmodel.GasStation)
-	for _, myGasStation := range gasStations {
-		postCodeGasStationsMap[myGasStation.PostCode] = append(postCodeGasStationsMap[myGasStation.PostCode], myGasStation)
-	}
-	var gasStationIds []string
-	for _, myGasStations := range postCodeGasStationsMap {
-		for _, myGasStation := range myGasStations {
-			gasStationIds = append(gasStationIds, myGasStation.ID)
-		}
-	}
-	gasPrices := FindPricesByStids(&gasStationIds, 0)
-	gasStationIdGasPriceMap := make(map[string]gsmodel.GasPrice)
-	for _, myGasPrice := range gasPrices {
-		if _, ok := gasStationIdGasPriceMap[myGasPrice.GasStationID]; !ok {
-			gasStationIdGasPriceMap[myGasPrice.GasStationID] = myGasPrice
-		}
-	}
-	//reset Data structs
-	for _, myCounty := range idCountyDataMap {
-		myCounty.AvgDiesel = 0
-		myCounty.AvgE10 = 0
-		myCounty.AvgE5 = 0
-		myCounty.GasStationNum = 0
-	}
-	for _, myState := range idStateDataMap {
-		myState.AvgDiesel = 0
-		myState.AvgE10 = 0
-		myState.AvgE5 = 0
-		myState.GasStationNum = 0
-	}
-
+	postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap := createPostCodeMaps()
+	postCodeGasStationsMap := createPostCodeGasStationsMap()
+	gasStationIdGasPriceMap := createGasStationIdGasPriceMap(&postCodeGasStationsMap)
+	resetDataMaps(&idStateDataMap, &idCountyDataMap)
+	//sum up prices and count stations
 	for _, myPostCodeLocation := range postCodePostCodeLocationMap {
 		myPostCode := postcode.FormatPostCode(myPostCodeLocation.PostCode)
 		for _, myGasStation := range postCodeGasStationsMap[myPostCode] {
@@ -216,6 +177,7 @@ func ReCalcCountyStatePrices() {
 			idCountyDataMap[int(myPostCodeLocation.CountyData.ID)] = myCountyData
 		}
 	}
+	//divide by station count and save
 	database.DB.Transaction(func(tx *gorm.DB) error {
 		for _, myStateData := range idStateDataMap {
 			if myStateData.GasStationNum > 0 {

@@ -35,6 +35,64 @@ type minMaxSquare struct {
 	MaxLng float64
 }
 
+func resetDataMaps(stateDataMapRef *map[int]pcmodel.StateData, countyDataMap *map[int]pcmodel.CountyData) {
+	idCountyDataMap := *countyDataMap
+	for _, myCounty := range idCountyDataMap {
+		myCounty.AvgDiesel = 0
+		myCounty.AvgE10 = 0
+		myCounty.AvgE5 = 0
+		myCounty.GasStationNum = 0
+	}
+	idStateDataMap := *stateDataMapRef
+	for _, myState := range idStateDataMap {
+		myState.AvgDiesel = 0
+		myState.AvgE10 = 0
+		myState.AvgE5 = 0
+		myState.GasStationNum = 0
+	}
+}
+
+func createPostCodeMaps() (map[int]pcmodel.PostCodeLocation, map[int]pcmodel.StateData, map[int]pcmodel.CountyData) {
+	var postcodeLocations []pcmodel.PostCodeLocation
+	database.DB.Preload("StateData").Preload("CountyData").Find(&postcodeLocations)
+	postCodePostCodeLocationMap := make(map[int]pcmodel.PostCodeLocation)
+	idStateDataMap := make(map[int]pcmodel.StateData)
+	idCountyDataMap := make(map[int]pcmodel.CountyData)
+	for _, myPostcodeLocation := range postcodeLocations {
+		postCodePostCodeLocationMap[int(myPostcodeLocation.PostCode)] = myPostcodeLocation
+		idStateDataMap[int(myPostcodeLocation.StateData.ID)] = myPostcodeLocation.StateData
+		idCountyDataMap[int(myPostcodeLocation.CountyData.ID)] = myPostcodeLocation.CountyData
+	}
+	return postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap
+}
+
+func createGasStationIdGasPriceMap(postCodeGasStationsMap *map[string][]gsmodel.GasStation) map[string]gsmodel.GasPrice {
+	var gasStationIds []string
+	for _, myGasStations := range *postCodeGasStationsMap {
+		for _, myGasStation := range myGasStations {
+			gasStationIds = append(gasStationIds, myGasStation.ID)
+		}
+	}
+	gasPrices := FindPricesByStids(&gasStationIds, 0)
+	gasStationIdGasPriceMap := make(map[string]gsmodel.GasPrice)
+	for _, myGasPrice := range gasPrices {
+		if _, ok := gasStationIdGasPriceMap[myGasPrice.GasStationID]; !ok {
+			gasStationIdGasPriceMap[myGasPrice.GasStationID] = myGasPrice
+		}
+	}
+	return gasStationIdGasPriceMap
+}
+
+func createPostCodeGasStationsMap() map[string][]gsmodel.GasStation {
+	var gasStations []gsmodel.GasStation
+	database.DB.Find(&gasStations)
+	postCodeGasStationsMap := make(map[string][]gsmodel.GasStation)
+	for _, myGasStation := range gasStations {
+		postCodeGasStationsMap[myGasStation.PostCode] = append(postCodeGasStationsMap[myGasStation.PostCode], myGasStation)
+	}
+	return postCodeGasStationsMap
+}
+
 func createNewGasStation(value GasStationImport) gsmodel.GasStation {
 	var resultGs gsmodel.GasStation
 	resultGs.ID = value.Uuid
@@ -58,7 +116,7 @@ func createNewGasStation(value GasStationImport) gsmodel.GasStation {
 	return resultGs
 }
 
-func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) int {
+func createPostCodePriceMap(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) map[string]gsmodel.GasStation {
 	var gasStationIDs []string
 	for gasStationID := range *gasStationIDToGasPriceMap {
 		gasStationIDs = append(gasStationIDs, gasStationID)
@@ -72,8 +130,12 @@ func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPr
 			postcodeGasPriceMap[myGasStation.PostCode] = myGasStation
 		}
 	}
+	return postcodeGasPriceMap
+}
+
+func createPostcodePostcodeLocationMap(postcodeGasPriceMap *map[string]gsmodel.GasStation) map[int]pcmodel.PostCodeLocation {
 	var postcodes []string
-	for myPostcode := range postcodeGasPriceMap {
+	for myPostcode := range *postcodeGasPriceMap {
 		postcodes = append(postcodes, myPostcode)
 	}
 	//var postcodeLocations []pcmodel.PostCodeLocation
@@ -87,8 +149,15 @@ func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPr
 			postcodePostcodeLocationMap[int(myValue.PostCode)] = myValue
 		}
 	}
+	return postcodePostcodeLocationMap
+}
+
+func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) int {
+	postcodeGasPriceMap := createPostCodePriceMap(gasStationIDToGasPriceMap)
+	postcodePostcodeLocationMap := createPostcodePostcodeLocationMap(&postcodeGasPriceMap)
 	modifiedStatesMap := make(map[int]pcmodel.StateData)
 	modifiedCountiesMap := make(map[int]pcmodel.CountyData)
+	//update avg prices
 	for myPostcode, myGasStation := range postcodeGasPriceMap {
 		myPostCodeInt, err := strconv.Atoi(myPostcode)
 		if err != nil {
@@ -97,6 +166,7 @@ func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPr
 		myPostcodeLocation := postcodePostcodeLocationMap[myPostCodeInt]
 		myGasStationIDToGasPriceMap := *gasStationIDToGasPriceMap
 		myGasprice := myGasStationIDToGasPriceMap[myGasStation.ID]
+		//calc CountData by subtracting the the average fraction and adding the new price fraction
 		if myPostcodeLocation.CountyData.GasStationNum > 0 {
 			if _, ok := modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)]; !ok {
 				modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)] = myPostcodeLocation.CountyData
@@ -107,6 +177,7 @@ func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPr
 			myCountyData.AvgE5 = float64(myGasprice.E5)/float64(myCountyData.GasStationNum) - myCountyData.AvgE5/float64(myCountyData.GasStationNum)
 			modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)] = myCountyData
 		}
+		//calc StateData by subtracting the the average fraction and adding the new price fraction
 		if myPostcodeLocation.StateData.GasStationNum > 0 {
 			if _, ok := modifiedStatesMap[int(myPostcodeLocation.StateData.ID)]; !ok {
 				modifiedStatesMap[int(myPostcodeLocation.StateData.ID)] = myPostcodeLocation.StateData
