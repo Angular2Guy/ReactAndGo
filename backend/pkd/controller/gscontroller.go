@@ -54,10 +54,7 @@ func searchGasStationLocation(c *gin.Context) {
 	c.JSON(http.StatusOK, gsEntity)
 }
 
-func postsUpdate(c *gin.Context) {
-
-}
-
-func postsDelete(c *gin.Context) {
-
+func getRecalcAvgs(c *gin.Context) {
+	gasstation.ReCalcCountyStatePrices()
+	c.JSON(http.StatusOK, "Done.")
 }
