@@ -180,6 +180,7 @@ func ReCalcCountyStatePrices() {
 			idCountyDataMap[int(myPostCodeLocation.CountyData.ID)] = myCountyData
 		}
 	}
+	log.Printf("sums for postCodePostCodeLocationMap: %v", len(postCodeGasStationsMap))
 	//divide by station count and save
 	database.DB.Transaction(func(tx *gorm.DB) error {
 		for _, myStateData := range idStateDataMap {
