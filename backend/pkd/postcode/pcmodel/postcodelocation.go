@@ -24,6 +24,6 @@ type PostCodeLocation struct {
 	CountyDataID    uint
 	CountyData      CountyData
 	SquareKM        float32 `gorm:"type:float8;"`
-	CenterLongitude float64 `gorm:"index:idx_post_code_location_center_logitude"`
-	CenterLatitude  float64 `gorm:"index:idx_post_code_location_center_latitude"`
+	CenterLongitude float64 `gorm:"type:float8;index:idx_post_code_location_center_logitude"`
+	CenterLatitude  float64 `gorm:"type:float8;index:idx_post_code_location_center_latitude"`
 }
