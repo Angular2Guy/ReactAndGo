@@ -53,9 +53,10 @@ type gsStations struct {
 }
 
 func UpdateGasStations(c *gin.Context) {
-	year := 2023
-	month := 1
-	day := 7
+	time.Now().Year()
+	year := time.Now().Year()
+	month := time.Now().Month()
+	day := time.Now().Day()
 	url := fmt.Sprintf("https://dev.azure.com/tankerkoenig/362e70d1-bafa-4cf7-a346-1f3613304973/_apis/git/repositories/0d6e7286-91e4-402c-af56-fa75be1f223d/Items?path=/stations/%04d/%02d/%04d-%02d-%02d-stations.csv"+
 		"&recursionLevel=0&includeContentMetadata=true&versionDescriptor.version=master&versionDescriptor.versionOptions=0&versionDescriptor.versionType=0&includeContent=true&resolveLfs=true", year, month, year, month, day)
 	//fmt.Printf("Url: %v\n", url)
@@ -70,7 +71,7 @@ func UpdateGasStations(c *gin.Context) {
 		log.Println("Cannot read request body:", err)
 	}
 	gasStationImports := convertCsvToGasStationImports(&rows)
-	log.Default().Printf("Result: %v\n", len(gasStationImports))
+	log.Printf("Result: %v\n", len(gasStationImports))
 	//log.Default().Fatalf("Result: GasStationImport {\nUuid: %v\nStationName: %v\nBrand: %v\nStreet: %v\nHouseNumber: %v\nPostCode: %v\nCity: %v\nLatitude: %v\nLongitude: %v\nFirstActive: %v\nOpeningTimesJson: %v\n",
 	//	gasStationImports[0].Uuid, gasStationImports[0].StationName, gasStationImports[0].Brand, gasStationImports[0].Street, gasStationImports[0].HouseNumber, gasStationImports[0].PostCode, gasStationImports[0].City,
 	//	gasStationImports[0].Latitude, gasStationImports[0].Longitude, gasStationImports[0].FirstActive, gasStationImports[0].OpeningTimesJson)
