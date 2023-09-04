@@ -13,6 +13,7 @@
 package gasstation
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"react-and-go/pkd/database"
@@ -73,7 +74,9 @@ func createGasStationIdGasPriceMap(postCodeGasStationsMap *map[string][]gsmodel.
 			gasStationIds = append(gasStationIds, myGasStation.ID)
 		}
 	}
-	gasPrices := FindPricesByStids(&gasStationIds, 0)
+	//log.Printf("gasStationIds: %v", len(gasStationIds))
+	gasPrices := FindPricesByStidsDistinct(&gasStationIds, 0)
+	//log.Printf("gasPrices: %v", len(gasPrices))
 	gasStationIdGasPriceMap := make(map[string]gsmodel.GasPrice)
 	for _, myGasPrice := range gasPrices {
 		if _, ok := gasStationIdGasPriceMap[myGasPrice.GasStationID]; !ok {
@@ -91,6 +94,41 @@ func createPostCodeGasStationsMap() map[string][]gsmodel.GasStation {
 		postCodeGasStationsMap[myGasStation.PostCode] = append(postCodeGasStationsMap[myGasStation.PostCode], myGasStation)
 	}
 	return postCodeGasStationsMap
+}
+
+func findPricesByStids(stids *[]string, resultLimit int, distinct bool) []gsmodel.GasPrice {
+	var myGasPrices []gsmodel.GasPrice
+	gasStationidGasPriceMap := make(map[string]gsmodel.GasPrice)
+	oneMonthAgo := time.Now().Add(time.Hour * -720)
+	dateStr := fmt.Sprintf("%04d-%02d-%02d", oneMonthAgo.Year(), oneMonthAgo.Month(), oneMonthAgo.Day())
+	//log.Printf("Cut off date: %v", dateStr)
+	chuncks := createInChunks(stids, true)
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		for _, chunk := range chuncks {
+			var values []gsmodel.GasPrice
+			//log.Printf("Chunk: %v\n", chunk)
+			myQuery := tx.Where("stid IN ? and date >= date(?) ", chunk, dateStr).Order("date desc")
+			if resultLimit > 0 {
+				myQuery.Limit(resultLimit)
+			}
+			myQuery.Find(&values)
+			//log.Printf("%v", values)
+			if distinct {
+				for _, value := range values {
+					if _, ok := gasStationidGasPriceMap[value.GasStationID]; !ok {
+						gasStationidGasPriceMap[value.GasStationID] = value
+					}
+				}
+				for _, myGasPrice := range gasStationidGasPriceMap {
+					myGasPrices = append(myGasPrices, myGasPrice)
+				}
+			} else {
+				myGasPrices = append(myGasPrices, values...)
+			}
+		}
+		return nil
+	})
+	return myGasPrices
 }
 
 func createNewGasStation(value GasStationImport) gsmodel.GasStation {

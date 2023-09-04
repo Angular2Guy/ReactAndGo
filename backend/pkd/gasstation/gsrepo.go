@@ -155,8 +155,11 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 func ReCalcCountyStatePrices() {
 	log.Printf("recalcCountyStatePrices started.")
 	postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap := createPostCodeMaps()
+	log.Printf("postCodePostCodeLocationMap: %v, idStateDataMap: %v, idCountyDataMap: %v", len(postCodePostCodeLocationMap), len(idStateDataMap), len(idCountyDataMap))
 	postCodeGasStationsMap := createPostCodeGasStationsMap()
+	log.Printf("postCodeGasStationsMap: %v", len(postCodeGasStationsMap))
 	gasStationIdGasPriceMap := createGasStationIdGasPriceMap(&postCodeGasStationsMap)
+	log.Printf("gasStationIdGasPriceMap: %v", len(gasStationIdGasPriceMap))
 	resetDataMaps(&idStateDataMap, &idCountyDataMap)
 	//sum up prices and count stations
 	for _, myPostCodeLocation := range postCodePostCodeLocationMap {
@@ -209,24 +212,12 @@ func FindById(id string) gsmodel.GasStation {
 }
 
 func FindPricesByStids(stids *[]string, resultLimit int) []gsmodel.GasPrice {
-	var myGasPrice []gsmodel.GasPrice
-	oneMonthAgo := time.Now().Add(time.Hour * -720)
-	dateStr := fmt.Sprintf("%04d-%02d-%02d", oneMonthAgo.Year(), oneMonthAgo.Month(), oneMonthAgo.Day())
-	//log.Printf("Cut off date: %v", dateStr)
-	chuncks := createInChunks(stids, true)
-	database.DB.Transaction(func(tx *gorm.DB) error {
-		for _, chunk := range chuncks {
-			var values []gsmodel.GasPrice
-			//log.Printf("Chunk: %v\n", chunk)
-			myQuery := tx.Where("stid IN ? and date >= date(?) ", chunk, dateStr).Order("date desc")
-			if resultLimit > 0 {
-				myQuery.Limit(resultLimit)
-			}
-			myQuery.Find(&values)
-			myGasPrice = append(myGasPrice, values...)
-		}
-		return nil
-	})
+	myGasPrice := findPricesByStids(stids, resultLimit, false)
+	return myGasPrice
+}
+
+func FindPricesByStidsDistinct(stids *[]string, resultLimit int) []gsmodel.GasPrice {
+	myGasPrice := findPricesByStids(stids, resultLimit, true)
 	return myGasPrice
 }
 
