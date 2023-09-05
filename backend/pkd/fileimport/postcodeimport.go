@@ -98,7 +98,11 @@ func UpdateStatesAndCounties(fileName string) {
 			continue
 		}
 		//log.Printf(line)
-		plzToCounty[lineTokens[3]] = lineTokens[4]
+		if len(strings.TrimSpace(lineTokens[4])) > 1 {
+			plzToCounty[lineTokens[3]] = lineTokens[4]
+		} else {
+			plzToCounty[lineTokens[3]] = "Kreisfrei"
+		}
 		plzToState[lineTokens[3]] = lineTokens[5]
 		plzs = append(plzs, lineTokens[3])
 		if _, ok := stateToAmount[lineTokens[5]]; ok {
