@@ -43,6 +43,8 @@ func ImportPostCodeData(postCodeData []PostCodeData) {
 	postCodeLocations := mapToPostCodeLocation(postCodeData)
 	var oriPostCodeLocations []pcmodel.PostCodeLocation
 	database.DB.Find(&oriPostCodeLocations)
+	var myCountyData pcmodel.CountyData
+	var myStateData pcmodel.StateData
 	postCodeLocationsMap := make(map[int32]pcmodel.PostCodeLocation)
 	for _, oriPostCodeLocation := range oriPostCodeLocations {
 		postCodeLocationsMap[oriPostCodeLocation.PostCode] = oriPostCodeLocation
@@ -59,6 +61,12 @@ func ImportPostCodeData(postCodeData []PostCodeData) {
 				oriPostCodeLocation.CenterLatitude = postCodeLocation.CenterLatitude
 				tx.Save(&oriPostCodeLocation)
 			} else {
+				tx.Save(&myCountyData)
+				tx.Save(&myStateData)
+				postCodeLocation.CountyData = myCountyData
+				postCodeLocation.CountyDataID = myCountyData.ID
+				postCodeLocation.StateData = myStateData
+				postCodeLocation.StateDataID = myStateData.ID
 				tx.Save(&postCodeLocation)
 			}
 		}
@@ -76,32 +84,38 @@ func UpdateStatesCounties(plzToState map[string]string, plzToCounty map[string]s
 	//log.Printf("%s, %s", plzToCounty[FormatPostCode(1159)], plzToState[FormatPostCode(1159)])
 	database.DB.Transaction(func(tx *gorm.DB) error {
 		for _, pcLocation := range pcLocations {
-			if &pcLocation.CountyData == nil || pcLocation.CountyDataID == 0 {
+			if &pcLocation.CountyData.County == nil || pcLocation.CountyData.County == "" {
 				myCountyData := pcmodel.CountyData{}
 				if mapValue, ok := countyMap[plzToCounty[FormatPostCode(pcLocation.PostCode)]]; ok {
 					myCountyData = *mapValue
 				} else {
 					countyMap[plzToCounty[FormatPostCode(pcLocation.PostCode)]] = &myCountyData
 					myCountyData.County = plzToCounty[FormatPostCode(pcLocation.PostCode)]
-					tx.Save(&myCountyData)
 				}
+				tx.Save(&myCountyData)
 				pcLocation.CountyData = myCountyData
+				pcLocation.CountyDataID = myCountyData.ID
 			}
-			if &pcLocation.StateData == nil || pcLocation.StateDataID == 0 {
+			if &pcLocation.StateData.State == nil || pcLocation.StateData.State == "" {
 				myStateData := pcmodel.StateData{}
 				if myMapValue, ok := stateMap[plzToState[FormatPostCode(pcLocation.PostCode)]]; ok {
 					myStateData = *myMapValue
 				} else {
 					stateMap[plzToState[FormatPostCode(pcLocation.PostCode)]] = &myStateData
 					myStateData.State = plzToState[FormatPostCode(pcLocation.PostCode)]
-					tx.Save(&myStateData)
 				}
+				tx.Save(&myStateData)
 				pcLocation.StateData = myStateData
+				pcLocation.StateDataID = myStateData.ID
 			}
 			pcLocation.CountyData.County = plzToCounty[FormatPostCode(pcLocation.PostCode)]
 			pcLocation.StateData.State = plzToState[FormatPostCode(pcLocation.PostCode)]
 			tx.Save(&pcLocation)
 		}
+		myCountyData := pcmodel.CountyData{}
+		tx.Where("county = ? or county is null", "").Delete(&myCountyData)
+		myStateData := pcmodel.StateData{}
+		tx.Where("state = ? or state is null", "").Delete(&myStateData)
 		return nil
 	})
 	log.Printf("UpdateStatesCounties updated: %v\n", len(pcLocations))
