@@ -115,7 +115,7 @@ func findPricesByStids(stids *[]string, resultLimit int, distinct bool) []gsmode
 			//log.Printf("%v", values)
 			if distinct {
 				for _, value := range values {
-					if _, ok := gasStationidGasPriceMap[value.GasStationID]; !ok {
+					if myValue, ok := gasStationidGasPriceMap[value.GasStationID]; !ok || myValue.Date.Before(value.Date) {
 						gasStationidGasPriceMap[value.GasStationID] = value
 					}
 				}
