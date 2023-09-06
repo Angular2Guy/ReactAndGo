@@ -180,6 +180,7 @@ func ReCalcCountyStatePrices() {
 			idCountyDataMap[int(myPostCodeLocation.CountyData.ID)] = myCountyData
 		}
 	}
+	//log.Printf("e5Count: %v, e10Count: %v, dieselCount: %v", e5Count, e10Count, dieselCount)
 	log.Printf("sums for postCodePostCodeLocationMap: %v", len(postCodeGasStationsMap))
 	//divide by station count and save
 	database.DB.Transaction(func(tx *gorm.DB) error {
@@ -189,7 +190,7 @@ func ReCalcCountyStatePrices() {
 				myStateData.AvgE10 /= float64(myStateData.GasStationNum)
 				myStateData.AvgE5 /= float64(myStateData.GasStationNum)
 			}
-			tx.Save(myStateData)
+			tx.Save(&myStateData)
 		}
 		for _, myCountyData := range idCountyDataMap {
 			if myCountyData.GasStationNum > 0 {
@@ -197,7 +198,7 @@ func ReCalcCountyStatePrices() {
 				myCountyData.AvgE10 /= float64(myCountyData.GasStationNum)
 				myCountyData.AvgE5 /= float64(myCountyData.GasStationNum)
 			}
-			tx.Save(myCountyData)
+			tx.Save(&myCountyData)
 		}
 		return nil
 	})
