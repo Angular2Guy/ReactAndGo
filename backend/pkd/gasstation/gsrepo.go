@@ -166,6 +166,10 @@ func ReCalcCountyStatePrices() {
 		myPostCode := postcode.FormatPostCode(myPostCodeLocation.PostCode)
 		for _, myGasStation := range postCodeGasStationsMap[myPostCode] {
 			myGasPrice := gasStationIdGasPriceMap[myGasStation.ID]
+			if myGasPrice.E5 < 10 && myGasPrice.E10 < 10 && myGasPrice.Diesel < 10 {
+				continue
+			}
+			//log.Printf("%v", myGasPrice)
 			myStateData := idStateDataMap[int(myPostCodeLocation.StateData.ID)]
 			myCountyData := idCountyDataMap[int(myPostCodeLocation.CountyData.ID)]
 			myStateData.GasStationNum += 1
