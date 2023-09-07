@@ -210,13 +210,13 @@ func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPr
 				modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)] = myPostcodeLocation.CountyData
 			}
 			myCountyData := modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)]
-			if myGasprice.Diesel > 10 {
+			if myGasprice.Diesel > 10 && myCountyData.GsNumDiesel > 0 {
 				myCountyData.AvgDiesel = float64(myGasprice.Diesel)/float64(myCountyData.GsNumDiesel) - myCountyData.AvgDiesel/float64(myCountyData.GsNumDiesel)
 			}
-			if myGasprice.E10 > 10 {
+			if myGasprice.E10 > 10 && myCountyData.GsNumE10 > 0 {
 				myCountyData.AvgE10 = float64(myGasprice.E10)/float64(myCountyData.GsNumE10) - myCountyData.AvgE10/float64(myCountyData.GsNumE10)
 			}
-			if myGasprice.E5 > 10 {
+			if myGasprice.E5 > 10 && myCountyData.GsNumE5 > 0 {
 				myCountyData.AvgE5 = float64(myGasprice.E5)/float64(myCountyData.GsNumE5) - myCountyData.AvgE5/float64(myCountyData.GsNumE5)
 			}
 			modifiedCountiesMap[int(myPostcodeLocation.CountyData.ID)] = myCountyData
@@ -227,9 +227,15 @@ func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPr
 				modifiedStatesMap[int(myPostcodeLocation.StateData.ID)] = myPostcodeLocation.StateData
 			}
 			myStateData := modifiedStatesMap[int(myPostcodeLocation.StateData.ID)]
-			myStateData.AvgDiesel = float64(myGasprice.Diesel)/float64(myStateData.GsNumDiesel) - myStateData.AvgDiesel/float64(myStateData.GsNumDiesel)
-			myStateData.AvgE10 = float64(myGasprice.E10)/float64(myStateData.GsNumE10) - myStateData.AvgE10/float64(myStateData.GsNumE10)
-			myStateData.AvgE5 = float64(myGasprice.E5)/float64(myStateData.GsNumE5) - myStateData.AvgE5/float64(myStateData.GsNumE5)
+			if myGasprice.Diesel > 10 && myStateData.GsNumDiesel > 0 {
+				myStateData.AvgDiesel = float64(myGasprice.Diesel)/float64(myStateData.GsNumDiesel) - myStateData.AvgDiesel/float64(myStateData.GsNumDiesel)
+			}
+			if myGasprice.E10 > 10 && myStateData.GsNumE10 > 0 {
+				myStateData.AvgE10 = float64(myGasprice.E10)/float64(myStateData.GsNumE10) - myStateData.AvgE10/float64(myStateData.GsNumE10)
+			}
+			if myGasprice.E5 > 10 && myStateData.GsNumE5 > 0 {
+				myStateData.AvgE5 = float64(myGasprice.E5)/float64(myStateData.GsNumE5) - myStateData.AvgE5/float64(myStateData.GsNumE5)
+			}
 			modifiedStatesMap[int(myPostcodeLocation.StateData.ID)] = myStateData
 		}
 	}
