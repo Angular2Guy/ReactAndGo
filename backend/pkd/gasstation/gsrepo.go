@@ -25,6 +25,12 @@ import (
 	"gorm.io/gorm"
 )
 
+type GasPriceCounts struct {
+	E5     int
+	E10    int
+	Diesel int
+}
+
 type GasStationPrices struct {
 	GasStationID string `gorm:"column:stid"`
 	E5           int
@@ -162,6 +168,8 @@ func ReCalcCountyStatePrices() {
 	log.Printf("gasStationIdGasPriceMap: %v", len(gasStationIdGasPriceMap))
 	resetDataMaps(&idStateDataMap, &idCountyDataMap)
 	//sum up prices and count stations
+	stateIdGasPriceCounts := make(map[int]GasPriceCounts)
+	countyIdGasPriceCounts := make(map[int]GasPriceCounts)
 	for _, myPostCodeLocation := range postCodePostCodeLocationMap {
 		myPostCode := postcode.FormatPostCode(myPostCodeLocation.PostCode)
 		for _, myGasStation := range postCodeGasStationsMap[myPostCode] {
@@ -182,27 +190,52 @@ func ReCalcCountyStatePrices() {
 			myCountyData.AvgE5 += float64(myGasPrice.E5)
 			idStateDataMap[int(myPostCodeLocation.StateData.ID)] = myStateData
 			idCountyDataMap[int(myPostCodeLocation.CountyData.ID)] = myCountyData
+			if _, ok := stateIdGasPriceCounts[int(myPostCodeLocation.StateData.ID)]; !ok {
+				var gasPriceCounts GasPriceCounts
+				stateIdGasPriceCounts[int(myPostCodeLocation.StateData.ID)] = gasPriceCounts
+			}
+			if _, ok := countyIdGasPriceCounts[int(myPostCodeLocation.CountyData.ID)]; !ok {
+				var gasPriceCounts GasPriceCounts
+				countyIdGasPriceCounts[int(myPostCodeLocation.CountyData.ID)] = gasPriceCounts
+			}
+			stateGasPriceCounts := stateIdGasPriceCounts[int(myPostCodeLocation.StateData.ID)]
+			countyGasPriceCounts := countyIdGasPriceCounts[int(myPostCodeLocation.CountyData.ID)]
+			if myGasPrice.E5 > 10 {
+				stateGasPriceCounts.E5 += 1
+				countyGasPriceCounts.E5 += 1
+
+			}
+			if myGasPrice.E10 > 10 {
+				stateGasPriceCounts.E10 += 1
+				countyGasPriceCounts.E10 += 1
+			}
+			if myGasPrice.Diesel > 10 {
+				stateGasPriceCounts.Diesel += 1
+				countyGasPriceCounts.Diesel += 1
+			}
+			stateIdGasPriceCounts[int(myPostCodeLocation.StateData.ID)] = stateGasPriceCounts
+			countyIdGasPriceCounts[int(myPostCodeLocation.CountyData.ID)] = countyGasPriceCounts
 		}
 	}
 	//log.Printf("e5Count: %v, e10Count: %v, dieselCount: %v", e5Count, e10Count, dieselCount)
 	log.Printf("sums for postCodePostCodeLocationMap: %v", len(postCodeGasStationsMap))
 	//divide by station count and save
 	database.DB.Transaction(func(tx *gorm.DB) error {
-		for _, myStateData := range idStateDataMap {
+		for stateId, myStateData := range idStateDataMap {
 			if myStateData.GasStationNum > 0 {
-				myStateData.AvgDiesel /= float64(myStateData.GasStationNum)
-				myStateData.AvgE10 /= float64(myStateData.GasStationNum)
-				myStateData.AvgE5 /= float64(myStateData.GasStationNum)
+				myStateData.AvgDiesel /= float64(stateIdGasPriceCounts[stateId].Diesel)
+				myStateData.AvgE10 /= float64(stateIdGasPriceCounts[stateId].E10)
+				myStateData.AvgE5 /= float64(stateIdGasPriceCounts[stateId].E5)
+				tx.Save(&myStateData)
 			}
-			tx.Save(&myStateData)
 		}
-		for _, myCountyData := range idCountyDataMap {
+		for countyId, myCountyData := range idCountyDataMap {
 			if myCountyData.GasStationNum > 0 {
-				myCountyData.AvgDiesel /= float64(myCountyData.GasStationNum)
-				myCountyData.AvgE10 /= float64(myCountyData.GasStationNum)
-				myCountyData.AvgE5 /= float64(myCountyData.GasStationNum)
+				myCountyData.AvgDiesel /= float64(countyIdGasPriceCounts[countyId].Diesel)
+				myCountyData.AvgE10 /= float64(countyIdGasPriceCounts[countyId].E10)
+				myCountyData.AvgE5 /= float64(countyIdGasPriceCounts[countyId].E5)
+				tx.Save(&myCountyData)
 			}
-			tx.Save(&myCountyData)
 		}
 		return nil
 	})
