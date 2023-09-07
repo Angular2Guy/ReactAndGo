@@ -181,8 +181,6 @@ func ReCalcCountyStatePrices() {
 			myCountyData.AvgDiesel += float64(myGasPrice.Diesel)
 			myCountyData.AvgE10 += float64(myGasPrice.E10)
 			myCountyData.AvgE5 += float64(myGasPrice.E5)
-			idStateDataMap[int(myPostCodeLocation.StateData.ID)] = myStateData
-			idCountyDataMap[int(myPostCodeLocation.CountyData.ID)] = myCountyData
 			if myGasPrice.E5 > 10 {
 				myCountyData.GsNumE5 += 1
 				myStateData.GsNumE5 += 1
@@ -196,6 +194,8 @@ func ReCalcCountyStatePrices() {
 				myCountyData.GsNumDiesel += 1
 				myStateData.GsNumDiesel += 1
 			}
+			idStateDataMap[int(myPostCodeLocation.StateData.ID)] = myStateData
+			idCountyDataMap[int(myPostCodeLocation.CountyData.ID)] = myCountyData
 		}
 	}
 	//log.Printf("e5Count: %v, e10Count: %v, dieselCount: %v", e5Count, e10Count, dieselCount)
