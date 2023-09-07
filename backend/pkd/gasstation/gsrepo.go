@@ -149,7 +149,7 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 	})
 	log.Printf("Prices updated: %v\n", len(gasPriceUpdateMap))
 	go sendNotifications(&gasPriceUpdateMap)
-	//go updateCountyStatePrices(&gasPriceUpdateMap)
+	go updateCountyStatePrices(&gasPriceUpdateMap)
 }
 
 func ReCalcCountyStatePrices() {

@@ -181,7 +181,7 @@ func createPostcodePostcodeLocationMap(postcodeGasPriceMap *map[string]gsmodel.G
 	postcodeChunks := createChunks(&postcodes)
 	for _, myPostcode := range postcodeChunks {
 		var values []pcmodel.PostCodeLocation
-		database.DB.Where("PostCode IN ?", myPostcode).Preload("StateData").Preload("CountyData").Find(&values)
+		database.DB.Where("post_code IN ?", myPostcode).Preload("StateData").Preload("CountyData").Find(&values)
 		//postcodeLocations = append(postcodeLocations, values...)
 		for _, myValue := range values {
 			postcodePostcodeLocationMap[int(myValue.PostCode)] = myValue
