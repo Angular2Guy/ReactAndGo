@@ -52,5 +52,24 @@ func MigrateDB() {
 	if !database.DB.Migrator().HasTable(&pcmodel.StateData{}) {
 		database.DB.AutoMigrate(&pcmodel.StateData{})
 	}
+	if !database.DB.Migrator().HasColumn(&pcmodel.StateData{}, "GsNumE5") {
+		database.DB.Migrator().AddColumn(&pcmodel.StateData{}, "GsNumE5")
+	}
+	if !database.DB.Migrator().HasColumn(&pcmodel.StateData{}, "GsNumE10") {
+		database.DB.Migrator().AddColumn(&pcmodel.StateData{}, "GsNumE10")
+	}
+	if !database.DB.Migrator().HasColumn(&pcmodel.StateData{}, "GsNumDiesel") {
+		database.DB.Migrator().AddColumn(&pcmodel.StateData{}, "GsNumDiesel")
+	}
+	if !database.DB.Migrator().HasColumn(&pcmodel.CountyData{}, "GsNumE5") {
+		database.DB.Migrator().AddColumn(&pcmodel.CountyData{}, "GsNumE5")
+	}
+	if !database.DB.Migrator().HasColumn(&pcmodel.CountyData{}, "GsNumE10") {
+		database.DB.Migrator().AddColumn(&pcmodel.CountyData{}, "GsNumE10")
+	}
+	if !database.DB.Migrator().HasColumn(&pcmodel.CountyData{}, "GsNumDiesel") {
+		database.DB.Migrator().AddColumn(&pcmodel.CountyData{}, "GsNumDiesel")
+	}
+
 	log.Printf("DB Migration Done.")
 }

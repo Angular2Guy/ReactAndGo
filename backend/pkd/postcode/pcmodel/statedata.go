@@ -18,10 +18,7 @@ import (
 
 type StateData struct {
 	gorm.Model
-	State             string `gorm:"size:256"`
-	GasStationNum     int
-	AvgE5             float64            `gorm:"type:float8;"`
-	AvgE10            float64            `gorm:"type:float8;"`
-	AvgDiesel         float64            `gorm:"type:float8;"`
+	State string `gorm:"size:256"`
+	GsAvgValues
 	PostCodeLocations []PostCodeLocation `gorm:"foreignKey:StateDataID"`
 }

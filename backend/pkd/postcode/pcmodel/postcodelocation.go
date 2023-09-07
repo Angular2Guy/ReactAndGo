@@ -27,3 +27,13 @@ type PostCodeLocation struct {
 	CenterLongitude float64 `gorm:"type:float8;index:idx_post_code_location_center_logitude"`
 	CenterLatitude  float64 `gorm:"type:float8;index:idx_post_code_location_center_latitude"`
 }
+
+type GsAvgValues struct {
+	GasStationNum int
+	AvgE5         float64 `gorm:"type:float8;"`
+	AvgE10        float64 `gorm:"type:float8;"`
+	AvgDiesel     float64 `gorm:"type:float8;"`
+	GsNumE5       int
+	GsNumE10      int
+	GsNumDiesel   int
+}
