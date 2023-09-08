@@ -174,6 +174,9 @@ func createPostCodePriceMap(gasStationIDToGasPriceMap *map[string]gsmodel.GasPri
 func createPostcodePostcodeLocationMap(postcodeGasPriceMap *map[string]gsmodel.GasStation) map[int]pcmodel.PostCodeLocation {
 	var postcodes []string
 	for myPostcode := range *postcodeGasPriceMap {
+		if len(strings.TrimSpace(myPostcode)) == 0 {
+			continue
+		}
 		postcodes = append(postcodes, myPostcode)
 	}
 	//var postcodeLocations []pcmodel.PostCodeLocation
