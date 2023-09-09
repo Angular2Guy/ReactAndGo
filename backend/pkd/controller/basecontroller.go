@@ -41,6 +41,7 @@ func Start(embeddedFiles fs.FS) {
 	router.GET("/config/recalcAvgs", token.CheckToken, getRecalcAvgs)
 	router.GET("/gasprice/:id", token.CheckToken, getGasPriceByGasStationId)
 	router.GET("/gasstation/:id", token.CheckToken, getGasStationById)
+	router.GET("/gasprice/avgs/:postcode", token.CheckToken, getAveragePrices)
 	router.POST("/gasstation/search/place", token.CheckToken, searchGasStationPlace)
 	router.POST("/gasstation/search/location", token.CheckToken, searchGasStationLocation)
 	router.GET("/usernotification/new/:useruuid", token.CheckToken, getNewUserNotifications)
