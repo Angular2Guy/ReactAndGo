@@ -18,6 +18,18 @@ import { useRecoilRefresher_UNSTABLE, useRecoilValue } from 'recoil';
 import GlobalState from '../GlobalState';
 import styles from './main.module.scss';
 
+interface GasPriceAvgs {
+	Postcode:        string
+	County:          string
+	State:           string
+	CountyAvgDiesel: number
+	CountyAvgE10:    number
+	CountyAvgE5:     number
+	StateAvgDiesel:  number
+	StateAvgE10:     number
+	StateAvgE5:      number
+}
+
 interface GasStation {
   StationName: string;
   Brand: string;
@@ -135,13 +147,31 @@ export default function Main() {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
       body: JSON.stringify({ Longitude: globalUserDataState.Longitude, Latitude: globalUserDataState.Latitude, Radius: globalUserDataState.SearchRadius }),
       signal: controller?.signal
-    }
+    }  
+    let postcode = ''
     fetch('/gasstation/search/location', requestOptions2).then(myResult => myResult.json() as Promise<GasStation[]>).then(myJson => {
-      const myResult = myJson.filter(value => value?.GasPrices?.length > 0).map(value => ({
+      const myResult = myJson.filter(value => value?.GasPrices?.length > 0).map(value => {
+        postcode = value.PostCode;
+        return value;
+      }).map(value => ({        
         location: value.Place + ' ' + value.Brand + ' ' + value.Street + ' ' + value.HouseNumber, e5: value.GasPrices[0].E5,
         e10: value.GasPrices[0].E10, diesel: value.GasPrices[0].Diesel, date: new Date(Date.parse(value.GasPrices[0].Date)), longitude: value.Longitude, latitude: value.Latitude
-      } as TableDataRow));
-      setRows(myResult);
+      } as TableDataRow));      
+      const requestOptions3 = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },        
+        signal: controller?.signal
+      }  
+      fetch(`/gasprice/avgs/${postcode}`, requestOptions3).then(myResult => myResult.json() as Promise<GasPriceAvgs>).then(myJson => {
+        const rowCounty = ({        
+          location: myJson.County, e5: Math.round(myJson.CountyAvgE5), e10: Math.round(myJson.CountyAvgE10), diesel: Math.round(myJson.CountyAvgDiesel), date: new Date(), longitude: 0, latitude: 0
+        } as TableDataRow);
+        const rowState = ({        
+          location: myJson.State, e5: Math.round(myJson.StateAvgE5), e10: Math.round(myJson.StateAvgE10), diesel: Math.round(myJson.StateAvgDiesel), date: new Date(), longitude: 0, latitude: 0
+        } as TableDataRow);
+        const resultRows = [rowCounty, rowState, ...myResult]
+        setRows(resultRows);
+      });      
       setGsValues(myResult);
     }).then(() => setController(null));
   }
