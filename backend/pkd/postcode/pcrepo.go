@@ -23,6 +23,18 @@ import (
 	"gorm.io/gorm"
 )
 
+type GasPriceAvgs struct {
+	Postcode        string
+	County          string
+	State           string
+	CountyAvgDiesel float64
+	CountyAvgE10    float64
+	CountyAvgE5     float64
+	StateAvgDiesel  float64
+	StateAvgE10     float64
+	StateAvgE5      float64
+}
+
 type PostCodeData struct {
 	Label           string
 	PostCode        int32
@@ -126,6 +138,26 @@ func FindByPlzs(plzs []string) *[]pcmodel.PostCodeLocation {
 	var plzInts = plzsToPlzInts(plzs)
 	database.DB.Where("post_code in ?", plzInts).Preload("StateData").Preload("CountyData").Find(&pcLocations)
 	return &pcLocations
+}
+
+func FindAvgsByPostcode(postcode string) GasPriceAvgs {
+	var gasPriceAvgs GasPriceAvgs
+	var postCodeLocation pcmodel.PostCodeLocation
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		intPostCode, _ := strconv.Atoi(postcode)
+		tx.Where("post_code = ?", intPostCode).Preload("StateData").Preload("CountyData").Find(&postCodeLocation)
+		return nil
+	})
+	gasPriceAvgs.Postcode = postcode
+	gasPriceAvgs.County = postCodeLocation.CountyData.County
+	gasPriceAvgs.State = postCodeLocation.StateData.State
+	gasPriceAvgs.CountyAvgDiesel = postCodeLocation.CountyData.AvgDiesel
+	gasPriceAvgs.CountyAvgE10 = postCodeLocation.CountyData.AvgE10
+	gasPriceAvgs.CountyAvgE5 = postCodeLocation.StateData.AvgE5
+	gasPriceAvgs.StateAvgDiesel = postCodeLocation.StateData.AvgDiesel
+	gasPriceAvgs.StateAvgE10 = postCodeLocation.StateData.AvgE10
+	gasPriceAvgs.StateAvgE5 = postCodeLocation.StateData.AvgE5
+	return gasPriceAvgs
 }
 
 func plzsToPlzInts(plzs []string) []int {

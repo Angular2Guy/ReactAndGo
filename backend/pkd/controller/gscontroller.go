@@ -17,6 +17,7 @@ import (
 	"net/http"
 	gsbody "react-and-go/pkd/controller/gsmodel"
 	"react-and-go/pkd/gasstation"
+	"react-and-go/pkd/postcode"
 
 	"github.com/gin-gonic/gin"
 )
@@ -57,4 +58,10 @@ func searchGasStationLocation(c *gin.Context) {
 func getRecalcAvgs(c *gin.Context) {
 	gasstation.ReCalcCountyStatePrices()
 	c.JSON(http.StatusOK, "Done.")
+}
+
+func getAveragePrices(c *gin.Context) {
+	myPostcode := c.Params.ByName("postcode")
+	avgPrices := postcode.FindAvgsByPostcode(myPostcode)
+	c.JSON(http.StatusOK, avgPrices)
 }
