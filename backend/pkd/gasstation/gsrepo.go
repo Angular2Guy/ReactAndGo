@@ -149,11 +149,12 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 	})
 	log.Printf("Prices updated: %v\n", len(gasPriceUpdateMap))
 	go sendNotifications(&gasPriceUpdateMap)
-	//go updateCountyStatePrices(&gasPriceUpdateMap)
+	go updateCountyStatePrices(&gasPriceUpdateMap)
 }
 
 func ReCalcCountyStatePrices() {
 	log.Printf("recalcCountyStatePrices started.")
+	myStart := time.Now()
 	postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap := createPostCodeMaps()
 	log.Printf("postCodePostCodeLocationMap: %v, idStateDataMap: %v, idCountyDataMap: %v",
 		len(postCodePostCodeLocationMap), len(idStateDataMap), len(idCountyDataMap))
@@ -225,7 +226,8 @@ func ReCalcCountyStatePrices() {
 		}
 		return nil
 	})
-	log.Printf("recalcCountyStatePrices finished for %v states and %v counties.", len(idStateDataMap), len(idCountyDataMap))
+	myDuration := time.Now().Sub(myStart)
+	log.Printf("recalcCountyStatePrices finished for %v states and %v counties in %v.", len(idStateDataMap), len(idCountyDataMap), myDuration)
 }
 
 func FindById(id string) gsmodel.GasStation {
