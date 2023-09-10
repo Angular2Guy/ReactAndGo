@@ -38,18 +38,26 @@ type minMaxSquare struct {
 
 func resetDataMaps(stateDataMapRef *map[int]pcmodel.StateData, countyDataMap *map[int]pcmodel.CountyData) {
 	idCountyDataMap := *countyDataMap
-	for _, myCounty := range idCountyDataMap {
+	for key, myCounty := range idCountyDataMap {
 		myCounty.AvgDiesel = 0
 		myCounty.AvgE10 = 0
 		myCounty.AvgE5 = 0
 		myCounty.GasStationNum = 0
+		myCounty.GsNumDiesel = 0
+		myCounty.GsNumE10 = 0
+		myCounty.GsNumE5 = 0
+		idCountyDataMap[key] = myCounty
 	}
 	idStateDataMap := *stateDataMapRef
-	for _, myState := range idStateDataMap {
+	for key, myState := range idStateDataMap {
 		myState.AvgDiesel = 0
 		myState.AvgE10 = 0
 		myState.AvgE5 = 0
 		myState.GasStationNum = 0
+		myState.GsNumDiesel = 0
+		myState.GsNumE10 = 0
+		myState.GsNumE5 = 0
+		idStateDataMap[key] = myState
 	}
 }
 

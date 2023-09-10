@@ -149,7 +149,7 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 	})
 	log.Printf("Prices updated: %v\n", len(gasPriceUpdateMap))
 	go sendNotifications(&gasPriceUpdateMap)
-	go updateCountyStatePrices(&gasPriceUpdateMap)
+	//go updateCountyStatePrices(&gasPriceUpdateMap)
 }
 
 func ReCalcCountyStatePrices() {
@@ -174,25 +174,30 @@ func ReCalcCountyStatePrices() {
 			myStateData := idStateDataMap[int(myPostCodeLocation.StateData.ID)]
 			myCountyData := idCountyDataMap[int(myPostCodeLocation.CountyData.ID)]
 			myStateData.GasStationNum += 1
-			myStateData.AvgDiesel += float64(myGasPrice.Diesel)
-			myStateData.AvgE10 += float64(myGasPrice.E10)
-			myStateData.AvgE5 += float64(myGasPrice.E5)
 			myCountyData.GasStationNum += 1
-			myCountyData.AvgDiesel += float64(myGasPrice.Diesel)
-			myCountyData.AvgE10 += float64(myGasPrice.E10)
-			myCountyData.AvgE5 += float64(myGasPrice.E5)
 			if myGasPrice.E5 > 10 {
 				myCountyData.GsNumE5 += 1
 				myStateData.GsNumE5 += 1
-
+				myStateData.AvgE5 += float64(myGasPrice.E5)
+				myCountyData.AvgE5 += float64(myGasPrice.E5)
+				/*
+					if myCountyData.ID == 51 {
+						gasStations := postCodeGasStationsMap[myPostCode]
+						log.Printf("GsNumE5: %v, AvgE5: %v, E5: %v, Id: %v, GasStations: %v", myCountyData.GsNumE5, myCountyData.AvgE5, myGasPrice.E5, myCountyData.ID, len(gasStations))
+					}
+				*/
 			}
 			if myGasPrice.E10 > 10 {
 				myCountyData.GsNumE10 += 1
 				myStateData.GsNumE10 += 1
+				myStateData.AvgE10 += float64(myGasPrice.E10)
+				myCountyData.AvgE10 += float64(myGasPrice.E10)
 			}
 			if myGasPrice.Diesel > 10 {
 				myCountyData.GsNumDiesel += 1
 				myStateData.GsNumDiesel += 1
+				myStateData.AvgDiesel += float64(myGasPrice.Diesel)
+				myCountyData.AvgDiesel += float64(myGasPrice.Diesel)
 			}
 			idStateDataMap[int(myPostCodeLocation.StateData.ID)] = myStateData
 			idCountyDataMap[int(myPostCodeLocation.CountyData.ID)] = myCountyData
