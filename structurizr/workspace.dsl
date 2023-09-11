@@ -15,6 +15,7 @@ workspace "ReactAndGo" "This is project to explore the integration of a React Fr
                 backendGasStationService = component "Gas station service" "Implements the gas station related logic."
                 backendNotificationService = component "Notification service" "Implements the notification related logic."
                 backendAppUserService = component "App user service" "Implements the app user related logic (login/signin/logout)."
+                backendPostCodeService = component "Postcode service" "Implements the postcode to state/county related logic."
             }
             database = container "Postgresql Db" "Postgresql Db stores all the data of the system." tag "Database"
         }
@@ -46,6 +47,8 @@ workspace "ReactAndGo" "This is project to explore the integration of a React Fr
         backendGasStationClient -> backendGasStationService
         backendMessageConsumer -> backendGasStationService "gas price updates"
         backendGasStationService -> backendNotificationService "create notifications from gas price updates."
+        backendCron -> backendGasStationService "recalculate price averages each night."
+        backendGasStationService -> backendPostCodeService "update price averages for states/counties."
     }
 
     views {

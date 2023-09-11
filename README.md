@@ -1,5 +1,5 @@
 # ReactAndGo
-This is a project to compare a single page application frontend based on React and a Rest backend based on Go, to Angular frontends and Spring Boot/Java backends. It enables the car drivers to find gas prices below an user defined target price. It sends notifications if the target price is reached and shows the prices matches in a table. The gas prices of the location of the user are shown in a table and on a map with with pins and hovers. The frontend uses React/Typescript  with Recoil for the state, Mui for the components and Openlayers for the map. The backend uses Go with Gin for the controllers with Jwt Token for security and Gorm for database access. Postgresql is used as database and for the MQTT messaging is the Paho library used. For development Apache Artemis is used as messaging system. The gas stations are imported every night with help of the go-cron library. 
+This is a project to compare a single page application frontend based on React and a Rest backend based on Go, to Angular frontends and Spring Boot/Java backends. It enables the car drivers to find gas prices below an user defined target price. It sends notifications if the target price is reached and shows the prices matches in a table. The gas prices of the location of the user are shown in a table and on a map with with pins and hovers. The frontend uses React/Typescript  with Recoil for the state, Mui for the components and Openlayers for the map. The backend uses Go with Gin for the controllers with Jwt Token for security and Gorm for database access. Postgresql is used as database and for the MQTT messaging is the Paho library used. For development Apache Artemis is used as messaging system. The gas stations are imported every night and the state/county averages are calculated every night with help of the go-cron library. 
 
 Technologies: Go/Golang, Gin, Gorm, Paho, React, Recoil, Typescript, Recoil, Mui, Openlayers, Structurizr
 
@@ -19,6 +19,7 @@ Technologies: Go/Golang, Gin, Gorm, Paho, React, Recoil, Typescript, Recoil, Mui
 7. The frontend shows the prices matches and the local prices in a Mui Table with React/Typescript.
 8. Price matches are shown as notifications. 
 9. The local prices are shown on a map with openlayers at the locations of the gas stations.
+10.The average gas prices of the states and counties are recalculated every night and updated with every MQTT message. They are shown in the gas price table.
 
 ## Mission Statement 
 The ReactAndGo project serves as example for the integration of React, Go, Gin, Gorm and Postgresql in a structured architecture. The build is integrated in one Makefile and the application can be build in a Docker image with the Dockerfile. As documentation are the structurizr diagrams as images and sources available.
