@@ -29,6 +29,8 @@ import (
 	"time"
 )
 
+var start = time.Now()
+
 //go:embed public
 var embeddedFiles embed.FS
 
@@ -41,6 +43,7 @@ func init() {
 }
 
 func main() {
+	log.Printf("Startup took: %vms\n", time.Since(start).Milliseconds())
 	updateThreadPoolSize()
 	quit := make(chan os.Signal, 1)
 	// kill (no param) default send syscall.SIGTERM
