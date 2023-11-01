@@ -20,6 +20,7 @@ import (
 	"os"
 	"react-and-go/pkd/gasstation"
 	"strings"
+	"sync"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -34,6 +35,8 @@ type PriceUpdates struct {
 	E5_delta     float64
 	E10_delta    float64
 }
+
+var updatePricesMutex sync.Mutex
 
 var client mqtt.Client
 
@@ -139,7 +142,10 @@ func HandlePriceUpdate(msgArr *[]byte, topicName string) {
 	}
 	//log.Printf("GasStationPrices: %v", myGasStationPrices)
 	log.Printf("Priceupdates received: %v", len(myGasStationPrices))
+	updatePricesMutex.Lock()
+	log.Printf("Priceupdates started: %v", len(myGasStationPrices))
 	gasstation.UpdatePrice(&myGasStationPrices)
+	updatePricesMutex.Unlock()
 }
 
 func subscribeToTopic(topicName string) {
