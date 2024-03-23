@@ -70,6 +70,9 @@ func MigrateDB() {
 	if !database.DB.Migrator().HasColumn(&pcmodel.CountyData{}, "GsNumDiesel") {
 		database.DB.Migrator().AddColumn(&pcmodel.CountyData{}, "GsNumDiesel")
 	}
+	if !database.DB.Migrator().HasTable(&pcmodel.CountyTimeSlot{}) {
+		database.DB.Migrator().AutoMigrate(&pcmodel.CountyTimeSlot{})
+	}
 
 	log.Printf("DB Migration Done.")
 }

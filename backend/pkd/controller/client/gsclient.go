@@ -53,7 +53,6 @@ type gsStations struct {
 }
 
 func UpdateGasStations(c *gin.Context) {
-	time.Now().Year()
 	year := time.Now().Year()
 	month := time.Now().Month()
 	day := time.Now().Day()

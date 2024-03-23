@@ -13,13 +13,15 @@
 package pcmodel
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
-type CountyData struct {
+type CountyTimeSlot struct {
 	gorm.Model
-	County string `gorm:"size:256"`
+	StartDate time.Time
 	GsAvgValues
-	PostCodeLocations []PostCodeLocation `gorm:"foreignKey:CountyDataID"`
-	CountyTimeSlots   []CountyTimeSlot   `gorm:"foreignKey:CountyDataID"`
+	CountyDataID uint
+	CountyData   CountyData
 }
