@@ -83,14 +83,7 @@ func createPostCodeMaps() (map[int]pcmodel.PostCodeLocation, map[int]pcmodel.Sta
 }
 
 func createGasStationIdGasPriceMap(postCodeGasStationsMap *map[string][]gsmodel.GasStation, timeframe TimeFrame) map[string]gsmodel.GasPrice {
-	var gasStationIds []string
-	for _, myGasStations := range *postCodeGasStationsMap {
-		for _, myGasStation := range myGasStations {
-			gasStationIds = append(gasStationIds, myGasStation.ID)
-		}
-	}
-	//log.Printf("gasStationIds: %v", len(gasStationIds))
-	gasPrices := FindPricesByStidsDistinct(&gasStationIds, 0, timeframe)
+	gasPrices := findGasPricesByTimeframe(postCodeGasStationsMap, timeframe)
 	//log.Printf("gasPrices: %v", len(gasPrices))
 	gasStationIdGasPriceMap := make(map[string]gsmodel.GasPrice)
 	for _, myGasPrice := range gasPrices {
@@ -99,6 +92,33 @@ func createGasStationIdGasPriceMap(postCodeGasStationsMap *map[string][]gsmodel.
 		}
 	}
 	return gasStationIdGasPriceMap
+}
+
+func createGasStationIdGasPriceArrayMap(postCodeGasStationsMap *map[string][]gsmodel.GasStation, timeframe TimeFrame) map[string][]gsmodel.GasPrice {
+	gasPrices := findGasPricesByTimeframe(postCodeGasStationsMap, timeframe)
+	//log.Printf("gasPrices: %v", len(gasPrices))
+	gasStationIdGasPriceMap := make(map[string][]gsmodel.GasPrice)
+	for _, myGasPrice := range gasPrices {
+		if _, ok := gasStationIdGasPriceMap[myGasPrice.GasStationID]; !ok {
+			gasStationIdGasPriceMap[myGasPrice.GasStationID] = make([]gsmodel.GasPrice, 1)
+			gasStationIdGasPriceMap[myGasPrice.GasStationID][0] = myGasPrice
+		} else {
+			gasStationIdGasPriceMap[myGasPrice.GasStationID] = append(gasStationIdGasPriceMap[myGasPrice.GasStationID], myGasPrice)
+		}
+	}
+	return gasStationIdGasPriceMap
+}
+
+func findGasPricesByTimeframe(postCodeGasStationsMap *map[string][]gsmodel.GasStation, timeframe TimeFrame) []gsmodel.GasPrice {
+	var gasStationIds []string
+	for _, myGasStations := range *postCodeGasStationsMap {
+		for _, myGasStation := range myGasStations {
+			gasStationIds = append(gasStationIds, myGasStation.ID)
+		}
+	}
+	//log.Printf("gasStationIds: %v", len(gasStationIds))
+	gasPrices := FindPricesByStidsDistinct(&gasStationIds, 0, timeframe)
+	return gasPrices
 }
 
 func createPostCodeGasStationsMap() map[string][]gsmodel.GasStation {

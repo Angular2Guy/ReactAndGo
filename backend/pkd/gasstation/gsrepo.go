@@ -224,24 +224,44 @@ func ReCalcCountyStatePrices() {
 	})
 	myDuration := time.Now().Sub(myStart)
 	log.Printf("recalcCountyStatePrices finished for %v states and %v counties in %v.", len(idStateDataMap), len(idCountyDataMap), myDuration)
-	go calcCountyTimeSlots()
+	//go calcCountyTimeSlots()
 }
 
 func calcCountyTimeSlots() {
-	//postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap, postCodeGasStationsMap := createPostCodeGasStationMaps(Day)
-	/*
-		for _, myPostCodeLocation := range postCodePostCodeLocationMap {
-			myPostCode := postcode.FormatPostCode(myPostCodeLocation.PostCode)
-			for _, myGasStation := range postCodeGasStationsMap[myPostCode] {
-				for myStation := gasStationIdGasPriceMap[myGasStation.ID] {
-
+	log.Printf("calcCountyTimeSlots started.")
+	myStart := time.Now()
+	postCodePostCodeLocationMap, _, idCountyDataMap, postCodeGasStationsMap := createPostCodeGasStationMaps()
+	gasStationIdGasPriceMap := createGasStationIdGasPriceArrayMap(&postCodeGasStationsMap, Day)
+	for _, myPostCodeLocation := range postCodePostCodeLocationMap {
+		myPostCode := postcode.FormatPostCode(myPostCodeLocation.PostCode)
+		for _, myGasStation := range postCodeGasStationsMap[myPostCode] {
+			yesterday := time.Now().AddDate(0, 0, -1)
+			//10 min slices
+			timeSlices := make([]time.Time, 0)
+			//10 min buckets
+			timeSliceBuckets := make(map[time.Time][]gsmodel.GasPrice)
+			for myTimeSlice := yesterday; myTimeSlice.Before(time.Now()); myTimeSlice = myTimeSlice.Add(time.Minute * 10) {
+				timeSlices = append(timeSlices, myTimeSlice)
+				timeSliceBuckets[myTimeSlice] = make([]gsmodel.GasPrice, 0)
+			}
+			for _, myStationPrice := range gasStationIdGasPriceMap[myGasStation.ID] {
+				for i := 0; i < len(timeSlices)-1; i++ {
+					if timeSlices[i].Before(myStationPrice.Date) && timeSlices[i+1].After(myStationPrice.Date) {
+						timeSliceBuckets[timeSlices[i]] = append(timeSliceBuckets[timeSlices[i]], myStationPrice)
+						break
+					} else if i == len(timeSlices)-1 && timeSlices[i+1].Before(myStationPrice.Date) {
+						timeSliceBuckets[timeSlices[i+1]] = append(timeSliceBuckets[timeSlices[i+1]], myStationPrice)
+						break
+					}
 				}
 			}
 
 		}
-	*/
-	//TODO calc average changes in 10 min slots
+		//TODO calc average changes in 10 min slots
+	}
 	//TODO store changes in countytimeslots
+	myDuration := time.Now().Sub(myStart)
+	log.Printf("calcCountyTimeSlots finished for %v counties in %v.", len(idCountyDataMap), myDuration)
 }
 
 func FindById(id string) gsmodel.GasStation {
