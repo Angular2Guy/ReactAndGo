@@ -19,6 +19,7 @@ import (
 	"react-and-go/pkd/database"
 	"react-and-go/pkd/gasstation/gsmodel"
 	"react-and-go/pkd/postcode"
+	"react-and-go/pkd/postcode/pcmodel"
 	"strings"
 	"time"
 
@@ -155,13 +156,7 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 func ReCalcCountyStatePrices() {
 	log.Printf("recalcCountyStatePrices started.")
 	myStart := time.Now()
-	postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap := createPostCodeMaps()
-	log.Printf("postCodePostCodeLocationMap: %v, idStateDataMap: %v, idCountyDataMap: %v",
-		len(postCodePostCodeLocationMap), len(idStateDataMap), len(idCountyDataMap))
-	postCodeGasStationsMap := createPostCodeGasStationsMap()
-	log.Printf("postCodeGasStationsMap: %v", len(postCodeGasStationsMap))
-	gasStationIdGasPriceMap := createGasStationIdGasPriceMap(&postCodeGasStationsMap)
-	log.Printf("gasStationIdGasPriceMap: %v", len(gasStationIdGasPriceMap))
+	postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap, postCodeGasStationsMap, gasStationIdGasPriceMap := createPostCodeGasStationMaps(Month)
 	resetDataMaps(&idStateDataMap, &idCountyDataMap)
 	//sum up prices and count stations
 	for _, myPostCodeLocation := range postCodePostCodeLocationMap {
@@ -229,6 +224,17 @@ func ReCalcCountyStatePrices() {
 	myDuration := time.Now().Sub(myStart)
 	log.Printf("recalcCountyStatePrices finished for %v states and %v counties in %v.", len(idStateDataMap), len(idCountyDataMap), myDuration)
 	go CalcCountyTimeSlots()
+}
+
+func createPostCodeGasStationMaps(timeframe TimeFrame) (map[int]pcmodel.PostCodeLocation, map[int]pcmodel.StateData, map[int]pcmodel.CountyData, map[string][]gsmodel.GasStation, map[string]gsmodel.GasPrice) {
+	postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap := createPostCodeMaps()
+	log.Printf("postCodePostCodeLocationMap: %v, idStateDataMap: %v, idCountyDataMap: %v",
+		len(postCodePostCodeLocationMap), len(idStateDataMap), len(idCountyDataMap))
+	postCodeGasStationsMap := createPostCodeGasStationsMap()
+	log.Printf("postCodeGasStationsMap: %v", len(postCodeGasStationsMap))
+	gasStationIdGasPriceMap := createGasStationIdGasPriceMap(&postCodeGasStationsMap, timeframe)
+	log.Printf("gasStationIdGasPriceMap: %v", len(gasStationIdGasPriceMap))
+	return postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap, postCodeGasStationsMap, gasStationIdGasPriceMap
 }
 
 func CalcCountyTimeSlots() {
