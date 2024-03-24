@@ -19,7 +19,6 @@ import (
 	"react-and-go/pkd/database"
 	"react-and-go/pkd/gasstation/gsmodel"
 	"react-and-go/pkd/postcode"
-	"react-and-go/pkd/postcode/pcmodel"
 	"strings"
 	"time"
 
@@ -156,7 +155,9 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 func ReCalcCountyStatePrices() {
 	log.Printf("recalcCountyStatePrices started.")
 	myStart := time.Now()
-	postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap, postCodeGasStationsMap, gasStationIdGasPriceMap := createPostCodeGasStationMaps(Month)
+	postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap, postCodeGasStationsMap := createPostCodeGasStationMaps()
+	gasStationIdGasPriceMap := createGasStationIdGasPriceMap(&postCodeGasStationsMap, Month)
+	log.Printf("gasStationIdGasPriceMap: %v", len(gasStationIdGasPriceMap))
 	resetDataMaps(&idStateDataMap, &idCountyDataMap)
 	//sum up prices and count stations
 	for _, myPostCodeLocation := range postCodePostCodeLocationMap {
@@ -223,22 +224,22 @@ func ReCalcCountyStatePrices() {
 	})
 	myDuration := time.Now().Sub(myStart)
 	log.Printf("recalcCountyStatePrices finished for %v states and %v counties in %v.", len(idStateDataMap), len(idCountyDataMap), myDuration)
-	go CalcCountyTimeSlots()
+	go calcCountyTimeSlots()
 }
 
-func createPostCodeGasStationMaps(timeframe TimeFrame) (map[int]pcmodel.PostCodeLocation, map[int]pcmodel.StateData, map[int]pcmodel.CountyData, map[string][]gsmodel.GasStation, map[string]gsmodel.GasPrice) {
-	postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap := createPostCodeMaps()
-	log.Printf("postCodePostCodeLocationMap: %v, idStateDataMap: %v, idCountyDataMap: %v",
-		len(postCodePostCodeLocationMap), len(idStateDataMap), len(idCountyDataMap))
-	postCodeGasStationsMap := createPostCodeGasStationsMap()
-	log.Printf("postCodeGasStationsMap: %v", len(postCodeGasStationsMap))
-	gasStationIdGasPriceMap := createGasStationIdGasPriceMap(&postCodeGasStationsMap, timeframe)
-	log.Printf("gasStationIdGasPriceMap: %v", len(gasStationIdGasPriceMap))
-	return postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap, postCodeGasStationsMap, gasStationIdGasPriceMap
-}
+func calcCountyTimeSlots() {
+	//postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap, postCodeGasStationsMap := createPostCodeGasStationMaps(Day)
+	/*
+		for _, myPostCodeLocation := range postCodePostCodeLocationMap {
+			myPostCode := postcode.FormatPostCode(myPostCodeLocation.PostCode)
+			for _, myGasStation := range postCodeGasStationsMap[myPostCode] {
+				for myStation := gasStationIdGasPriceMap[myGasStation.ID] {
 
-func CalcCountyTimeSlots() {
-	//TODO read yesterdays gas price changes per county
+				}
+			}
+
+		}
+	*/
 	//TODO calc average changes in 10 min slots
 	//TODO store changes in countytimeslots
 }

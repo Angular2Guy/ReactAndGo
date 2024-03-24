@@ -213,6 +213,15 @@ func createPostcodePostcodeLocationMap(postcodeGasPriceMap *map[string]gsmodel.G
 	return postcodePostcodeLocationMap
 }
 
+func createPostCodeGasStationMaps() (map[int]pcmodel.PostCodeLocation, map[int]pcmodel.StateData, map[int]pcmodel.CountyData, map[string][]gsmodel.GasStation) {
+	postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap := createPostCodeMaps()
+	log.Printf("postCodePostCodeLocationMap: %v, idStateDataMap: %v, idCountyDataMap: %v",
+		len(postCodePostCodeLocationMap), len(idStateDataMap), len(idCountyDataMap))
+	postCodeGasStationsMap := createPostCodeGasStationsMap()
+	log.Printf("postCodeGasStationsMap: %v", len(postCodeGasStationsMap))
+	return postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap, postCodeGasStationsMap
+}
+
 func updateCountyStatePrices(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) int {
 	postcodeGasPriceMap := createPostCodePriceMap(gasStationIDToGasPriceMap)
 	postcodePostcodeLocationMap := createPostcodePostcodeLocationMap(&postcodeGasPriceMap)
