@@ -94,7 +94,7 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 		stationPricesKeys = append(stationPricesKeys, value.GasStationID)
 	}
 	gasPriceUpdateMap := make(map[string]gsmodel.GasPrice)
-	stationPricesDb := FindPricesByStids(&stationPricesKeys, 0)
+	stationPricesDb := FindPricesByStids(&stationPricesKeys, 0, Month)
 	log.Printf("StationPricesKeys: %v StationPricesDb: %v", len(stationPricesKeys), len(stationPricesDb))
 	for _, value := range stationPricesDb {
 		if _, found := gasPriceUpdateMap[value.GasStationID]; !found {
@@ -228,6 +228,13 @@ func ReCalcCountyStatePrices() {
 	})
 	myDuration := time.Now().Sub(myStart)
 	log.Printf("recalcCountyStatePrices finished for %v states and %v counties in %v.", len(idStateDataMap), len(idCountyDataMap), myDuration)
+	go CalcCountyTimeSlots()
+}
+
+func CalcCountyTimeSlots() {
+	//TODO read yesterdays gas price changes per county
+	//TODO calc average changes in 10 min slots
+	//TODO store changes in countytimeslots
 }
 
 func FindById(id string) gsmodel.GasStation {
@@ -238,13 +245,13 @@ func FindById(id string) gsmodel.GasStation {
 	return myGasStation
 }
 
-func FindPricesByStids(stids *[]string, resultLimit int) []gsmodel.GasPrice {
-	myGasPrice := findPricesByStids(stids, resultLimit, false)
+func FindPricesByStids(stids *[]string, resultLimit int, timeframe TimeFrame) []gsmodel.GasPrice {
+	myGasPrice := findPricesByStids(stids, resultLimit, false, timeframe)
 	return myGasPrice
 }
 
-func FindPricesByStidsDistinct(stids *[]string, resultLimit int) []gsmodel.GasPrice {
-	myGasPrice := findPricesByStids(stids, resultLimit, true)
+func FindPricesByStidsDistinct(stids *[]string, resultLimit int, timeframe TimeFrame) []gsmodel.GasPrice {
+	myGasPrice := findPricesByStids(stids, resultLimit, true, timeframe)
 	return myGasPrice
 }
 

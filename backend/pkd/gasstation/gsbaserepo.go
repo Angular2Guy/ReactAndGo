@@ -29,6 +29,13 @@ import (
 
 //const earthRadius = 6371.0
 
+type TimeFrame uint
+
+const (
+	Day   TimeFrame = iota
+	Month TimeFrame = iota
+)
+
 type minMaxSquare struct {
 	MinLat float64
 	MinLng float64
@@ -83,7 +90,7 @@ func createGasStationIdGasPriceMap(postCodeGasStationsMap *map[string][]gsmodel.
 		}
 	}
 	//log.Printf("gasStationIds: %v", len(gasStationIds))
-	gasPrices := FindPricesByStidsDistinct(&gasStationIds, 0)
+	gasPrices := FindPricesByStidsDistinct(&gasStationIds, 0, Month)
 	//log.Printf("gasPrices: %v", len(gasPrices))
 	gasStationIdGasPriceMap := make(map[string]gsmodel.GasPrice)
 	for _, myGasPrice := range gasPrices {
@@ -104,11 +111,16 @@ func createPostCodeGasStationsMap() map[string][]gsmodel.GasStation {
 	return postCodeGasStationsMap
 }
 
-func findPricesByStids(stids *[]string, resultLimit int, distinct bool) []gsmodel.GasPrice {
+func findPricesByStids(stids *[]string, resultLimit int, distinct bool, timeframe TimeFrame) []gsmodel.GasPrice {
 	var myGasPrices []gsmodel.GasPrice
 	gasStationidGasPriceMap := make(map[string]gsmodel.GasPrice)
-	oneMonthAgo := time.Now().Add(time.Hour * -720)
-	dateStr := fmt.Sprintf("%04d-%02d-%02d", oneMonthAgo.Year(), oneMonthAgo.Month(), oneMonthAgo.Day())
+	var myTimeFrame time.Time
+	if timeframe == Day {
+		time.Now().Add(time.Hour * -24)
+	} else {
+		time.Now().Add(time.Hour * -720)
+	}
+	dateStr := fmt.Sprintf("%04d-%02d-%02d", myTimeFrame.Year(), myTimeFrame.Month(), myTimeFrame.Day())
 	//log.Printf("Cut off date: %v", dateStr)
 	chuncks := createInChunks(stids, true)
 	database.DB.Transaction(func(tx *gorm.DB) error {
