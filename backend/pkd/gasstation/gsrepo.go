@@ -228,10 +228,7 @@ func ReCalcCountyStatePrices() {
 	//go calcCountyTimeSlots()
 }
 
-func calcCountyTimeSlots() {
-	log.Printf("calcCountyTimeSlots started.")
-	myStart := time.Now()
-	postCodePostCodeLocationMap, _, idCountyDataMap, postCodeGasStationsMap := createPostCodeGasStationMaps()
+func createCodeTimeSliceBuckets(postCodePostCodeLocationMap map[int]pcmodel.PostCodeLocation, postCodeGasStationsMap map[string][]gsmodel.GasStation) map[string]map[time.Time][]gsmodel.GasPrice {
 	gasStationIdGasPriceMap := createGasStationIdGasPriceArrayMap(&postCodeGasStationsMap, Day)
 	postCodeTimeSliceBuckets := make(map[string]map[time.Time][]gsmodel.GasPrice)
 	for _, myPostCodeLocation := range postCodePostCodeLocationMap {
@@ -266,58 +263,76 @@ func calcCountyTimeSlots() {
 			}
 		}
 	}
+	return postCodeTimeSliceBuckets
+}
+
+func createTimeSliceBuckets(myCountyData pcmodel.CountyData, postCodeTimeSliceBuckets map[string]map[time.Time][]gsmodel.GasPrice) map[time.Time][]gsmodel.GasPrice {
+	timeSliceBuckets := make(map[time.Time][]gsmodel.GasPrice)
+	for _, myPcLocation := range myCountyData.PostCodeLocations {
+		myPostCode := postcode.FormatPostCode(myPcLocation.PostCode)
+		if myBuckets, ok := postCodeTimeSliceBuckets[myPostCode]; ok {
+			for mySlice, myNewPrices := range myBuckets {
+				if myOldPrices, ok := timeSliceBuckets[mySlice]; ok {
+					timeSliceBuckets[mySlice] = append(myOldPrices, myNewPrices...)
+				} else {
+					timeSliceBuckets[mySlice] = myNewPrices
+				}
+			}
+		}
+	}
+	return timeSliceBuckets
+}
+
+func createTimeSlicesPriceSums(myCountyData pcmodel.CountyData, timeSliceBuckets map[time.Time][]gsmodel.GasPrice) map[time.Time]pcmodel.CountyTimeSlot {
+	timeSlicesPriceSums := make(map[time.Time]pcmodel.CountyTimeSlot)
+	for mySlice, myPrices := range timeSliceBuckets {
+		var e5Sum, e10Sum, dieselSum, e5Num, e10Num, dieselNum, gsNum int64 = 0, 0, 0, 0, 0, 0, 0
+		for _, myPrice := range myPrices {
+			if myPrice.E5 > 10 {
+				e5Num += 1
+				e5Sum += int64(myPrice.E5)
+			}
+			if myPrice.E10 > 10 {
+				e10Sum += int64(myPrice.E10)
+				e10Num += 1
+			}
+			if myPrice.Diesel > 10 {
+				dieselSum += int64(myPrice.Diesel)
+				dieselNum += 1
+			}
+			if myPrice.E5 > 10 || myPrice.E10 > 10 || myPrice.Diesel > 10 {
+				gsNum += 1
+			}
+		}
+		myCountyTimeSlot := pcmodel.CountyTimeSlot{
+			StartDate:    mySlice,
+			CountyDataID: myCountyData.ID,
+			CountyData:   myCountyData,
+			GsAvgValues: pcmodel.GsAvgValues{
+				GasStationNum: int(gsNum),
+				GsNumDiesel:   int(dieselNum),
+				GsNumE10:      int(e10Num),
+				GsNumE5:       int(e5Num),
+				AvgE5:         float64(e5Sum / e5Num),
+				AvgE10:        float64(e10Sum / e10Num),
+				AvgDiesel:     float64(dieselSum / dieselNum),
+			},
+		}
+		timeSlicesPriceSums[mySlice] = myCountyTimeSlot
+	}
+	return timeSlicesPriceSums
+}
+
+func calcCountyTimeSlots() {
+	log.Printf("calcCountyTimeSlots started.")
+	myStart := time.Now()
+	postCodePostCodeLocationMap, _, idCountyDataMap, postCodeGasStationsMap := createPostCodeGasStationMaps()
+	postCodeTimeSliceBuckets := createCodeTimeSliceBuckets(postCodePostCodeLocationMap, postCodeGasStationsMap)
 	//TODO calc average changes in 10 min slots
 	for _, myCountyData := range idCountyDataMap {
 		//10 min buckets
-		timeSliceBuckets := make(map[time.Time][]gsmodel.GasPrice)
-		for _, myPcLocation := range myCountyData.PostCodeLocations {
-			myPostCode := postcode.FormatPostCode(myPcLocation.PostCode)
-			if myBuckets, ok := postCodeTimeSliceBuckets[myPostCode]; ok {
-				for mySlice, myNewPrices := range myBuckets {
-					if myOldPrices, ok := timeSliceBuckets[mySlice]; ok {
-						timeSliceBuckets[mySlice] = append(myOldPrices, myNewPrices...)
-					} else {
-						timeSliceBuckets[mySlice] = myNewPrices
-					}
-				}
-			}
-		}
-		timeSlicesPriceSums := make(map[time.Time]pcmodel.CountyTimeSlot)
-		for mySlice, myPrices := range timeSliceBuckets {
-			var e5Sum, e10Sum, dieselSum, e5Num, e10Num, dieselNum, gsNum int64 = 0, 0, 0, 0, 0, 0, 0
-			for _, myPrice := range myPrices {
-				if myPrice.E5 > 10 {
-					e5Num += 1
-					e5Sum += int64(myPrice.E5)
-				}
-				if myPrice.E10 > 10 {
-					e10Sum += int64(myPrice.E10)
-					e10Num += 1
-				}
-				if myPrice.Diesel > 10 {
-					dieselSum += int64(myPrice.Diesel)
-					dieselNum += 1
-				}
-				if myPrice.E5 > 10 || myPrice.E10 > 10 || myPrice.Diesel > 10 {
-					gsNum += 1
-				}
-			}
-			myCountyTimeSlot := pcmodel.CountyTimeSlot{
-				StartDate:    mySlice,
-				CountyDataID: myCountyData.ID,
-				CountyData:   myCountyData,
-				GsAvgValues: pcmodel.GsAvgValues{
-					GasStationNum: int(gsNum),
-					GsNumDiesel:   int(dieselNum),
-					GsNumE10:      int(e10Num),
-					GsNumE5:       int(e5Num),
-					AvgE5:         float64(e5Sum / e5Num),
-					AvgE10:        float64(e10Sum / e10Num),
-					AvgDiesel:     float64(dieselSum / dieselNum),
-				},
-			}
-			timeSlicesPriceSums[mySlice] = myCountyTimeSlot
-		}
+		timeSliceBuckets := createTimeSliceBuckets(myCountyData, postCodeTimeSliceBuckets)
+		timeSlicesPriceSums := createTimeSlicesPriceSums(myCountyData, timeSliceBuckets)
 		database.DB.Transaction(func(tx *gorm.DB) error {
 			for _, myCountyTimeSlots := range timeSlicesPriceSums {
 				tx.Save(&myCountyTimeSlots)
