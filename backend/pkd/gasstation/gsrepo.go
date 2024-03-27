@@ -328,6 +328,10 @@ func calcCountyTimeSlots() {
 	myStart := time.Now()
 	postCodePostCodeLocationMap, _, idCountyDataMap, postCodeGasStationsMap := createPostCodeGasStationMaps()
 	postCodeTimeSliceBuckets := createCodeTimeSliceBuckets(postCodePostCodeLocationMap, postCodeGasStationsMap)
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		tx.Delete(&pcmodel.CountyTimeSlot{})
+		return nil
+	})
 	//TODO calc average changes in 10 min slots
 	for _, myCountyData := range idCountyDataMap {
 		//10 min buckets
