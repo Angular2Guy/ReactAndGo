@@ -225,7 +225,7 @@ func ReCalcCountyStatePrices() {
 	})
 	myDuration := time.Now().Sub(myStart)
 	log.Printf("recalcCountyStatePrices finished for %v states and %v counties in %v.", len(idStateDataMap), len(idCountyDataMap), myDuration)
-	//go calcCountyTimeSlots()
+	go calcCountyTimeSlots()
 }
 
 func createCodeTimeSliceBuckets(postCodePostCodeLocationMap map[int]pcmodel.PostCodeLocation, postCodeGasStationsMap map[string][]gsmodel.GasStation) map[string]map[time.Time][]gsmodel.GasPrice {
@@ -332,7 +332,7 @@ func calcCountyTimeSlots() {
 		tx.Delete(&pcmodel.CountyTimeSlot{})
 		return nil
 	})
-	//TODO calc average changes in 10 min slots
+	//calc average changes in 10 min slots
 	for _, myCountyData := range idCountyDataMap {
 		//10 min buckets
 		timeSliceBuckets := createTimeSliceBuckets(myCountyData, postCodeTimeSliceBuckets)
@@ -344,7 +344,7 @@ func calcCountyTimeSlots() {
 			return nil
 		})
 	}
-	//TODO store changes in countytimeslots
+	//store changes in countytimeslots
 	myDuration := time.Now().Sub(myStart)
 	log.Printf("calcCountyTimeSlots finished for %v counties in %v.", len(idCountyDataMap), myDuration)
 }
