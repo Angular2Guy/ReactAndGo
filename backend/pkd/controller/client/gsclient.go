@@ -53,12 +53,12 @@ type gsStations struct {
 }
 
 func UpdateGasStations(c *gin.Context) {
-	year := time.Now().Year()
-	month := time.Now().Month()
-	day := time.Now().Day()
-	//url := fmt.Sprintf("https://dev.azure.com/tankerkoenig/362e70d1-bafa-4cf7-a346-1f3613304973/_apis/git/repositories/0d6e7286-91e4-402c-af56-fa75be1f223d/items?path=/stations/%04d/%02d/%04d-%02d-%02d-stations.csv&versionDescriptor%5BversionOptions%5D=0&versionDescriptor%5BversionType%5D=0&versionDescriptor%5Bversion%5D=master&resolveLfs=true&%24format=octetStream&api-version=5.0&download=true", year, month, year, month, day)
-	url := fmt.Sprintf("https://dev.azure.com/tankerkoenig/362e70d1-bafa-4cf7-a346-1f3613304973/_apis/git/repositories/0d6e7286-91e4-402c-af56-fa75be1f223d/Items?path=/stations/%04d/%02d/%04d-%02d-%02d-stations.csv"+
-		"&recursionLevel=0&includeContentMetadata=true&versionDescriptor.version=master&versionDescriptor.versionOptions=0&versionDescriptor.versionType=0&includeContent=true&resolveLfs=true", year, month, year, month, day)
+	year := time.Now().Add(time.Hour * -30).Year()
+	month := time.Now().Add(time.Hour * -30).Month()
+	day := time.Now().Add(time.Hour * -30).Day()
+	url := fmt.Sprintf("https://dev.azure.com/tankerkoenig/362e70d1-bafa-4cf7-a346-1f3613304973/_apis/git/repositories/0d6e7286-91e4-402c-af56-fa75be1f223d/items?path=/stations/%04d/%02d/%04d-%02d-%02d-stations.csv&versionDescriptor%5BversionOptions%5D=0&versionDescriptor%5BversionType%5D=0&versionDescriptor%5Bversion%5D=master&resolveLfs=true&%24format=octetStream&api-version=5.0&download=true", year, month, year, month, day)
+	//url := fmt.Sprintf("https://dev.azure.com/tankerkoenig/362e70d1-bafa-4cf7-a346-1f3613304973/_apis/git/repositories/0d6e7286-91e4-402c-af56-fa75be1f223d/Items?path=/stations/%04d/%02d/%04d-%02d-%02d-stations.csv"+
+	//	"&recursionLevel=0&includeContentMetadata=true&versionDescriptor.version=master&versionDescriptor.versionOptions=0&versionDescriptor.versionType=0&includeContent=true&resolveLfs=true", year, month, year, month, day)
 	//fmt.Printf("Url: %v\n", url)
 	response, err := http.Get(url)
 	if err != nil {
