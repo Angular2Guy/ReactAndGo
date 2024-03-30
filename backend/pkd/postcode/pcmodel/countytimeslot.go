@@ -20,7 +20,7 @@ import (
 
 type CountyTimeSlot struct {
 	gorm.Model
-	StartDate time.Time
+	StartDate time.Time `gorm:"index:idx_pc_cts_startdate"`
 	GsAvgValues
 	CountyDataID uint
 	CountyData   CountyData
