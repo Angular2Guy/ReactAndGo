@@ -346,7 +346,7 @@ func CalcCountyTimeSlots() {
 	postCodeTimeSliceBuckets := createCodeTimeSliceBuckets(postCodePostCodeLocationMap, postCodeGasStationsMap)
 	//log.Printf("postCodeTimeSliceBuckets: %v\n", len(postCodeGasStationsMap))
 	database.DB.Transaction(func(tx *gorm.DB) error {
-		tx.Where("1=1").Delete(&pcmodel.CountyTimeSlot{})
+		tx.Unscoped().Where("1=1").Delete(&pcmodel.CountyTimeSlot{})
 		return nil
 	})
 	//log.Printf("idCountyDataMap: %v\n", len(idCountyDataMap))
