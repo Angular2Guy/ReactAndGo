@@ -311,21 +311,23 @@ func createTimeSlicesPriceSums(myCountyData pcmodel.CountyData, timeSliceBuckets
 				gsNum += 1
 			}
 		}
-		myCountyTimeSlot := pcmodel.CountyTimeSlot{
-			StartDate:    mySlice,
-			CountyDataID: myCountyData.ID,
-			CountyData:   myCountyData,
-			GsAvgValues: pcmodel.GsAvgValues{
-				GasStationNum: int(gsNum),
-				GsNumDiesel:   int(dieselNum),
-				GsNumE10:      int(e10Num),
-				GsNumE5:       int(e5Num),
-				AvgE5:         divZeroCheck(e5Sum, e5Num),
-				AvgE10:        divZeroCheck(e10Sum, e10Num),
-				AvgDiesel:     divZeroCheck(dieselSum, dieselNum),
-			},
+		if gsNum > 0 {
+			myCountyTimeSlot := pcmodel.CountyTimeSlot{
+				StartDate:    mySlice,
+				CountyDataID: myCountyData.ID,
+				CountyData:   myCountyData,
+				GsAvgValues: pcmodel.GsAvgValues{
+					GasStationNum: int(gsNum),
+					GsNumDiesel:   int(dieselNum),
+					GsNumE10:      int(e10Num),
+					GsNumE5:       int(e5Num),
+					AvgE5:         divZeroCheck(e5Sum, e5Num),
+					AvgE10:        divZeroCheck(e10Sum, e10Num),
+					AvgDiesel:     divZeroCheck(dieselSum, dieselNum),
+				},
+			}
+			timeSlicesPriceSums[mySlice] = myCountyTimeSlot
 		}
-		timeSlicesPriceSums[mySlice] = myCountyTimeSlot
 	}
 	return timeSlicesPriceSums
 }
