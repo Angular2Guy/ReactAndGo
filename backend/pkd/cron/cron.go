@@ -117,9 +117,9 @@ func Start() {
 
 	scheduler.Every(60).Seconds().Tag("messaging").Do(messaging.ConnectionCheck)
 
-	scheduler.Every(1).Day().At("01:32").Tag("timeslices").Do(gasstation.CalcCountyTimeSlots)
+	scheduler.Every(1).Day().At("00:02").Tag("timeslices").Do(gasstation.CalcCountyTimeSlots)
 
-	scheduler.Every(1).Day().At("03:05").Tag("averages").Do(gasstation.ReCalcCountyStatePrices)
+	scheduler.Every(1).Day().At("02:05").Tag("averages").Do(gasstation.ReCalcCountyStatePrices)
 
 	msgFileStr := os.Getenv("MSG_MESSAGES")
 	if len(strings.TrimSpace(msgFileStr)) > 3 {
