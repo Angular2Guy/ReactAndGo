@@ -238,7 +238,7 @@ func createCodeTimeSliceBuckets(postCodePostCodeLocationMap map[int]pcmodel.Post
 			timeSlices := make([]time.Time, 0)
 			//15 min buckets
 			timeSliceBuckets := make(map[time.Time][]gsmodel.GasPrice)
-			for myTimeSlice := yesterday; myTimeSlice.Before(time.Now()); myTimeSlice = myTimeSlice.Add(time.Minute * 15) {
+			for myTimeSlice := yesterday; myTimeSlice.Before(time.Now()); myTimeSlice = myTimeSlice.Add(time.Minute * 15).Round(time.Minute) {
 				timeSlices = append(timeSlices, myTimeSlice)
 				timeSliceBuckets[myTimeSlice] = make([]gsmodel.GasPrice, 0)
 			}
