@@ -225,7 +225,6 @@ func ReCalcCountyStatePrices() {
 	})
 	myDuration := time.Now().Sub(myStart)
 	log.Printf("recalcCountyStatePrices finished for %v states and %v counties in %v.", len(idStateDataMap), len(idCountyDataMap), myDuration)
-	go calcCountyTimeSlots()
 }
 
 func createCodeTimeSliceBuckets(postCodePostCodeLocationMap map[int]pcmodel.PostCodeLocation, postCodeGasStationsMap map[string][]gsmodel.GasStation) map[string]map[time.Time][]gsmodel.GasPrice {
@@ -274,7 +273,7 @@ func createTimeSliceBuckets(myCountyData pcmodel.CountyData, postCodePostCodeLoc
 			myPostCodeLocations = append(myPostCodeLocations, myPostCodeLocation)
 		}
 	}
-	log.Printf("myPostCodeLocations: %v\n", len(myPostCodeLocations))
+	log.Printf("myPostCodeLocations: %v postcode: %v\n", len(myPostCodeLocations), myCountyData.County)
 	for _, myPcLocation := range myPostCodeLocations {
 		//log.Printf("postCodeLocations: %v\n", len(myPcLocation.CountyData.PostCodeLocations))
 		myPostCode := postcode.FormatPostCode(myPcLocation.PostCode)
@@ -338,7 +337,7 @@ func divZeroCheck(number int64, divisor int64) float64 {
 	return float64(number / divisor)
 }
 
-func calcCountyTimeSlots() {
+func CalcCountyTimeSlots() {
 	log.Printf("calcCountyTimeSlots started.")
 	myStart := time.Now()
 	postCodePostCodeLocationMap, _, idCountyDataMap, postCodeGasStationsMap := createPostCodeGasStationMaps()
