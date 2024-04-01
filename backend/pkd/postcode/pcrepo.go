@@ -173,6 +173,18 @@ func plzsToPlzInts(plzs []string) []int {
 	return plzInts
 }
 
+func FindCountyDataById(countyDataIdStr string) []pcmodel.CountyTimeSlot {
+	var myCountyTimeSlots []pcmodel.CountyTimeSlot
+	countyDataId, err := strconv.Atoi(countyDataIdStr)
+	if err == nil {
+		database.DB.Transaction(func(tx *gorm.DB) error {
+			tx.Where("county_data_id = ?", countyDataId).Order("start_date").Preload("CountyData").Find(&myCountyTimeSlots)
+			return nil
+		})
+	}
+	return myCountyTimeSlots
+}
+
 func FormatPostCode(postCode int32) string {
 	pcStr := strconv.Itoa(int(postCode))
 	for len(pcStr) < 5 {

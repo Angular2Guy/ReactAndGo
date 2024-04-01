@@ -82,13 +82,17 @@ func createPostCodeMaps() (map[int]pcmodel.PostCodeLocation, map[int]pcmodel.Sta
 	return postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap
 }
 
-func createGasStationIdGasPriceMap(postCodeGasStationsMap *map[string][]gsmodel.GasStation, timeframe TimeFrame) map[string]gsmodel.GasPrice {
+func createGasStationIdGasPriceMap(postCodeGasStationsMap *map[string][]gsmodel.GasStation, timeframe TimeFrame) map[string][]gsmodel.GasPrice {
 	gasPrices := findGasPricesByTimeframe(postCodeGasStationsMap, timeframe)
 	//log.Printf("gasPrices: %v", len(gasPrices))
-	gasStationIdGasPriceMap := make(map[string]gsmodel.GasPrice)
+	gasStationIdGasPriceMap := make(map[string][]gsmodel.GasPrice)
 	for _, myGasPrice := range gasPrices {
-		if _, ok := gasStationIdGasPriceMap[myGasPrice.GasStationID]; !ok {
-			gasStationIdGasPriceMap[myGasPrice.GasStationID] = myGasPrice
+		today := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local).Round(time.Hour)
+		if _, ok := gasStationIdGasPriceMap[myGasPrice.GasStationID]; !ok && myGasPrice.Date.Before(today) {
+			var myGasPrices []gsmodel.GasPrice
+			gasStationIdGasPriceMap[myGasPrice.GasStationID] = append(myGasPrices, myGasPrice)
+		} else if myGasPrice.Date.Before(today) {
+			gasStationIdGasPriceMap[myGasPrice.GasStationID] = append(gasStationIdGasPriceMap[myGasPrice.GasStationID], myGasPrice)
 		}
 	}
 	return gasStationIdGasPriceMap
@@ -136,7 +140,7 @@ func findPricesByStids(stids *[]string, resultLimit int, distinct bool, timefram
 	gasStationidGasPriceMap := make(map[string]gsmodel.GasPrice)
 	var myTimeFrame time.Time
 	if timeframe == Day {
-		myTimeFrame = time.Now().Add(time.Hour * -24)
+		myTimeFrame = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local).AddDate(0, 0, -1).Round(time.Hour)
 	} else {
 		myTimeFrame = time.Now().Add(time.Hour * -720)
 	}

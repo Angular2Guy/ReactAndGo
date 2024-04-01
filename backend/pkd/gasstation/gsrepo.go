@@ -164,41 +164,42 @@ func ReCalcCountyStatePrices() {
 	for _, myPostCodeLocation := range postCodePostCodeLocationMap {
 		myPostCode := postcode.FormatPostCode(myPostCodeLocation.PostCode)
 		for _, myGasStation := range postCodeGasStationsMap[myPostCode] {
-			myGasPrice := gasStationIdGasPriceMap[myGasStation.ID]
-			if myGasPrice.E5 < 10 && myGasPrice.E10 < 10 && myGasPrice.Diesel < 10 {
-				continue
+			for _, myGasPrice := range gasStationIdGasPriceMap[myGasStation.ID] {
+				if myGasPrice.E5 < 10 && myGasPrice.E10 < 10 && myGasPrice.Diesel < 10 {
+					continue
+				}
+				//log.Printf("%v", myGasPrice)
+				myStateData := idStateDataMap[int(myPostCodeLocation.StateData.ID)]
+				myCountyData := idCountyDataMap[int(myPostCodeLocation.CountyData.ID)]
+				myStateData.GasStationNum += 1
+				myCountyData.GasStationNum += 1
+				if myGasPrice.E5 > 10 {
+					myCountyData.GsNumE5 += 1
+					myStateData.GsNumE5 += 1
+					myStateData.AvgE5 += float64(myGasPrice.E5)
+					myCountyData.AvgE5 += float64(myGasPrice.E5)
+					/*
+						if myCountyData.ID == 51 {
+							gasStations := postCodeGasStationsMap[myPostCode]
+							log.Printf("GsNumE5: %v, AvgE5: %v, E5: %v, Id: %v, GasStations: %v", myCountyData.GsNumE5, myCountyData.AvgE5, myGasPrice.E5, myCountyData.ID, len(gasStations))
+						}
+					*/
+				}
+				if myGasPrice.E10 > 10 {
+					myCountyData.GsNumE10 += 1
+					myStateData.GsNumE10 += 1
+					myStateData.AvgE10 += float64(myGasPrice.E10)
+					myCountyData.AvgE10 += float64(myGasPrice.E10)
+				}
+				if myGasPrice.Diesel > 10 {
+					myCountyData.GsNumDiesel += 1
+					myStateData.GsNumDiesel += 1
+					myStateData.AvgDiesel += float64(myGasPrice.Diesel)
+					myCountyData.AvgDiesel += float64(myGasPrice.Diesel)
+				}
+				idStateDataMap[int(myPostCodeLocation.StateData.ID)] = myStateData
+				idCountyDataMap[int(myPostCodeLocation.CountyData.ID)] = myCountyData
 			}
-			//log.Printf("%v", myGasPrice)
-			myStateData := idStateDataMap[int(myPostCodeLocation.StateData.ID)]
-			myCountyData := idCountyDataMap[int(myPostCodeLocation.CountyData.ID)]
-			myStateData.GasStationNum += 1
-			myCountyData.GasStationNum += 1
-			if myGasPrice.E5 > 10 {
-				myCountyData.GsNumE5 += 1
-				myStateData.GsNumE5 += 1
-				myStateData.AvgE5 += float64(myGasPrice.E5)
-				myCountyData.AvgE5 += float64(myGasPrice.E5)
-				/*
-					if myCountyData.ID == 51 {
-						gasStations := postCodeGasStationsMap[myPostCode]
-						log.Printf("GsNumE5: %v, AvgE5: %v, E5: %v, Id: %v, GasStations: %v", myCountyData.GsNumE5, myCountyData.AvgE5, myGasPrice.E5, myCountyData.ID, len(gasStations))
-					}
-				*/
-			}
-			if myGasPrice.E10 > 10 {
-				myCountyData.GsNumE10 += 1
-				myStateData.GsNumE10 += 1
-				myStateData.AvgE10 += float64(myGasPrice.E10)
-				myCountyData.AvgE10 += float64(myGasPrice.E10)
-			}
-			if myGasPrice.Diesel > 10 {
-				myCountyData.GsNumDiesel += 1
-				myStateData.GsNumDiesel += 1
-				myStateData.AvgDiesel += float64(myGasPrice.Diesel)
-				myCountyData.AvgDiesel += float64(myGasPrice.Diesel)
-			}
-			idStateDataMap[int(myPostCodeLocation.StateData.ID)] = myStateData
-			idCountyDataMap[int(myPostCodeLocation.CountyData.ID)] = myCountyData
 		}
 	}
 	//log.Printf("e5Count: %v, e10Count: %v, dieselCount: %v", e5Count, e10Count, dieselCount)
