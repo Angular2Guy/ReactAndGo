@@ -233,7 +233,8 @@ func createCodeTimeSliceBuckets(postCodePostCodeLocationMap map[int]pcmodel.Post
 	for _, myPostCodeLocation := range postCodePostCodeLocationMap {
 		myPostCode := postcode.FormatPostCode(myPostCodeLocation.PostCode)
 		for _, myGasStation := range postCodeGasStationsMap[myPostCode] {
-			yesterday := time.Now().AddDate(0, 0, -1).Round(time.Hour)
+			yesterday := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local).AddDate(0, 0, -1).Round(time.Hour)
+			//yesterday := time.Now().AddDate(0, 0, -1).Round(time.Hour)
 			//15 min slices
 			timeSlices := make([]time.Time, 0)
 			//15 min buckets
