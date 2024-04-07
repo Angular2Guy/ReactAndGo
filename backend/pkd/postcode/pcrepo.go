@@ -153,7 +153,7 @@ func FindAvgsByPostcode(postcode string) GasPriceAvgs {
 	gasPriceAvgs.State = postCodeLocation.StateData.State
 	gasPriceAvgs.CountyAvgDiesel = postCodeLocation.CountyData.AvgDiesel
 	gasPriceAvgs.CountyAvgE10 = postCodeLocation.CountyData.AvgE10
-	gasPriceAvgs.CountyAvgE5 = postCodeLocation.StateData.AvgE5
+	gasPriceAvgs.CountyAvgE5 = postCodeLocation.CountyData.AvgE5
 	gasPriceAvgs.StateAvgDiesel = postCodeLocation.StateData.AvgDiesel
 	gasPriceAvgs.StateAvgE10 = postCodeLocation.StateData.AvgE10
 	gasPriceAvgs.StateAvgE5 = postCodeLocation.StateData.AvgE5
