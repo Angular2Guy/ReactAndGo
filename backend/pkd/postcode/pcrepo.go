@@ -173,14 +173,21 @@ func plzsToPlzInts(plzs []string) []int {
 	return plzInts
 }
 
-func FindCountyDataById(countyDataIdStr string) []pcmodel.CountyTimeSlot {
+func FindCountyTimeSlotByPostcode(postcodeStr string) []pcmodel.CountyTimeSlot {
 	var myCountyTimeSlots []pcmodel.CountyTimeSlot
-	countyDataId, err := strconv.Atoi(countyDataIdStr)
+	myPostcode, err := strconv.Atoi(postcodeStr)
 	if err == nil {
+		var myPostCodeLocations []pcmodel.PostCodeLocation
 		database.DB.Transaction(func(tx *gorm.DB) error {
-			tx.Where("county_data_id = ?", countyDataId).Order("start_date").Preload("CountyData").Find(&myCountyTimeSlots)
+			tx.Where("post_code = ?", myPostcode).Find(&myPostCodeLocations)
 			return nil
 		})
+		if len(myPostCodeLocations) > 0 {
+			database.DB.Transaction(func(tx *gorm.DB) error {
+				tx.Where("county_data_id = ?", myPostCodeLocations[0].CountyDataID).Order("start_date").Preload("CountyData").Find(&myCountyTimeSlots)
+				return nil
+			})
+		}
 	}
 	return myCountyTimeSlots
 }

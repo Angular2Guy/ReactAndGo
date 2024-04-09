@@ -20,7 +20,7 @@ import (
 )
 
 func getCountyDataByIdWithTimeSlots(c *gin.Context) {
-	countyDataId := c.Param("id")
-	myCountyData := postcode.FindCountyDataById(countyDataId)
+	myPostcode := c.Param("postcode")
+	myCountyData := postcode.FindCountyTimeSlotByPostcode(myPostcode)
 	c.JSON(http.StatusOK, myCountyData)
 }
