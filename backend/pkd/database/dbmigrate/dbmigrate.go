@@ -73,6 +73,9 @@ func MigrateDB() {
 	if !database.DB.Migrator().HasTable(&pcmodel.CountyTimeSlot{}) {
 		database.DB.Migrator().AutoMigrate(&pcmodel.CountyTimeSlot{})
 	}
+	if !database.DB.Migrator().HasColumn(&aumodel.AppUser{}, "PostCode") {
+		database.DB.Migrator().AddColumn(&aumodel.AppUser{}, "PostCode")
+	}
 
 	log.Printf("DB Migration Done.")
 }

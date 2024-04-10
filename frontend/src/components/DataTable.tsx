@@ -31,11 +31,14 @@ export interface TableDataRow {
 interface DataTableProps {
     location: string;
     time: string;
+    showAverages: boolean;
     e5: string;
     e10: string;
     diesel: string;
     rows: TableDataRow[];
 }
+
+//function PriceChart(props: )
 
 export default function DataTable(props: DataTableProps) {    
 

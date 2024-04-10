@@ -19,26 +19,27 @@ import { Box, TextField, Button, Tab, Tabs, Dialog, DialogContent } from '@mui/m
 //import { Token } from "@mui/icons-material";
 
 export interface UserRequest {
-  Username: string
-  Password: string
-  Latitude?: number
-  Longitude?: number
-  SearchRadius?: number
-  TargetDiesel?: string
-  TargetE10?: string
-  TargetE5?: string
+  Username: string;
+  Password: string;
+  Latitude?: number;
+  Longitude?: number;
+  SearchRadius?: number;
+  TargetDiesel?: string;
+  TargetE10?: string;
+  TargetE5?: string;
 }
 
 export interface UserResponse {
-  Token?: string
-  Message?: string
-  Uuid?: string
-  Longitude?: number
-  Latitude?: number
-  SearchRadius?: number
-  TargetDiesel?: number
-  TargetE5?: number
-  TargetE10?: number
+  Token?: string;
+  Message?: string;
+  PostCode?: string;
+  Uuid?: string;
+  Longitude?: number;
+  Latitude?: number;
+  SearchRadius?: number;
+  TargetDiesel?: number;
+  TargetE5?: number;
+  TargetE10?: number;
 }
 
 interface MsgData {
@@ -116,7 +117,7 @@ const LoginModal = () => {
       setGlobalJwtToken(userResponse.Token);      
       setGlobalUuid(userResponse.Uuid);
       setGlobalUserDataState({
-        Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius,
+        Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius, PostCode: userResponse.PostCode,
         TargetDiesel: userResponse.TargetDiesel, TargetE10: userResponse.TargetE10, TargetE5: userResponse.TargetE5
       } as UserDataState);
       setGlobalLoginModal(false);

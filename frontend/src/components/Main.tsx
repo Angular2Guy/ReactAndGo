@@ -30,7 +30,7 @@ interface GasPriceAvgs {
 	StateAvgE5:      number
 }
 
-interface GasStation {
+interface GasStation {  
   StationName: string;
   Brand: string;
   Street: string;
@@ -108,6 +108,7 @@ export default function Main() {
   const [value, setValue] = useState(0);
   const [first, setFirst] = useState(true);
   const [rows, setRows] = useState([] as TableDataRow[]);
+  const [avgTimeSlots, setAvgTimeSlots] = useState([])
   const [gsValues, setGsValues] = useState([] as GsValue[]);
   const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
   const globalUserUuidState = useRecoilValue(GlobalState.userUuidState);
@@ -171,7 +172,7 @@ export default function Main() {
         } as TableDataRow);
         const resultRows = [rowCounty, rowState, ...myResult]
         setRows(resultRows);
-      });      
+      });         
       setGsValues(myResult);
     }).then(() => setController(null));
   }
@@ -195,6 +196,7 @@ export default function Main() {
         });
       })?.flat();
       setRows(result);
+      //const result 
     }).then(() => setController(null));
   }
 
@@ -213,10 +215,10 @@ export default function Main() {
       <Tab label="Current Prices Map" />
     </Tabs>
     <TabPanel value={value} index={0}>
-      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' time='Time' rows={rows}></DataTable>
+      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
     </TabPanel>
     <TabPanel value={value} index={1}>
-      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' time='Time' rows={rows}></DataTable>
+      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
     </TabPanel>
     <TabPanel value={value} index={2}>
       <GsMap gsValues={gsValues} center={globalUserDataState}></GsMap>      
