@@ -16,7 +16,7 @@ export interface UserDataState {
     Longitude: number;
 	Latitude: number;
 	SearchRadius: number;
-    PostCode: string;
+    PostCode: number;
 	TargetDiesel: number;
 	TargetE5: number;
 	TargetE10: number;
@@ -34,7 +34,7 @@ const GlobalState = {
     }),
     userDataState: atom({
         key: 'userDataState',
-        default: {Latitude: 0.0, Longitude: 0.0, SearchRadius: 0, PostCode: '', TargetDiesel: 0.0, TargetE10: 0.0, TargetE5: 0.0} as UserDataState,
+        default: {Latitude: 0.0, Longitude: 0.0, SearchRadius: 0, PostCode: 0, TargetDiesel: 0.0, TargetE10: 0.0, TargetE5: 0.0} as UserDataState,
     }),
     jwtTokenState: atom({
         key: 'jwtTokenState',

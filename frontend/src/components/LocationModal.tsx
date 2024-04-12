@@ -56,12 +56,12 @@ const LocationModal = () => {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}`},
-            body: JSON.stringify({Username: globalUserNameState, Password: '', Latitude: latitude, Longitude: longitude, SearchRadius: searchRadius, PostCode: postCode} as UserRequest)             
+            body: JSON.stringify({Username: globalUserNameState, Password: '', Latitude: latitude, Longitude: longitude, SearchRadius: searchRadius, PostCode: parseInt(postCode)} as UserRequest)             
         };
         const response = await fetch('/appuser/locationradius', requestOptions);
         const userResponse = response.json() as UserResponse;
         controller = null;
-        setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius, PostCode: postCode,
+        setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius, PostCode: postCode.toString() || 0,
             TargetDiesel: globalUserDataState.TargetDiesel, TargetE10: globalUserDataState.TargetE10, TargetE5: globalUserDataState.TargetE5} as UserDataState);
         setGlobalLocationModalState(false);
     }
@@ -128,9 +128,10 @@ const LocationModal = () => {
         //console.log(globalUserDataState.Longitude+' '+globalUserDataState.Latitude);        
         setLongitude(globalUserDataState.Longitude);
         setLatitude(globalUserDataState.Latitude);              
-        setSearchRadius(globalUserDataState.SearchRadius);           
+        setSearchRadius(globalUserDataState.SearchRadius); 
+        setPostCode(formatPostCode(globalUserDataState.PostCode));          
         return globalLocationModalState;
-    }, [globalLocationModalState, globalUserDataState.Longitude, globalUserDataState.Latitude, globalUserDataState.SearchRadius]);    
+    }, [globalLocationModalState, globalUserDataState.Longitude, globalUserDataState.Latitude, globalUserDataState.SearchRadius, globalUserDataState.PostCode]);    
 
     return (<Dialog open={dialogOpen} className="backDrop">
         <DialogContent>

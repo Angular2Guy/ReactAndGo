@@ -24,7 +24,7 @@ export interface UserRequest {
   Latitude?: number;
   Longitude?: number;
   SearchRadius?: number;
-  PostCode?: string;
+  PostCode?: number;
   TargetDiesel?: string;
   TargetE10?: string;
   TargetE5?: string;
@@ -33,7 +33,7 @@ export interface UserRequest {
 export interface UserResponse {
   Token?: string;
   Message?: string;
-  PostCode?: string;
+  PostCode?: number;
   Uuid?: string;
   Longitude?: number;
   Latitude?: number;
