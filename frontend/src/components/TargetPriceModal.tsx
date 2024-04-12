@@ -74,7 +74,7 @@ const TargetPriceModal = () => {
         const result = await response.json() as UserResponse;
         controller = null;
         setGlobalUserDataState({
-            Latitude: globalUserDataState.Latitude, Longitude: globalUserDataState.Longitude, SearchRadius: globalUserDataState.SearchRadius,
+            Latitude: globalUserDataState.Latitude, Longitude: globalUserDataState.Longitude, SearchRadius: globalUserDataState.SearchRadius, PostCode: globalUserDataState.PostCode,
             TargetDiesel: !result.TargetDiesel ? 0 : result.TargetDiesel, TargetE10: !result.TargetE10 ? 0 : result.TargetE10, TargetE5: !result.TargetE5 ? 0 : result.TargetE5
         });
         setGlobalTargetPriceModalState(false);

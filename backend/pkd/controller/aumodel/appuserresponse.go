@@ -15,7 +15,7 @@ package aubody
 type AppUserResponse struct {
 	Token        string
 	Message      string
-	PostCode     string
+	PostCode     int32
 	Uuid         string
 	Longitude    float64
 	Latitude     float64

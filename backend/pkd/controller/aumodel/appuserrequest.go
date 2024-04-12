@@ -18,6 +18,7 @@ type AppUserRequest struct {
 	Latitude     float64
 	Longitude    float64
 	SearchRadius float64
+	PostCode     int32
 	TargetDiesel string
 	TargetE10    string
 	TargetE5     string

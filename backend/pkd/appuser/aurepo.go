@@ -30,7 +30,7 @@ import (
 type AppUserIn struct {
 	Username     string
 	Password     string
-	PostCode     string
+	PostCode     int32
 	Uuid         string
 	Language     UserLang
 	Latitude     float64
@@ -81,24 +81,24 @@ func StoreUserLogout(username string, uuid string) []token.LoggedOutUserOut {
 	return results
 }
 
-func Login(appUserIn AppUserIn) (string, int, string, string, float64, float64, float64, int, int, int) {
+func Login(appUserIn AppUserIn) (string, int, int32, string, float64, float64, float64, int, int, int) {
 	result := ""
 	status := http.StatusUnauthorized
 	//log.Printf("%v", appUserIn.Username)
 	var appUser aumodel.AppUser
 	if err := database.DB.Where("username = ?", appUserIn.Username).First(&appUser); err.Error != nil {
 		log.Printf("User not found: %v error: %v\n", appUserIn.Username, err.Error)
-		return result, status, "", "", 0.0, 0.0, 0.0, 0, 0, 0
+		return result, status, 0, "", 0.0, 0.0, 0.0, 0, 0, 0
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(appUser.Password), []byte(appUserIn.Password)); err != nil {
 		log.Printf("Password wrong. Username: %v\n", appUser.Username)
-		return result, status, "", "", 0.0, 0.0, 0.0, 0, 0, 0
+		return result, status, 0, "", 0.0, 0.0, 0.0, 0, 0, 0
 	}
 	//jwt token creation
 	result, err := token.CreateToken(token.TokenUser{Username: appUser.Username, Roles: []string{"USERS"}})
 	if err != nil {
 		log.Printf("Failed to create jwt token: %v\n", err)
-		return result, status, "", "", 0.0, 0.0, 0.0, 0, 0, 0
+		return result, status, 0, "", 0.0, 0.0, 0.0, 0, 0, 0
 	} else {
 		status = http.StatusOK
 	}

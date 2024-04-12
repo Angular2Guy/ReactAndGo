@@ -138,7 +138,7 @@ func postUserLocationRadius(c *gin.Context) {
 	if err := c.Bind(&appUserRequest); err != nil {
 		log.Printf("putUserLocationRadius: %v", err.Error())
 	}
-	myAppUser := appuser.AppUserIn{Username: appUserRequest.Username, Uuid: "", Longitude: appUserRequest.Longitude, Latitude: appUserRequest.Latitude, SearchRadius: appUserRequest.SearchRadius}
+	myAppUser := appuser.AppUserIn{Username: appUserRequest.Username, PostCode: appUserRequest.PostCode, Uuid: "", Longitude: appUserRequest.Longitude, Latitude: appUserRequest.Latitude, SearchRadius: appUserRequest.SearchRadius}
 	result := appuser.StoreLocationAndRadius(myAppUser)
 	httpResult := http.StatusOK
 	message := "Ok"
@@ -146,7 +146,7 @@ func postUserLocationRadius(c *gin.Context) {
 		httpResult = http.StatusBadRequest
 		message = "Invalid"
 	}
-	c.JSON(httpResult, aubody.CodeLocationResponse{Message: message, Label: "", Longitude: appUserRequest.Longitude, Latitude: appUserRequest.Latitude, PostCode: 0, SquareKM: 0, Population: 0})
+	c.JSON(httpResult, aubody.CodeLocationResponse{Message: message, Label: "", Longitude: appUserRequest.Longitude, Latitude: appUserRequest.Latitude, PostCode: appUserRequest.PostCode, SquareKM: 0, Population: 0})
 }
 
 func postTargetPrices(c *gin.Context) {

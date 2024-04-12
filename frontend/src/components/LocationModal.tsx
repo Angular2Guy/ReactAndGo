@@ -98,7 +98,12 @@ const LocationModal = () => {
         if(filteredOptions.length > 0) {
             setLongitude(filteredOptions[0].Longitude);
             setLatitude(filteredOptions[0].Latitude);
+            setPostCode(formatPostCode(filteredOptions[0].PostCode));
         }
+    }
+
+    const formatPostCode = (myPlz: number) => {                
+        return '00000'.substring(0, 5 - myPlz?.toString()?.length > 0 ? myPlz?.toString()?.length : 0) + myPlz.toString();
     }
 
     const handleCancel = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
