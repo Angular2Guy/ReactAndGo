@@ -34,6 +34,7 @@ const LocationModal = () => {
     const [searchRadius, setSearchRadius] = useState(0);
     const [longitude, setLongitude] = useState(0);
     const [latitude, setLatitude] = useState(0);
+    const [postCode, setPostCode] = useState('');
     const [options, setOptions] = useState([] as PostCodeLocation[]);       
     const [globalLocationModalState, setGlobalLocationModalState] = useRecoilState(GlobalState.locationModalState);
     const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
@@ -55,12 +56,12 @@ const LocationModal = () => {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}`},
-            body: JSON.stringify({Username: globalUserNameState, Password: '', Latitude: latitude, Longitude: longitude, SearchRadius: searchRadius} as UserRequest)             
+            body: JSON.stringify({Username: globalUserNameState, Password: '', Latitude: latitude, Longitude: longitude, SearchRadius: searchRadius, PostCode: postCode} as UserRequest)             
         };
         const response = await fetch('/appuser/locationradius', requestOptions);
         const userResponse = response.json() as UserResponse;
         controller = null;
-        setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius, 
+        setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius, PostCode: postCode,
             TargetDiesel: globalUserDataState.TargetDiesel, TargetE10: globalUserDataState.TargetE10, TargetE5: globalUserDataState.TargetE5} as UserDataState);
         setGlobalLocationModalState(false);
     }
@@ -149,7 +150,8 @@ const LocationModal = () => {
         ></Autocomplete>
         <div>
             <h3>Longitude: {longitude}</h3>
-            <h3>Latitude: {latitude}</h3>            
+            <h3>Latitude: {latitude}</h3>
+            <h3>Postcode: {postCode}</h3>
         </div>
          <TextField
             autoFocus
