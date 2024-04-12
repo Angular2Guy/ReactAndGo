@@ -108,7 +108,7 @@ export default function Main() {
   const [value, setValue] = useState(0);
   const [first, setFirst] = useState(true);
   const [rows, setRows] = useState([] as TableDataRow[]);
-  const [avgTimeSlots, setAvgTimeSlots] = useState([])
+//  const [avgTimeSlots, setAvgTimeSlots] = useState([])
   const [gsValues, setGsValues] = useState([] as GsValue[]);
   const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
   const globalUserUuidState = useRecoilValue(GlobalState.userUuidState);
