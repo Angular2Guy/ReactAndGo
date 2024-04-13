@@ -65,3 +65,8 @@ func getAveragePrices(c *gin.Context) {
 	avgPrices := postcode.FindAvgsByPostcode(myPostcode)
 	c.JSON(http.StatusOK, avgPrices)
 }
+
+func getRecalcTimeSlots(c *gin.Context) {
+	gasstation.CalcCountyTimeSlots()
+	c.JSON(http.StatusOK, "Done.")
+}

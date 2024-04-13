@@ -41,6 +41,7 @@ const LocationModal = () => {
     const [globalUserDataState, setGlobalUserDataState] = useRecoilState(GlobalState.userDataState);
     const globalUserNameState = useRecoilValue(GlobalState.userNameState);
     
+    
     useEffect(() => {
         if (!open) {
           setOptions([]);

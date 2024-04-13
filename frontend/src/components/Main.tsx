@@ -14,7 +14,7 @@ import { Tabs, Tab, Box } from '@mui/material';
 import { useEffect, useState, SyntheticEvent } from 'react';
 import DataTable, { TableDataRow } from './DataTable';
 import GsMap, { GsValue } from './GsMap';
-import { useRecoilRefresher_UNSTABLE, useRecoilValue } from 'recoil';
+import { useRecoilRefresher_UNSTABLE, useRecoilValue, useRecoilState } from 'recoil';
 import GlobalState from '../GlobalState';
 import styles from './main.module.scss';
 
@@ -108,7 +108,7 @@ export default function Main() {
   const [value, setValue] = useState(0);
   const [first, setFirst] = useState(true);
   const [rows, setRows] = useState([] as TableDataRow[]);
-//  const [avgTimeSlots, setAvgTimeSlots] = useState([])
+  const [avgTimeSlots, setAvgTimeSlots] = useState([])
   const [gsValues, setGsValues] = useState([] as GsValue[]);
   const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
   const globalUserUuidState = useRecoilValue(GlobalState.userUuidState);
@@ -121,6 +121,10 @@ export default function Main() {
     clearInterval(timer);
     getData(newValue);
     setTimer(setInterval(() => getData(newValue), 10000));
+  }
+
+  const formatPostCode = (myPlz: number) => {                
+    return '00000'.substring(0, 5 - myPlz?.toString()?.length > 0 ? myPlz?.toString()?.length : 0) + myPlz.toString();
   }
 
   const getData = (newValue: number) => {
@@ -183,9 +187,9 @@ export default function Main() {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
       signal: controller?.signal
     }
-    fetch(`/usernotification/current/${globalUserUuidState}`, requestOptions1).then(myResult => myResult.json() as Promise<Notification[]>).then(myJson => {
-      //console.log(myJson);
-      const result = myJson.map(value => {
+    fetch(`/usernotification/current/${globalUserUuidState}`, requestOptions1).then(myResult => myResult?.json() as Promise<Notification[]>).then(myJson => {
+      console.log(myJson);
+      const result = myJson?.map(value => {
         //console.log(JSON.parse(value?.DataJson));
         return (JSON.parse(value?.DataJson) as MyDataJson[])?.map(value2 => {
           //console.log(value2);
@@ -194,10 +198,18 @@ export default function Main() {
             e5: value2.E5, e10: value2.E10, diesel: value2.Diesel, date: new Date(Date.parse(value2.Timestamp)), longitude: 0, latitude: 0
           } as TableDataRow;
         });
-      })?.flat();
+      })?.flat() || [];
       setRows(result);
       //const result 
-    }).then(() => setController(null));
+      const requestOptions2 = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
+        signal: controller?.signal
+      }
+      const myPostcode = formatPostCode(globalUserDataState.PostCode);      
+      fetch(`/postcode/countytimeslots/${myPostcode}`, requestOptions2).then(myResult1 => myResult1.json()).then(myJson1 => console.log(myJson1));
+    })
+    .then(() => setController(null));
   }
 
   // eslint-disable-next-line

@@ -47,6 +47,7 @@ func Start(embeddedFiles fs.FS) {
 	router.GET("/usernotification/new/:useruuid", token.CheckToken, getNewUserNotifications)
 	router.GET("/usernotification/current/:useruuid", token.CheckToken, getCurrentUserNotifications)
 	router.GET("/postcode/countytimeslots/:postcode", token.CheckToken, getCountyDataByIdWithTimeSlots)
+	router.GET("/gasstation/countytimeslots/recalc", token.CheckToken, getRecalcTimeSlots)
 
 	myPort := strings.TrimSpace(os.Getenv("PORT"))
 	portNum, err := strconv.ParseInt(myPort, 10, 0)
