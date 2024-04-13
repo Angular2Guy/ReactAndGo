@@ -152,11 +152,9 @@ export default function Main() {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
       body: JSON.stringify({ Longitude: globalUserDataState.Longitude, Latitude: globalUserDataState.Latitude, Radius: globalUserDataState.SearchRadius }),
       signal: controller?.signal
-    }  
-    let postcode = ''
+    }      
     fetch('/gasstation/search/location', requestOptions2).then(myResult => myResult.json() as Promise<GasStation[]>).then(myJson => {
       const myResult = myJson.filter(value => value?.GasPrices?.length > 0).map(value => {
-        postcode = value.PostCode;
         return value;
       }).map(value => ({        
         location: value.Place + ' ' + value.Brand + ' ' + value.Street + ' ' + value.HouseNumber, e5: value.GasPrices[0].E5,
@@ -167,7 +165,8 @@ export default function Main() {
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },        
         signal: controller?.signal
       }  
-      fetch(`/gasprice/avgs/${postcode}`, requestOptions3).then(myResult => myResult.json() as Promise<GasPriceAvgs>).then(myJson => {
+      const myPostcode = formatPostCode(globalUserDataState.PostCode); 
+      fetch(`/gasprice/avgs/${myPostcode}`, requestOptions3).then(myResult => myResult.json() as Promise<GasPriceAvgs>).then(myJson => {
         const rowCounty = ({        
           location: myJson.County, e5: Math.round(myJson.CountyAvgE5), e10: Math.round(myJson.CountyAvgE10), diesel: Math.round(myJson.CountyAvgDiesel), date: new Date(), longitude: 0, latitude: 0
         } as TableDataRow);
