@@ -14,9 +14,10 @@ import { Tabs, Tab, Box } from '@mui/material';
 import { useEffect, useState, SyntheticEvent } from 'react';
 import DataTable, { TableDataRow } from './DataTable';
 import GsMap, { GsValue } from './GsMap';
-import { useRecoilRefresher_UNSTABLE, useRecoilValue, useRecoilState } from 'recoil';
+import { useRecoilRefresher_UNSTABLE, useRecoilValue } from 'recoil';
 import GlobalState from '../GlobalState';
 import styles from './main.module.scss';
+import Chart, {FuelType, TimeSlot} from './Chart';
 
 interface GasPriceAvgs {
 	Postcode:        string
@@ -76,6 +77,22 @@ interface MyDataJson {
   Timestamp: string;
 }
 
+interface TimeSlotResponse {
+  ID:            number;
+  CreatedAt:     Date;
+  UpdatedAt:     Date;
+  DeletedAt:     Date;
+  GasStationNum: number;
+  AvgE5:         number;
+  AvgE10:        number;
+  AvgDiesel:     number;
+  GsNumE5:       number;
+  GsNumE10:      number;
+  GsNumDiesel:   number;
+  StartDate:     Date;    
+  CountyDataID:  number;
+}
+
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -108,7 +125,7 @@ export default function Main() {
   const [value, setValue] = useState(0);
   const [first, setFirst] = useState(true);
   const [rows, setRows] = useState([] as TableDataRow[]);
-  const [avgTimeSlots, setAvgTimeSlots] = useState([])
+  const [avgTimeSlots, setAvgTimeSlots] = useState([] as TimeSlot[])
   const [gsValues, setGsValues] = useState([] as GsValue[]);
   const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
   const globalUserUuidState = useRecoilValue(GlobalState.userUuidState);
@@ -206,7 +223,29 @@ export default function Main() {
         signal: controller?.signal
       }
       const myPostcode = formatPostCode(globalUserDataState.PostCode);      
-      fetch(`/postcode/countytimeslots/${myPostcode}`, requestOptions2).then(myResult1 => myResult1.json()).then(myJson1 => console.log(myJson1));
+      fetch(`/postcode/countytimeslots/${myPostcode}`, requestOptions2).then(myResult1 => myResult1.json() as Promise<TimeSlotResponse[]>).then(myJson1 => {
+        const timeSlots = [] as TimeSlot[];
+        timeSlots.push(...myJson1.filter(myValue => myValue.AvgDiesel > 10).map(myValue => {          
+          let dieselTimeSlot = {fuelType: FuelType.diesel, x: new Date(), y: 0} as TimeSlot;          
+            dieselTimeSlot.x = myValue.StartDate;
+            dieselTimeSlot.y = myValue.AvgDiesel;            
+          return dieselTimeSlot;
+        }));
+        timeSlots.push(...myJson1.filter(myValue => myValue.AvgE10 > 10).map(myValue => {          
+          let e10TimeSlot = {fuelType: FuelType.e10, x: new Date(), y: 0} as TimeSlot;          
+            e10TimeSlot.x = myValue.StartDate;
+            e10TimeSlot.y = myValue.AvgE10;            
+          return e10TimeSlot;
+        }));
+        timeSlots.push(...myJson1.filter(myValue => myValue.AvgE5 > 10).map(myValue => {          
+          let e5TimeSlot = {fuelType: FuelType.e5, x: new Date(), y: 0} as TimeSlot;          
+            e5TimeSlot.x = myValue.StartDate;
+            e5TimeSlot.y = myValue.AvgE5;            
+          return e5TimeSlot;
+        }));
+        setAvgTimeSlots(timeSlots);
+        console.log(myJson1);
+      });
     })
     .then(() => setController(null));
   }
@@ -229,6 +268,7 @@ export default function Main() {
       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
     </TabPanel>
     <TabPanel value={value} index={1}>
+      <Chart e5={avgTimeSlots.filter(value => value.fuelType === FuelType.e5)} e10={avgTimeSlots.filter(value => value.fuelType === FuelType.e10)} diesel={avgTimeSlots.filter(value => value.fuelType === FuelType.diesel)}></Chart>
       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
     </TabPanel>
     <TabPanel value={value} index={2}>
