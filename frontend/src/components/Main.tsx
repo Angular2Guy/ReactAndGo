@@ -226,12 +226,12 @@ export default function Main() {
       fetch(`/postcode/countytimeslots/${myPostcode}`, requestOptions2).then(myResult1 => myResult1.json() as Promise<TimeSlotResponse[]>).then(myJson1 => {
         const timeSlots = [] as TimeSlot[];
         timeSlots.push(...myJson1.filter(myValue => myValue.AvgDiesel > 10).map(myValue => {          
-          const dieselTimeSlot = {x: '', diesel: 0, e10: 0, e5: 0} as TimeSlot;        
+          const dieselTimeSlot = {x: '00.00', diesel: 0, e10: 0, e5: 0} as TimeSlot;        
             const myDate = new Date(myValue.StartDate);  
             dieselTimeSlot.x = ''+myDate.getHours()+':'+myDate.getMinutes();
-            dieselTimeSlot.diesel = myValue.AvgDiesel;            
-            dieselTimeSlot.e10 = myValue.AvgE10;
-            dieselTimeSlot.e5 = myValue.AvgE5;
+            dieselTimeSlot.diesel = myValue.AvgDiesel/1000;            
+            dieselTimeSlot.e10 = myValue.AvgE10/1000;
+            dieselTimeSlot.e5 = myValue.AvgE5/1000;
           return dieselTimeSlot;
         }));        
         setAvgTimeSlots(timeSlots);

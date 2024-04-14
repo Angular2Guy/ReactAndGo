@@ -10,18 +10,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import {
-  ScatterChart,
-  Scatter,
-  XAxis,
-  YAxis,
-  ZAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
-import { useEffect, useState, SyntheticEvent } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export interface TimeSlot {
     x: string;
@@ -34,37 +23,28 @@ export interface ChartProps {
     timeSlots: TimeSlot[];
 }
 
-const values = [{diesel: 1700, e10: 1750, e5: 1800, x: '19:00'} as TimeSlot, {diesel: 1710, e10: 1760, e5: 1810, x: '19:30'} as TimeSlot]
-
-export default function Chart(props: ChartProps) {
-    const [avgTimeSlots, setAvgTimeSlots] = useState([] as TimeSlot[])
-    if(props.timeSlots.length !== avgTimeSlots.length) {
-        setAvgTimeSlots(props.timeSlots);
-    }    
-    //console.log(avgTimeSlots);
-    //console.log(avgTimeSlots.filter(value => value.e5 > 10).map(value => value.e5));
-    console.log(props.timeSlots);
-        return ( props.timeSlots.length > 0 ? 
-          <ResponsiveContainer width="100%" height={300}>
-            <ScatterChart
-              margin={{
-                top: 20,
-                right: 20,
-                bottom: 20,
-                left: 20,
-              }}
-            >
-              <CartesianGrid />
-              <XAxis type="category" dataKey="x" name="time" />
-              <YAxis type="number" dataKey="e5" name="price" />
-              <ZAxis type="number" range={[100]} />
-              <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-              <Legend />
-              <Scatter name="E5" data={avgTimeSlots.filter(value => value.e5 > 10).map(value => value.e5)} fill="#8884d8" line shape="cross" />
-              <Scatter name="E10" data={avgTimeSlots.filter(value => value.e10 > 10).map(value => value.e10)} fill="#82ca9d" line shape="diamond" />
-              <Scatter name="Diesel" data={avgTimeSlots.filter(value => value.diesel > 10).map(value => value.diesel)} fill="#ff8042" line shape="triangle" />
-            </ScatterChart>
-          </ResponsiveContainer>
-          : <div></div>
-        );
+export default function Chart(props: ChartProps) {    
+    //console.log(props.timeSlots);
+    return (
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            margin={{
+              top: 20,
+              right: 20,
+              bottom: 20,
+              left: 20,
+            }}
+            data={props.timeSlots}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="x" />
+          <YAxis  />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="e5" fill="#8884d8" />
+          <Bar dataKey="e10" fill="#82ca9d" />
+          <Bar dataKey="diesel" fill="#82caff" />
+          </BarChart>
+        </ResponsiveContainer>
+      );
 }
