@@ -228,7 +228,7 @@ export default function Main() {
         timeSlots.push(...myJson1.filter(myValue => myValue.AvgDiesel > 10).map(myValue => {          
           const dieselTimeSlot = {x: '00.00', diesel: 0, e10: 0, e5: 0} as TimeSlot;        
             const myDate = new Date(myValue.StartDate);  
-            dieselTimeSlot.x = ''+myDate.getHours()+':'+myDate.getMinutes();
+            dieselTimeSlot.x = ''+myDate.getHours()+':'+(myDate.getMinutes().toString().length < 2 ? myDate.getMinutes().toString().length +'0': myDate.getMinutes());
             dieselTimeSlot.diesel = myValue.AvgDiesel/1000;            
             dieselTimeSlot.e10 = myValue.AvgE10/1000;
             dieselTimeSlot.e5 = myValue.AvgE5/1000;
