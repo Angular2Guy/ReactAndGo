@@ -17,7 +17,7 @@ import GsMap, { GsValue } from './GsMap';
 import { useRecoilRefresher_UNSTABLE, useRecoilValue } from 'recoil';
 import GlobalState from '../GlobalState';
 import styles from './main.module.scss';
-import Chart, {FuelType, TimeSlot} from './Chart';
+import Chart, {TimeSlot} from './Chart';
 
 interface GasPriceAvgs {
 	Postcode:        string
@@ -204,7 +204,7 @@ export default function Main() {
       signal: controller?.signal
     }
     fetch(`/usernotification/current/${globalUserUuidState}`, requestOptions1).then(myResult => myResult?.json() as Promise<Notification[]>).then(myJson => {
-      console.log(myJson);
+      //console.log(myJson);
       const result = myJson?.map(value => {
         //console.log(JSON.parse(value?.DataJson));
         return (JSON.parse(value?.DataJson) as MyDataJson[])?.map(value2 => {
@@ -226,25 +226,16 @@ export default function Main() {
       fetch(`/postcode/countytimeslots/${myPostcode}`, requestOptions2).then(myResult1 => myResult1.json() as Promise<TimeSlotResponse[]>).then(myJson1 => {
         const timeSlots = [] as TimeSlot[];
         timeSlots.push(...myJson1.filter(myValue => myValue.AvgDiesel > 10).map(myValue => {          
-          let dieselTimeSlot = {fuelType: FuelType.diesel, x: new Date(), y: 0} as TimeSlot;          
-            dieselTimeSlot.x = myValue.StartDate;
-            dieselTimeSlot.y = myValue.AvgDiesel;            
+          const dieselTimeSlot = {x: '', diesel: 0, e10: 0, e5: 0} as TimeSlot;        
+            const myDate = new Date(myValue.StartDate);  
+            dieselTimeSlot.x = ''+myDate.getHours()+':'+myDate.getMinutes();
+            dieselTimeSlot.diesel = myValue.AvgDiesel;            
+            dieselTimeSlot.e10 = myValue.AvgE10;
+            dieselTimeSlot.e5 = myValue.AvgE5;
           return dieselTimeSlot;
-        }));
-        timeSlots.push(...myJson1.filter(myValue => myValue.AvgE10 > 10).map(myValue => {          
-          let e10TimeSlot = {fuelType: FuelType.e10, x: new Date(), y: 0} as TimeSlot;          
-            e10TimeSlot.x = myValue.StartDate;
-            e10TimeSlot.y = myValue.AvgE10;            
-          return e10TimeSlot;
-        }));
-        timeSlots.push(...myJson1.filter(myValue => myValue.AvgE5 > 10).map(myValue => {          
-          let e5TimeSlot = {fuelType: FuelType.e5, x: new Date(), y: 0} as TimeSlot;          
-            e5TimeSlot.x = myValue.StartDate;
-            e5TimeSlot.y = myValue.AvgE5;            
-          return e5TimeSlot;
-        }));
+        }));        
         setAvgTimeSlots(timeSlots);
-        console.log(myJson1);
+        //console.log(myJson1);
       });
     })
     .then(() => setController(null));
@@ -268,7 +259,7 @@ export default function Main() {
       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
     </TabPanel>
     <TabPanel value={value} index={1}>
-      <Chart e5={avgTimeSlots.filter(value => value.fuelType === FuelType.e5)} e10={avgTimeSlots.filter(value => value.fuelType === FuelType.e10)} diesel={avgTimeSlots.filter(value => value.fuelType === FuelType.diesel)}></Chart>
+      <Chart timeSlots={avgTimeSlots}></Chart>
       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
     </TabPanel>
     <TabPanel value={value} index={2}>

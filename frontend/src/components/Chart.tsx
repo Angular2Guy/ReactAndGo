@@ -21,26 +21,30 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-
-export enum FuelType {
-    e5, e10, diesel
-}
+import { useEffect, useState, SyntheticEvent } from 'react';
 
 export interface TimeSlot {
-    x: Date;
-    y: number;
-    fuelType: FuelType;
+    x: string;
+    e5: number;
+    e10: number;
+    diesel: number;
 }
 
 export interface ChartProps {
-    e5: TimeSlot[];
-    e10: TimeSlot[];
-    diesel: TimeSlot[];
+    timeSlots: TimeSlot[];
 }
 
+const values = [{diesel: 1700, e10: 1750, e5: 1800, x: '19:00'} as TimeSlot, {diesel: 1710, e10: 1760, e5: 1810, x: '19:30'} as TimeSlot]
+
 export default function Chart(props: ChartProps) {
-    
-        return ( (props?.diesel?.length > 0 || props?.e10?.length > 0 || props?.e5?.length > 0) ? 
+    const [avgTimeSlots, setAvgTimeSlots] = useState([] as TimeSlot[])
+    if(props.timeSlots.length !== avgTimeSlots.length) {
+        setAvgTimeSlots(props.timeSlots);
+    }    
+    //console.log(avgTimeSlots);
+    //console.log(avgTimeSlots.filter(value => value.e5 > 10).map(value => value.e5));
+    console.log(props.timeSlots);
+        return ( props.timeSlots.length > 0 ? 
           <ResponsiveContainer width="100%" height={300}>
             <ScatterChart
               margin={{
@@ -51,14 +55,14 @@ export default function Chart(props: ChartProps) {
               }}
             >
               <CartesianGrid />
-              <XAxis type="number" dataKey="x" name="time" />
-              <YAxis type="number" dataKey="y" name="price" />
+              <XAxis type="category" dataKey="x" name="time" />
+              <YAxis type="number" dataKey="e5" name="price" />
               <ZAxis type="number" range={[100]} />
               <Tooltip cursor={{ strokeDasharray: '3 3' }} />
               <Legend />
-              <Scatter name="E5" data={props.e5} fill="#8884d8" line shape="cross" />
-              <Scatter name="E10" data={props.e10} fill="#82ca9d" line shape="diamond" />
-              <Scatter name="Diesel" data={props.diesel} fill="#ff8042" line shape="triangle" />
+              <Scatter name="E5" data={avgTimeSlots.filter(value => value.e5 > 10).map(value => value.e5)} fill="#8884d8" line shape="cross" />
+              <Scatter name="E10" data={avgTimeSlots.filter(value => value.e10 > 10).map(value => value.e10)} fill="#82ca9d" line shape="diamond" />
+              <Scatter name="Diesel" data={avgTimeSlots.filter(value => value.diesel > 10).map(value => value.diesel)} fill="#ff8042" line shape="triangle" />
             </ScatterChart>
           </ResponsiveContainer>
           : <div></div>
