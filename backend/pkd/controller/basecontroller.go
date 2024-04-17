@@ -23,11 +23,13 @@ import (
 	"strings"
 
 	"github.com/angular2guy/go-actuator"
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 )
 
 func Start(embeddedFiles fs.FS) {
 	router := gin.Default()
+	router.Use(gzip.Gzip(gzip.DefaultCompression))
 	router.POST("/appuser/signin", postSignin)
 	router.POST("/appuser/login", postLogin)
 	router.GET("/appuser/logout", token.CheckToken, getLogout)
