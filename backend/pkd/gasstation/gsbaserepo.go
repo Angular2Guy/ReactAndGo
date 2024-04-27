@@ -121,7 +121,7 @@ func findGasPricesByTimeframe(postCodeGasStationsMap *map[string][]gsmodel.GasSt
 		}
 	}
 	//log.Printf("gasStationIds: %v", len(gasStationIds))
-	gasPrices := FindPricesByStidsDistinct(&gasStationIds, 0, timeframe)
+	gasPrices := FindPricesByStids(&gasStationIds, 0, timeframe)
 	return gasPrices
 }
 
@@ -135,9 +135,8 @@ func createPostCodeGasStationsMap() map[string][]gsmodel.GasStation {
 	return postCodeGasStationsMap
 }
 
-func findPricesByStids(stids *[]string, resultLimit int, distinct bool, timeframe TimeFrame) []gsmodel.GasPrice {
+func findPricesByStids(stids *[]string, resultLimit int, timeframe TimeFrame) []gsmodel.GasPrice {
 	var myGasPrices []gsmodel.GasPrice
-	gasStationidGasPriceMap := make(map[string]gsmodel.GasPrice)
 	var myTimeFrame time.Time
 	if timeframe == Day {
 		myTimeFrame = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local).AddDate(0, 0, -1).Round(time.Hour)
@@ -157,18 +156,7 @@ func findPricesByStids(stids *[]string, resultLimit int, distinct bool, timefram
 			}
 			myQuery.Find(&values)
 			//log.Printf("%v", values)
-			if distinct {
-				for _, value := range values {
-					if myValue, ok := gasStationidGasPriceMap[value.GasStationID]; !ok || myValue.Date.Before(value.Date) {
-						gasStationidGasPriceMap[value.GasStationID] = value
-					}
-				}
-				for _, myGasPrice := range gasStationidGasPriceMap {
-					myGasPrices = append(myGasPrices, myGasPrice)
-				}
-			} else {
-				myGasPrices = append(myGasPrices, values...)
-			}
+			myGasPrices = append(myGasPrices, values...)
 		}
 		return nil
 	})

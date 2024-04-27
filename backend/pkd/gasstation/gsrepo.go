@@ -379,12 +379,7 @@ func FindById(id string) gsmodel.GasStation {
 }
 
 func FindPricesByStids(stids *[]string, resultLimit int, timeframe TimeFrame) []gsmodel.GasPrice {
-	myGasPrice := findPricesByStids(stids, resultLimit, false, timeframe)
-	return myGasPrice
-}
-
-func FindPricesByStidsDistinct(stids *[]string, resultLimit int, timeframe TimeFrame) []gsmodel.GasPrice {
-	myGasPrice := findPricesByStids(stids, resultLimit, true, timeframe)
+	myGasPrice := findPricesByStids(stids, resultLimit, timeframe)
 	return myGasPrice
 }
 
