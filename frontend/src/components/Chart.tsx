@@ -10,41 +10,86 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useEffect, useState } from 'react';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+
+enum FuelType {
+  E5 = 'e5',
+  E10 = 'e10',
+  Diesel = 'diesel'
+}
+
+export interface GsPoint {
+  timestamp: string;
+  price: number;
+}
 
 export interface TimeSlot {
-    x: string;
-    e5: number;
-    e10: number;
-    diesel: number;
+  x: string;
+  e5: number;
+  e10: number;
+  diesel: number;
 }
 
 export interface ChartProps {
-    timeSlots: TimeSlot[];
+  timeSlots: TimeSlot[];
 }
 
-export default function Chart(props: ChartProps) {    
-    //console.log(props.timeSlots);
-    return (
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            margin={{
-              top: 20,
-              right: 20,
-              bottom: 20,
-              left: 20,
-            }}
-            data={props.timeSlots}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="x" />
-          <YAxis  />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="e5" fill="#8884d8" />
-          <Bar dataKey="e10" fill="#82ca9d" />
-          <Bar dataKey="diesel" fill="#82caff" />
-          </BarChart>
-        </ResponsiveContainer>
-      );
+export default function Chart(props: ChartProps) {
+  //console.log(props.timeSlots);
+  const [gsValues, setGsValues] = useState([] as GsPoint[]);
+  const [fuelType, setFuelType] = useState(FuelType.E5);
+  const [lineColor, setLineColor] = useState('#8884d8')
+
+  // eslint-disable-next-line
+  useEffect(() => {
+    if (fuelType === FuelType.E5) {
+      setLineColor('#8884d8')
+      const avgValue = props.timeSlots.reduce((acc, value) => value.e5 + acc, 0) / (props.timeSlots.length || 1);
+      setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.e5 - avgValue } as GsPoint)))
+    } else if (fuelType === FuelType.E10) {
+      setLineColor('#82ca9d')
+      const avgValue = props.timeSlots.reduce((acc, value) => value.e10 + acc, 0) / (props.timeSlots.length || 1);
+      setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.e10 - avgValue } as GsPoint)))
+    } else {
+      setLineColor('#82caff')
+      const avgValue = props.timeSlots.reduce((acc, value) => value.diesel + acc, 0) / (props.timeSlots.length || 1);
+      setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.diesel - avgValue } as GsPoint)))
+    }
+  });
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFuelType(((event.target as HTMLInputElement).value) as FuelType);
+  };
+  return (<div>
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={gsValues}
+        margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="timestamp" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey="price" stroke={lineColor} />
+      </LineChart>
+    </ResponsiveContainer>
+    <FormControl>
+      <RadioGroup
+        row
+        aria-labelledby="demo-row-radio-buttons-group-label"
+        name="row-radio-buttons-group"
+        value={fuelType}
+        onChange={handleChange}
+      >
+        <FormControlLabel value={FuelType.E5} control={<Radio />} label="E5" />
+        <FormControlLabel value={FuelType.E10} control={<Radio />} label="E10" />
+        <FormControlLabel value={FuelType.Diesel} control={<Radio />} label="Diesel" />
+      </RadioGroup>
+    </FormControl>
+  </div>
+  );
 }
