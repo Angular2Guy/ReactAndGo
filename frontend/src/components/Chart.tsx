@@ -43,21 +43,22 @@ export default function Chart(props: ChartProps) {
   //console.log(props.timeSlots);
   const [gsValues, setGsValues] = useState([] as GsPoint[]);
   const [fuelType, setFuelType] = useState(FuelType.E5);
-  const [lineColor, setLineColor] = useState('#8884d8')
+  const [lineColor, setLineColor] = useState('#8884d8');
+  const [avgValue, setAvgValue] = useState(0.0);
 
   // eslint-disable-next-line
   useEffect(() => {
     if (fuelType === FuelType.E5) {
       setLineColor('#8884d8')
-      const avgValue = props.timeSlots.reduce((acc, value) => value.e5 + acc, 0) / (props.timeSlots.length || 1);
+      setAvgValue(props.timeSlots.reduce((acc, value) => value.e5 + acc, 0) / (props.timeSlots.length || 1));
       setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.e5 - avgValue } as GsPoint)))
     } else if (fuelType === FuelType.E10) {
       setLineColor('#82ca9d')
-      const avgValue = props.timeSlots.reduce((acc, value) => value.e10 + acc, 0) / (props.timeSlots.length || 1);
+      setAvgValue(props.timeSlots.reduce((acc, value) => value.e10 + acc, 0) / (props.timeSlots.length || 1));
       setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.e10 - avgValue } as GsPoint)))
     } else {
       setLineColor('#82caff')
-      const avgValue = props.timeSlots.reduce((acc, value) => value.diesel + acc, 0) / (props.timeSlots.length || 1);
+      setAvgValue(props.timeSlots.reduce((acc, value) => value.diesel + acc, 0) / (props.timeSlots.length || 1));
       setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.diesel - avgValue } as GsPoint)))
     }
   });
@@ -74,7 +75,7 @@ export default function Chart(props: ChartProps) {
         <YAxis />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="price" stroke={lineColor} />
+        <Line name={'AvgPrice: '+(Math.round(avgValue*1000)/1000)} type="monotone" dataKey="price" stroke={lineColor} />
       </LineChart>
     </ResponsiveContainer>
     <FormControl>
