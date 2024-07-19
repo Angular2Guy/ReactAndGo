@@ -3,6 +3,8 @@ This is a project to compare a single page application frontend based on React a
 
 Technologies: Go/Golang, Gin, Gorm, Paho, React, Recoil, Typescript, Recoil, Mui, Recharts, Openlayers, Structurizr
 
+[![CodeQL](https://github.com/Angular2Guy/ReactAndGo/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/Angular2Guy/ReactAndGo/actions/workflows/codeql-analysis.yml)
+
 ## Articles
 * [Comparing the efficency of a Spring Boot project as GraalVm native image and on the Jdk to a Go project](https://angular2guy.wordpress.com/2023/10/21/comparing-the-efficiency-of-a-spring-boot-project-as-graalvm-native-image-and-on-the-jdk-to-a-go-project/)
 * [Adding a gas station map to ReactAndGo](https://angular2guy.wordpress.com/2023/06/16/adding-a-gas-station-map-to-reactandgo/)
