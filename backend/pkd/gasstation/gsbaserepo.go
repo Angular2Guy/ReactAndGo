@@ -305,9 +305,9 @@ func sendNotifications(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) {
 }
 
 func createInChunks(ids *[]string, chunkedSelects bool) [][]string {
-	chunkSize := 10000
+	chunkSize := 1000
 	if chunkedSelects {
-		chunkSize = 999
+		chunkSize = 399
 	}
 	chuncks := chunkSlice(*ids, chunkSize)
 	if len(chuncks) > 1 {
