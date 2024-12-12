@@ -48,6 +48,10 @@ export default function Chart(props: ChartProps) {
 
   // eslint-disable-next-line
   useEffect(() => {
+    updateChart();    
+  }, []);
+
+  function updateChart() {
     if (fuelType === FuelType.E5) {
       setLineColor('#8884d8')
       setAvgValue(props.timeSlots.reduce((acc, value) => value.e5 + acc, 0) / (props.timeSlots.length || 1));
@@ -61,10 +65,11 @@ export default function Chart(props: ChartProps) {
       setAvgValue(props.timeSlots.reduce((acc, value) => value.diesel + acc, 0) / (props.timeSlots.length || 1));
       setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.diesel - avgValue } as GsPoint)))
     }
-  });
+  }
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {    
     setFuelType(((event.target as HTMLInputElement).value) as FuelType);
+    updateChart();    
   };
   return (<div>
     <ResponsiveContainer width="100%" height={300}>

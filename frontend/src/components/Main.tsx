@@ -10,7 +10,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import { Tabs, Tab, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import { useEffect, useState, SyntheticEvent } from 'react';
 import DataTable, { TableDataRow } from './DataTable';
 import GsMap, { GsValue } from './GsMap';
@@ -18,6 +18,8 @@ import { useRecoilRefresher_UNSTABLE, useRecoilValue } from 'recoil';
 import GlobalState from '../GlobalState';
 import styles from './main.module.scss';
 import Chart, {TimeSlot} from './Chart';
+import { BrowserRouter, Outlet, Route, Routes, Link} from 'react-router-dom';
+
 
 interface GasPriceAvgs {
 	Postcode:        string
@@ -130,8 +132,7 @@ export default function Main() {
   const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
   const globalUserUuidState = useRecoilValue(GlobalState.userUuidState);
   const globalUserDataState = useRecoilValue(GlobalState.userDataState);    
-  const refreshJwtTokenState = useRecoilRefresher_UNSTABLE(GlobalState.jwtTokenState);  
-
+  const refreshJwtTokenState = useRecoilRefresher_UNSTABLE(GlobalState.jwtTokenState);    
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -241,29 +242,69 @@ export default function Main() {
     .then(() => setController(null));
   }
 
+  const Area = () => {
+    return (
+      <>
+        <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
+      </>
+    )
+  };
+
+  const Target = () => {
+    return ( 
+      <>
+        <Chart timeSlots={avgTimeSlots}></Chart>
+        <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
+      </>
+    )
+  }
+
+  const Map = () => {
+    return (
+      <>
+        <GsMap gsValues={gsValues} center={globalUserDataState}></GsMap>  
+      </>
+    )
+  }
+
+  const Layout = () => {    
+    return (
+      <>
+        <div className={styles.headerTabs}>
+            <div className={styles.headerTab}>            
+              <Link className={styles.linkText} to="/area">Area Gas Prices</Link>
+              </div>
+              <div className={styles.headerTab}>
+              <Link className={styles.linkText} to="/target">Target Gas Prices</Link>
+              </div>
+              <div className={styles.headerTab}>
+              <Link className={styles.linkText} to="/map">Map Gas Prices</Link>
+                </div>          
+        </div>  
+        <Outlet />
+        </>      
+    );
+  }
+
   // eslint-disable-next-line
   useEffect(() => {
     if (globalJwtTokenState?.length > 10 && globalUserUuidState?.length > 10 && first) {
       setTimeout(() => handleTabChange({} as unknown as SyntheticEvent, value), 3000);
       setFirst(false);
-    }
+    }    
   });
 
   return (<Box sx={{ width: '100%' }}>
-    <Tabs value={value} onChange={handleTabChange} >
-      <Tab label="Current Prices" />
-      <Tab label="Last Price matches" />
-      <Tab label="Current Prices Map" />
-    </Tabs>
-    <TabPanel value={value} index={0}>
-      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
-    </TabPanel>
-    <TabPanel value={value} index={1}>
-      <Chart timeSlots={avgTimeSlots}></Chart>
-      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
-    </TabPanel>
-    <TabPanel value={value} index={2}>
-      <GsMap gsValues={gsValues} center={globalUserDataState}></GsMap>      
-    </TabPanel>
+        <BrowserRouter>        
+      <Routes>        
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Area />} />
+          <Route path="area" element={<Area />} />
+          <Route path="target" element={<Target />} />
+          <Route path="map" element={<Map />} />
+          <Route path="*" element={<Area />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>    
   </Box>);
 }
