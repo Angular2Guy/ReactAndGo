@@ -22,6 +22,12 @@ export interface UserDataState {
 	TargetE10: number;
 }
 
+export enum FuelType {
+    E5 = 'e5',
+    E10 = 'e10',
+    Diesel = 'diesel'
+  }
+
 const GlobalState = {
     jwtToken: '',
     userNameState: atom({
@@ -51,6 +57,10 @@ const GlobalState = {
     loginModalState: atom({
         key: 'loginModalState',
         default: true
+    }),
+    fuelTypeState: atom({
+        key: 'fuelTypeState', 
+        default: FuelType.E5
     }),
     webWorkerRefState: atom<null|Worker>({
         key: 'webWorkerRefState',    

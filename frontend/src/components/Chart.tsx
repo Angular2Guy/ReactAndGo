@@ -16,12 +16,8 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
-
-enum FuelType {
-  E5 = 'e5',
-  E10 = 'e10',
-  Diesel = 'diesel'
-}
+import GlobalState, { FuelType } from '../GlobalState';
+import { useRecoilState } from 'recoil';
 
 export interface GsPoint {
   timestamp: string;
@@ -41,8 +37,8 @@ export interface ChartProps {
 
 export default function Chart(props: ChartProps) {
   //console.log(props.timeSlots);
-  const [gsValues, setGsValues] = useState([] as GsPoint[]);
-  const [fuelType, setFuelType] = useState(FuelType.E5);
+  const [gsValues, setGsValues] = useState([] as GsPoint[]);  
+  const [fuelTypeState, setfuelTypeState] = useRecoilState(GlobalState.fuelTypeState);
   const [lineColor, setLineColor] = useState('#8884d8');
   const [avgValue, setAvgValue] = useState(0.0);
 
@@ -52,11 +48,11 @@ export default function Chart(props: ChartProps) {
   }, []);
 
   function updateChart() {
-    if (fuelType === FuelType.E5) {
+    if (fuelTypeState === FuelType.E5) {
       setLineColor('#8884d8')
       setAvgValue(props.timeSlots.reduce((acc, value) => value.e5 + acc, 0) / (props.timeSlots.length || 1));
       setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.e5 - avgValue } as GsPoint)))
-    } else if (fuelType === FuelType.E10) {
+    } else if (fuelTypeState === FuelType.E10) {
       setLineColor('#82ca9d')
       setAvgValue(props.timeSlots.reduce((acc, value) => value.e10 + acc, 0) / (props.timeSlots.length || 1));
       setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.e10 - avgValue } as GsPoint)))
@@ -68,7 +64,7 @@ export default function Chart(props: ChartProps) {
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {    
-    setFuelType(((event.target as HTMLInputElement).value) as FuelType);
+    setfuelTypeState(((event.target as HTMLInputElement).value) as FuelType);
     updateChart();    
   };
   return (<div>
@@ -88,7 +84,7 @@ export default function Chart(props: ChartProps) {
         row
         aria-labelledby="demo-row-radio-buttons-group-label"
         name="row-radio-buttons-group"
-        value={fuelType}
+        value={fuelTypeState}
         onChange={handleChange}
       >
         <FormControlLabel value={FuelType.E5} control={<Radio />} label="E5" />
