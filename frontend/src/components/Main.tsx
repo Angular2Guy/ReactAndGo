@@ -10,13 +10,13 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import { Box, InputProps, Tab, Tabs } from '@mui/material';
+import { Box, Tab, Tabs } from '@mui/material';
 import { useEffect, useState, SyntheticEvent } from 'react';
 import DataTable, { TableDataRow } from './DataTable';
 import GsMap, { GsValue } from './GsMap';
 import { useRecoilRefresher_UNSTABLE, useRecoilValue } from 'recoil';
 import GlobalState from '../GlobalState';
-import styles from './main.module.scss';
+//import styles from './main.module.scss';
 import Chart, {TimeSlot} from './Chart';
 
 
