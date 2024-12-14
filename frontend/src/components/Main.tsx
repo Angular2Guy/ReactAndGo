@@ -12,12 +12,12 @@
 */
 import { Box } from '@mui/material';
 import { useEffect, useState, SyntheticEvent } from 'react';
-import DataTable from './DataTable';
-import GsMap from './GsMap';
-import { useRecoilRefresher_UNSTABLE, useRecoilValue, useSetRecoilState } from 'recoil';
-import GlobalState, { TableDataRow, TimeSlot } from '../GlobalState';
+import DataTable, { TableDataRow } from './DataTable';
+import GsMap, { GsValue } from './GsMap';
+import { useRecoilRefresher_UNSTABLE, useRecoilValue } from 'recoil';
+import GlobalState from '../GlobalState';
 import styles from './main.module.scss';
-import Chart from './Chart';
+import Chart, {TimeSlot} from './Chart';
 import { BrowserRouter, Outlet, Route, Routes, Link} from 'react-router-dom';
 
 
@@ -95,20 +95,46 @@ interface TimeSlotResponse {
   CountyDataID:  number;
 }
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }} className={styles.myText}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
 export default function Main() {  
   const [controller, setController] = useState(null as AbortController | null);
   const [timer, setTimer] = useState(undefined as undefined | NodeJS.Timer);
   const [value, setValue] = useState(0);
   const [first, setFirst] = useState(true);
+  const [rows, setRows] = useState([] as TableDataRow[]);
+  const [avgTimeSlots, setAvgTimeSlots] = useState([] as TimeSlot[])
+  const [gsValues, setGsValues] = useState([] as GsValue[]);
   const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
   const globalUserUuidState = useRecoilValue(GlobalState.userUuidState);
   const globalUserDataState = useRecoilValue(GlobalState.userDataState);    
-  const setRowsState = useSetRecoilState(GlobalState.rowsState);
-  const setGsValuesState = useSetRecoilState(GlobalState.gsValuesState);
-  const setAvgTimeSlotsState = useSetRecoilState(GlobalState.avgTimeSlotsState);
   const refreshJwtTokenState = useRecoilRefresher_UNSTABLE(GlobalState.jwtTokenState);    
 
-  const handleLinkClick = (newValue: number) => {
+  const handleTabChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
     clearInterval(timer);
     getData(newValue);
@@ -165,10 +191,10 @@ export default function Main() {
         const rowState = ({        
           location: myJson.State, e5: Math.round(myJson.StateAvgE5), e10: Math.round(myJson.StateAvgE10), diesel: Math.round(myJson.StateAvgDiesel), date: new Date(), longitude: 0, latitude: 0
         } as TableDataRow);
-        const resultRows = [rowCounty, rowState, ...myResult];
-        setRowsState(resultRows);
+        const resultRows = [rowCounty, rowState, ...myResult]
+        setRows(resultRows);
       });         
-      setGsValuesState(myResult);
+      setGsValues(myResult);
     }).then(() => setController(null));
   }
 
@@ -190,8 +216,7 @@ export default function Main() {
           } as TableDataRow;
         });
       })?.flat() || [];
-      const myResult = addStyles(result);
-      setRowsState(myResult);
+      setRows(result);
       //const result 
       const requestOptions2 = {
         method: 'GET',
@@ -210,45 +235,17 @@ export default function Main() {
             dieselTimeSlot.e5 = myValue.AvgE5/1000;
           return dieselTimeSlot;
         }));        
-        setAvgTimeSlotsState(timeSlots);
+        setAvgTimeSlots(timeSlots);
         //console.log(myJson1);
       });
     })
     .then(() => setController(null));
   }
 
-  const addStyles = (rows: TableDataRow[]) => {
-    if(rows.length < 4) {
-      return [];
-    }  
-    const e5Arr = [...rows].filter(row => row.e5 > 10);
-    e5Arr.sort((a,b) => a.e5 - b.e5);
-    const e10Arr = [...rows].filter(row => row.e10 > 10);    
-    e10Arr.sort((a,b) => a.e10 - b.e10);
-    const dieselArr = [...rows].filter(row => row.diesel > 10);
-    dieselArr.sort((a,b) => a.diesel - b.diesel);
-    if(e5Arr?.length >= 3) {
-    e5Arr[0].e5Class = 'best-price';
-    e5Arr[1].e5Class = 'good-price';
-    e5Arr[2].e5Class = 'good-price';
-    }
-    if(e10Arr?.length >= 3) {
-    e10Arr[0].e10Class = 'best-price';
-    e10Arr[1].e10Class = 'good-price';
-    e10Arr[2].e10Class = 'good-price';
-    }
-    if(dieselArr?.length >= 3) {
-    dieselArr[0].dieselClass = 'best-price';
-    dieselArr[1].dieselClass = 'good-price';
-    dieselArr[2].dieselClass = 'good-price';
-  }
-  return rows;
-}
-
   const Area = () => {
     return (
       <>
-        <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time'></DataTable>
+        <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
       </>
     )
   };
@@ -256,8 +253,8 @@ export default function Main() {
   const Target = () => {
     return ( 
       <>
-        <Chart></Chart>
-        <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time'></DataTable>
+        <Chart timeSlots={avgTimeSlots}></Chart>
+        <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
       </>
     )
   }
@@ -265,7 +262,7 @@ export default function Main() {
   const Map = () => {
     return (
       <>
-        <GsMap center={globalUserDataState}></GsMap>  
+        <GsMap gsValues={gsValues} center={globalUserDataState}></GsMap>  
       </>
     )
   }
@@ -275,13 +272,13 @@ export default function Main() {
       <>
         <div className={styles.headerTabs}>
             <div className={styles.headerTab}>            
-              <Link className={styles.linkText} to="/area" onClick={() => handleLinkClick(0)}>Area Gas Prices</Link>
+              <Link className={styles.linkText} to="/area">Area Gas Prices</Link>
               </div>
               <div className={styles.headerTab}>
-              <Link className={styles.linkText} to="/target" onClick={() => handleLinkClick(1)}>Target Gas Prices</Link>
+              <Link className={styles.linkText} to="/target">Target Gas Prices</Link>
               </div>
               <div className={styles.headerTab}>
-              <Link className={styles.linkText} to="/map" onClick={() => handleLinkClick(2)}>Map Gas Prices</Link>
+              <Link className={styles.linkText} to="/map">Map Gas Prices</Link>
                 </div>          
         </div>  
         <Outlet />
@@ -292,7 +289,7 @@ export default function Main() {
   // eslint-disable-next-line
   useEffect(() => {
     if (globalJwtTokenState?.length > 10 && globalUserUuidState?.length > 10 && first) {
-      setTimeout(() => handleLinkClick(value), 3000);
+      setTimeout(() => handleTabChange({} as unknown as SyntheticEvent, value), 3000);
       setFirst(false);
     }    
   });
