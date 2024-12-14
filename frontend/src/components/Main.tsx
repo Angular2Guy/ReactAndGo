@@ -95,11 +95,6 @@ interface TimeSlotResponse {
   CountyDataID:  number;
 }
 
-interface TargetAreaProperties {
-  rows: TableDataRow[];
-  timeSlots: TimeSlot[];
-}
-
 export default function Main() {  
   const [controller, setController] = useState(null as AbortController | null);
   const [timer, setTimer] = useState(undefined as undefined | NodeJS.Timer);
