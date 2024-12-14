@@ -36,40 +36,41 @@ export interface ChartProps {
 }
 
 export default function Chart(props: ChartProps) {
-  //console.log(props.timeSlots);
-  const [updated, setUpdated] = useState(0);
+  //console.log(props.timeSlots);  
   const [gsValues, setGsValues] = useState([] as GsPoint[]);  
   const [fuelTypeState, setfuelTypeState] = useRecoilState(GlobalState.fuelTypeState);
   const [lineColor, setLineColor] = useState('#8884d8');
   const [avgValue, setAvgValue] = useState(0.0);
+  const [timeSlots, setTimeSlots] = useState([] as TimeSlot[]);
 
   // eslint-disable-next-line
   useEffect(() => {
-    if(updated < 3) {      
-      setUpdated(updated + 1);
-      updateChart();          
+    if(props.timeSlots.length > 0 && timeSlots !== props.timeSlots) {    
+      updateChart();            
+      setTimeSlots(props.timeSlots);
     }    
   });
 
   function updateChart() {
+    const avg = props.timeSlots.reduce((acc, value) => value[fuelTypeState] + acc, 0) / (props.timeSlots.length || 1);
     if (fuelTypeState === FuelType.E5) {
-      setLineColor('#8884d8')
-      setAvgValue(props.timeSlots.reduce((acc, value) => value.e5 + acc, 0) / (props.timeSlots.length || 1));
-      setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.e5 - avgValue } as GsPoint)))
+      setLineColor('#8884d8');
+      setAvgValue(avg);
+      setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.e5 - avg } as GsPoint)))
     } else if (fuelTypeState === FuelType.E10) {
-      setLineColor('#82ca9d')
-      setAvgValue(props.timeSlots.reduce((acc, value) => value.e10 + acc, 0) / (props.timeSlots.length || 1));
-      setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.e10 - avgValue } as GsPoint)))
+      setLineColor('#82ca9d');
+      setAvgValue(avg);
+      setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.e10 - avg } as GsPoint)))
     } else {
-      setLineColor('#82caff')
-      setAvgValue(props.timeSlots.reduce((acc, value) => value.diesel + acc, 0) / (props.timeSlots.length || 1));
-      setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.diesel - avgValue } as GsPoint)))
+      setLineColor('#82caff');
+      setAvgValue(avg);
+      setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.diesel - avg } as GsPoint)))
     }
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {    
     setfuelTypeState(((event.target as HTMLInputElement).value) as FuelType);
-    setUpdated(0);
+    setTimeSlots([]);
     updateChart();    
   };
   return (<div>
