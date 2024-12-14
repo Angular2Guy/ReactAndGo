@@ -28,7 +28,7 @@ export interface TableDataRow {
     dieselClass: string;
 }
 
-interface DataTableProps {
+export interface DataTableProps {
     location: string;
     time: string;
     showAverages: boolean;

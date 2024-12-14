@@ -37,6 +37,7 @@ export interface ChartProps {
 
 export default function Chart(props: ChartProps) {
   //console.log(props.timeSlots);
+  const [updated, setUpdated] = useState(0);
   const [gsValues, setGsValues] = useState([] as GsPoint[]);  
   const [fuelTypeState, setfuelTypeState] = useRecoilState(GlobalState.fuelTypeState);
   const [lineColor, setLineColor] = useState('#8884d8');
@@ -44,8 +45,11 @@ export default function Chart(props: ChartProps) {
 
   // eslint-disable-next-line
   useEffect(() => {
-    updateChart();    
-  }, []);
+    if(updated < 3) {      
+      setUpdated(updated + 1);
+      updateChart();          
+    }    
+  });
 
   function updateChart() {
     if (fuelTypeState === FuelType.E5) {
@@ -65,6 +69,7 @@ export default function Chart(props: ChartProps) {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {    
     setfuelTypeState(((event.target as HTMLInputElement).value) as FuelType);
+    setUpdated(0);
     updateChart();    
   };
   return (<div>

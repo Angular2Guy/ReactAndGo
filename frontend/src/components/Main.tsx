@@ -10,7 +10,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import { Box } from '@mui/material';
+import { Box, InputProps, Tab, Tabs } from '@mui/material';
 import { useEffect, useState, SyntheticEvent } from 'react';
 import DataTable, { TableDataRow } from './DataTable';
 import GsMap, { GsValue } from './GsMap';
@@ -18,7 +18,7 @@ import { useRecoilRefresher_UNSTABLE, useRecoilValue } from 'recoil';
 import GlobalState from '../GlobalState';
 import styles from './main.module.scss';
 import Chart, {TimeSlot} from './Chart';
-import { BrowserRouter, Outlet, Route, Routes, Link} from 'react-router-dom';
+
 
 
 interface GasPriceAvgs {
@@ -95,30 +95,9 @@ interface TimeSlotResponse {
   CountyDataID:  number;
 }
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }} className={styles.myText}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
+interface TargetAreaProperties {
+  rows: TableDataRow[];
+  timeSlots: TimeSlot[];
 }
 
 export default function Main() {  
@@ -242,69 +221,27 @@ export default function Main() {
     .then(() => setController(null));
   }
 
-  const Area = () => {
-    return (
-      <>
-        <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
-      </>
-    )
-  };
-
-  const Target = () => {
-    return ( 
-      <>
-        <Chart timeSlots={avgTimeSlots}></Chart>
-        <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>
-      </>
-    )
-  }
-
-  const Map = () => {
-    return (
-      <>
-        <GsMap gsValues={gsValues} center={globalUserDataState}></GsMap>  
-      </>
-    )
-  }
-
-  const Layout = () => {    
-    return (
-      <>
-        <div className={styles.headerTabs}>
-            <div className={styles.headerTab}>            
-              <Link className={styles.linkText} to="/area">Area Gas Prices</Link>
-              </div>
-              <div className={styles.headerTab}>
-              <Link className={styles.linkText} to="/target">Target Gas Prices</Link>
-              </div>
-              <div className={styles.headerTab}>
-              <Link className={styles.linkText} to="/map">Map Gas Prices</Link>
-                </div>          
-        </div>  
-        <Outlet />
-        </>      
-    );
-  }
-
   // eslint-disable-next-line
   useEffect(() => {
     if (globalJwtTokenState?.length > 10 && globalUserUuidState?.length > 10 && first) {
-      setTimeout(() => handleTabChange({} as unknown as SyntheticEvent, value), 3000);
+      setTimeout(() => handleTabChange({} as unknown as SyntheticEvent,  value), 3000);
       setFirst(false);
     }    
   });
 
   return (<Box sx={{ width: '100%' }}>
-        <BrowserRouter>        
-      <Routes>        
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Area />} />
-          <Route path="area" element={<Area />} />
-          <Route path="target" element={<Target />} />
-          <Route path="map" element={<Map />} />
-          <Route path="*" element={<Area />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>    
+    <Tabs value={value} onChange={handleTabChange} centered={true}>
+      <Tab label="Current Prices"/>
+      <Tab label="Last Price matches"/>
+      <Tab label="Current Prices Map"/>
+    </Tabs>
+    { value === 0 && 
+      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>}    
+    { value === 1 && 
+      <Chart timeSlots={avgTimeSlots}></Chart>}
+    { value === 1 && 
+      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>}    
+    { value === 2 &&
+      <GsMap gsValues={gsValues} center={globalUserDataState}></GsMap>}    
   </Box>);
 }
