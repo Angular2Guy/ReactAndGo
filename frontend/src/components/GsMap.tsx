@@ -23,16 +23,8 @@ import myStyle from './gsmap.module.scss';
 import { Icon, Style } from 'ol/style.js';
 import { useEffect } from 'react';
 import { nanoid } from 'nanoid';
-
-export interface GsValue {
-  location: string;
-  e5: number;
-  e10: number;
-  diesel: number;
-  date: Date;
-  longitude: number;
-  latitude: number;
-}
+import GlobalState, { GsValue } from '../GlobalState';
+import { useRecoilValue } from 'recoil';
 
 export interface CenterLocation {
   Longitude: number;
@@ -40,13 +32,14 @@ export interface CenterLocation {
 }
 
 interface InputProps {
-  center: CenterLocation;
-  gsValues: GsValue[];
+  center: CenterLocation;  
 }
 
 export default function GsMap(inputProps: InputProps) {
   let map: Map;    
   let currentOverlay: Overlay | null = null;
+  const gsValuesState = useRecoilValue(GlobalState.gsValuesState); 
+
   useEffect(() => {
     if (!map) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -72,7 +65,7 @@ export default function GsMap(inputProps: InputProps) {
   }, []);
 
   function createOverlays(): Overlay[] {
-    return inputProps.gsValues.map((gsValue, index) => {
+    return gsValuesState.map((gsValue, index) => {
       const element = document.createElement('div');
       element.id = nanoid();
       element.innerHTML = `${gsValue.location}<br/>E5: ${gsValue.e5}<br/>E10: ${gsValue.e10}<br/>Diesel: ${gsValue.diesel}`;

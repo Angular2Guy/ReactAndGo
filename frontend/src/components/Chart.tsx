@@ -17,28 +17,18 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import GlobalState, { FuelType } from '../GlobalState';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 export interface GsPoint {
   timestamp: string;
   price: number;
 }
 
-export interface TimeSlot {
-  x: string;
-  e5: number;
-  e10: number;
-  diesel: number;
-}
-
-export interface ChartProps {
-  timeSlots: TimeSlot[];
-}
-
-export default function Chart(props: ChartProps) {
+export default function Chart() {
   //console.log(props.timeSlots);
   const [gsValues, setGsValues] = useState([] as GsPoint[]);  
   const [fuelTypeState, setfuelTypeState] = useRecoilState(GlobalState.fuelTypeState);
+  const avgTimeSlotsState = useRecoilValue(GlobalState.avgTimeSlotsState);
   const [lineColor, setLineColor] = useState('#8884d8');
   const [avgValue, setAvgValue] = useState(0.0);
 
@@ -50,16 +40,16 @@ export default function Chart(props: ChartProps) {
   function updateChart() {
     if (fuelTypeState === FuelType.E5) {
       setLineColor('#8884d8')
-      setAvgValue(props.timeSlots.reduce((acc, value) => value.e5 + acc, 0) / (props.timeSlots.length || 1));
-      setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.e5 - avgValue } as GsPoint)))
+      setAvgValue(avgTimeSlotsState.reduce((acc, value) => value.e5 + acc, 0) / (avgTimeSlotsState.length || 1));
+      setGsValues(avgTimeSlotsState.map(myValue => ({ timestamp: myValue.x, price: myValue.e5 - avgValue } as GsPoint)))
     } else if (fuelTypeState === FuelType.E10) {
       setLineColor('#82ca9d')
-      setAvgValue(props.timeSlots.reduce((acc, value) => value.e10 + acc, 0) / (props.timeSlots.length || 1));
-      setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.e10 - avgValue } as GsPoint)))
+      setAvgValue(avgTimeSlotsState.reduce((acc, value) => value.e10 + acc, 0) / (avgTimeSlotsState.length || 1));
+      setGsValues(avgTimeSlotsState.map(myValue => ({ timestamp: myValue.x, price: myValue.e10 - avgValue } as GsPoint)))
     } else {
       setLineColor('#82caff')
-      setAvgValue(props.timeSlots.reduce((acc, value) => value.diesel + acc, 0) / (props.timeSlots.length || 1));
-      setGsValues(props.timeSlots.map(myValue => ({ timestamp: myValue.x, price: myValue.diesel - avgValue } as GsPoint)))
+      setAvgValue(avgTimeSlotsState.reduce((acc, value) => value.diesel + acc, 0) / (avgTimeSlotsState.length || 1));
+      setGsValues(avgTimeSlotsState.map(myValue => ({ timestamp: myValue.x, price: myValue.diesel - avgValue } as GsPoint)))
     }
   }
 

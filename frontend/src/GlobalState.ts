@@ -28,6 +28,36 @@ export enum FuelType {
     Diesel = 'diesel'
   }
 
+export interface TableDataRow {
+    location: string;
+    e5: number;
+    e10: number;
+    diesel: number;
+    date: Date;
+    longitude: number;
+    latitude: number;
+    e5Class: string;
+    e10Class: string;
+    dieselClass: string;
+}
+
+export interface TimeSlot {
+    x: string;
+    e5: number;
+    e10: number;
+    diesel: number;
+  }
+
+  export interface GsValue {
+    location: string;
+    e5: number;
+    e10: number;
+    diesel: number;
+    date: Date;
+    longitude: number;
+    latitude: number;
+  }
+
 const GlobalState = {
     jwtToken: '',
     userNameState: atom({
@@ -65,6 +95,18 @@ const GlobalState = {
     webWorkerRefState: atom<null|Worker>({
         key: 'webWorkerRefState',    
         default: null
-    }),    
+    }),
+    rowsState: atom({
+        key: 'rowsState',
+        default: [] as TableDataRow[]
+    }),
+    avgTimeSlotsState: atom({
+        key: 'avgTimeSlotsState',
+        default: [] as TimeSlot[]
+    }),
+    gsValuesState: atom({
+        key: 'gsValuesState',
+        default: [] as GsValue[]
+    })
 }
 export default GlobalState;

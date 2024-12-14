@@ -14,19 +14,8 @@ import {TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody}
 import { nanoid } from 'nanoid';
 import { useMemo } from 'react';
 import styles from "./datatable.module.scss";
-
-export interface TableDataRow {
-    location: string;
-    e5: number;
-    e10: number;
-    diesel: number;
-    date: Date;
-    longitude: number;
-    latitude: number;
-    e5Class: string;
-    e10Class: string;
-    dieselClass: string;
-}
+import GlobalState from '../GlobalState';
+import { useRecoilValue } from 'recoil';
 
 interface DataTableProps {
     location: string;
@@ -35,22 +24,22 @@ interface DataTableProps {
     e5: string;
     e10: string;
     diesel: string;
-    rows: TableDataRow[];
 }
 
 //function PriceChart(props: )
 
 export default function DataTable(props: DataTableProps) {    
-
+  const rowsState = useRecoilValue(GlobalState.rowsState);
+  /*
   useMemo(() => {   
-    if(props?.rows?.length < 4) {
+    if(rowsState.length < 4) {
       return;
     }  
-    const e5Arr = [...props.rows].filter(row => row.e5 > 10);
+    const e5Arr = [...rowsState].filter(row => row.e5 > 10);
     e5Arr.sort((a,b) => a.e5 - b.e5);
-    const e10Arr = [...props.rows].filter(row => row.e10 > 10);    
+    const e10Arr = [...rowsState].filter(row => row.e10 > 10);    
     e10Arr.sort((a,b) => a.e10 - b.e10);
-    const dieselArr = [...props.rows].filter(row => row.diesel > 10);
+    const dieselArr = [...rowsState].filter(row => row.diesel > 10);
     dieselArr.sort((a,b) => a.diesel - b.diesel);
     if(e5Arr?.length >= 3) {
     e5Arr[0].e5Class = 'best-price';
@@ -67,8 +56,8 @@ export default function DataTable(props: DataTableProps) {
     dieselArr[1].dieselClass = 'good-price';
     dieselArr[2].dieselClass = 'good-price';      
     }
-  },[props.rows]);
-
+  },[rowsState]);
+*/
     return (
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: '100%' }}>
@@ -82,7 +71,7 @@ export default function DataTable(props: DataTableProps) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {props.rows.map((row) => (
+              {rowsState.map((row) => (
                 <TableRow
                   key={nanoid()}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
