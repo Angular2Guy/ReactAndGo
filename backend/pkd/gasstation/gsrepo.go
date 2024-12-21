@@ -224,7 +224,7 @@ func ReCalcCountyStatePrices() {
 		}
 		return nil
 	})
-	myDuration := time.Now().Sub(myStart)
+	myDuration := time.Since(myStart)
 	log.Printf("recalcCountyStatePrices finished for %v states and %v counties in %v.", len(idStateDataMap), len(idCountyDataMap), myDuration)
 }
 
@@ -366,7 +366,7 @@ func CalcCountyTimeSlots() {
 		})
 	}
 	//store changes in countytimeslots
-	myDuration := time.Now().Sub(myStart)
+	myDuration := time.Since(myStart)
 	log.Printf("calcCountyTimeSlots finished for %v counties in %v.", len(idCountyDataMap), myDuration)
 }
 

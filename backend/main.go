@@ -50,7 +50,7 @@ func main() {
 	// kill -2 is syscall.SIGINT
 	// kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	go controller.Start(getPublicFolder(embeddedFiles))
+	go controller.Start(getPublicFolder())
 
 	<-quit
 	log.Println("Shutting down server...")
@@ -61,7 +61,7 @@ func main() {
 	log.Println("Server exiting")
 }
 
-func getPublicFolder(myEmbeddedFiles embed.FS) fs.FS {
+func getPublicFolder() fs.FS {
 	result, err := fs.Sub(embeddedFiles, "public")
 	if err != nil {
 		log.Fatalf("%v\n", err)
