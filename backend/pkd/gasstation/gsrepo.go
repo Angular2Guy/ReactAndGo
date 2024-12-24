@@ -124,6 +124,11 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 			delete(stationPricesMap, value.GasStationID)
 		}
 	}
+	stationPricesDb = nil
+	handleMaps(stationPricesMap, gasPriceUpdateMap)
+}
+
+func handleMaps(stationPricesMap map[string]GasStationPrices, gasPriceUpdateMap map[string]gsmodel.GasPrice) {
 	if len(stationPricesMap) > 0 {
 		var stationIds []string
 		for _, stationPrice := range stationPricesMap {
