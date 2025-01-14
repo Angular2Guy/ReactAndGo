@@ -156,10 +156,30 @@ func findPricesByStids(stids *[]string, resultLimit int, timeframe TimeFrame) []
 			}
 			myQuery.Find(&values)
 			//log.Printf("%v", values)
-			myGasPrices = append(myGasPrices, values...)
+			var lastUpdates = returnLastUpdatesGasStation(&values)
+			//log.Printf("%v", lastUpdates)
+			myGasPrices = append(myGasPrices, lastUpdates...)
 		}
 		return nil
 	})
+	return myGasPrices
+}
+
+func returnLastUpdatesGasStation(values *[]gsmodel.GasPrice) []gsmodel.GasPrice {
+	var myGasPrices []gsmodel.GasPrice
+	gasPriceUpdateMap := make(map[string]gsmodel.GasPrice)
+	for _, value := range *values {
+		if entry, ok := gasPriceUpdateMap[value.GasStationID]; ok {
+			if entry.Date.Before(value.Date) {
+				gasPriceUpdateMap[value.GasStationID] = value
+			}
+		} else {
+			gasPriceUpdateMap[value.GasStationID] = value
+		}
+	}
+	for _, value := range gasPriceUpdateMap {
+		myGasPrices = append(myGasPrices, value)
+	}
 	return myGasPrices
 }
 
@@ -305,9 +325,9 @@ func sendNotifications(gasStationIDToGasPriceMap *map[string]gsmodel.GasPrice) {
 }
 
 func createInChunks(ids *[]string, chunkedSelects bool) [][]string {
-	chunkSize := 1000
+	chunkSize := 500
 	if chunkedSelects {
-		chunkSize = 399
+		chunkSize = 249
 	}
 	chuncks := chunkSlice(*ids, chunkSize)
 	if len(chuncks) > 1 {
