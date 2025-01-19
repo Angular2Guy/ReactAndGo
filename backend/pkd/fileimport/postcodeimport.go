@@ -189,7 +189,7 @@ func updateCountyStatePrices(plzs []string) {
 		gasStationStids = append(gasStationStids, myGasStation.ID)
 		plzGasStation[myGasStation.PostCode] = append(plzGasStation[myGasStation.PostCode], myGasStation)
 	}
-	myGasPrices := gasstation.FindPricesByStids(&gasStationStids, 5, gasstation.Month)
+	myGasPrices := gasstation.FindPricesByStids(&gasStationStids, 5, gasstation.Month, false)
 	gasStationIdGasPrices := make(map[string][]gsmodel.GasPrice)
 	for _, myGasPrice := range myGasPrices {
 		gasStationIdGasPrices[myGasPrice.GasStationID] = append(gasStationIdGasPrices[myGasPrice.GasStationID], myGasPrice)

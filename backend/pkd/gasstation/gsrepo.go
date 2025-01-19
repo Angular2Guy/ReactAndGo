@@ -95,7 +95,7 @@ func UpdatePrice(gasStationPrices *[]GasStationPrices) {
 		stationPricesKeys = append(stationPricesKeys, value.GasStationID)
 	}
 	gasPriceUpdateMap := make(map[string]gsmodel.GasPrice)
-	stationPricesDb := FindPricesByStids(&stationPricesKeys, 0, Month)
+	stationPricesDb := FindPricesByStids(&stationPricesKeys, 0, Month, true)
 	log.Printf("StationPricesKeys: %v StationPricesDb: %v", len(stationPricesKeys), len(stationPricesDb))
 	for _, value := range stationPricesDb {
 		if _, found := gasPriceUpdateMap[value.GasStationID]; !found {
@@ -383,8 +383,8 @@ func FindById(id string) gsmodel.GasStation {
 	return myGasStation
 }
 
-func FindPricesByStids(stids *[]string, resultLimit int, timeframe TimeFrame) []gsmodel.GasPrice {
-	myGasPrice := findPricesByStids(stids, resultLimit, timeframe)
+func FindPricesByStids(stids *[]string, resultLimit int, timeframe TimeFrame, onlyLastUpdate bool) []gsmodel.GasPrice {
+	myGasPrice := findPricesByStids(stids, resultLimit, timeframe, onlyLastUpdate)
 	return myGasPrice
 }
 

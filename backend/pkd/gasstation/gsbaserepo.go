@@ -121,7 +121,7 @@ func findGasPricesByTimeframe(postCodeGasStationsMap *map[string][]gsmodel.GasSt
 		}
 	}
 	//log.Printf("gasStationIds: %v", len(gasStationIds))
-	gasPrices := FindPricesByStids(&gasStationIds, 0, timeframe)
+	gasPrices := FindPricesByStids(&gasStationIds, 0, timeframe, false)
 	return gasPrices
 }
 
@@ -135,7 +135,7 @@ func createPostCodeGasStationsMap() map[string][]gsmodel.GasStation {
 	return postCodeGasStationsMap
 }
 
-func findPricesByStids(stids *[]string, resultLimit int, timeframe TimeFrame) []gsmodel.GasPrice {
+func findPricesByStids(stids *[]string, resultLimit int, timeframe TimeFrame, onlyLastUpdate bool) []gsmodel.GasPrice {
 	var myGasPrices []gsmodel.GasPrice
 	var myTimeFrame time.Time
 	if timeframe == Day {
@@ -156,7 +156,10 @@ func findPricesByStids(stids *[]string, resultLimit int, timeframe TimeFrame) []
 			}
 			myQuery.Find(&values)
 			//log.Printf("%v", values)
-			var lastUpdates = returnLastUpdatesGasStation(&values)
+			var lastUpdates = values
+			if onlyLastUpdate {
+				lastUpdates = returnLastUpdatesGasStation(&values)
+			}
 			//log.Printf("%v", lastUpdates)
 			myGasPrices = append(myGasPrices, lastUpdates...)
 		}
