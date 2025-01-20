@@ -162,14 +162,15 @@ func ReCalcCountyStatePrices() {
 	log.Printf("recalcCountyStatePrices started.")
 	myStart := time.Now()
 	postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap, postCodeGasStationsMap := createPostCodeGasStationMaps()
-	gasStationIdGasPriceMap := createGasStationIdGasPriceMap(&postCodeGasStationsMap, Month)
-	log.Printf("gasStationIdGasPriceMap: %v", len(gasStationIdGasPriceMap))
+	//gasStationIdGasPriceMap := createGasStationIdGasPriceMap(&postCodeGasStationsMap, Month)
 	resetDataMaps(&idStateDataMap, &idCountyDataMap)
 	//sum up prices and count stations
 	for _, myPostCodeLocation := range postCodePostCodeLocationMap {
 		myPostCode := postcode.FormatPostCode(myPostCodeLocation.PostCode)
-		for _, myGasStation := range postCodeGasStationsMap[myPostCode] {
-			for _, myGasPrice := range gasStationIdGasPriceMap[myGasStation.ID] {
+		gasStations := postCodeGasStationsMap[myPostCode]
+		//log.Printf("gasStationIdGasPriceMap: %v", len(gasStations))
+		for _, myGasStationPrices := range createGasStationIdGasPriceMap(&gasStations, Month) {
+			for _, myGasPrice := range myGasStationPrices {
 				if myGasPrice.E5 < 10 && myGasPrice.E10 < 10 && myGasPrice.Diesel < 10 {
 					continue
 				}
@@ -234,10 +235,12 @@ func ReCalcCountyStatePrices() {
 }
 
 func createCodeTimeSliceBuckets(postCodePostCodeLocationMap map[int]pcmodel.PostCodeLocation, postCodeGasStationsMap map[string][]gsmodel.GasStation) map[string]map[time.Time][]gsmodel.GasPrice {
-	gasStationIdGasPriceMap := createGasStationIdGasPriceArrayMap(&postCodeGasStationsMap, Day)
+	//gasStationIdGasPriceMap := createGasStationIdGasPriceArrayMap(&postCodeGasStationsMap, Day)
 	postCodeTimeSliceBuckets := make(map[string]map[time.Time][]gsmodel.GasPrice)
 	for _, myPostCodeLocation := range postCodePostCodeLocationMap {
 		myPostCode := postcode.FormatPostCode(myPostCodeLocation.PostCode)
+		gasStations := postCodeGasStationsMap[myPostCode]
+		gasStationIdGasPriceMap := createGasStationIdGasPriceArrayMap(&gasStations, Day)
 		for _, myGasStation := range postCodeGasStationsMap[myPostCode] {
 			yesterday := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Local).AddDate(0, 0, -1).Round(time.Hour)
 			//yesterday := time.Now().AddDate(0, 0, -1).Round(time.Hour)
@@ -350,6 +353,7 @@ func CalcCountyTimeSlots() {
 	log.Printf("calcCountyTimeSlots started.")
 	myStart := time.Now()
 	postCodePostCodeLocationMap, _, idCountyDataMap, postCodeGasStationsMap := createPostCodeGasStationMaps()
+
 	postCodeTimeSliceBuckets := createCodeTimeSliceBuckets(postCodePostCodeLocationMap, postCodeGasStationsMap)
 	//log.Printf("postCodeTimeSliceBuckets: %v\n", len(postCodeGasStationsMap))
 	database.DB.Transaction(func(tx *gorm.DB) error {

@@ -82,8 +82,8 @@ func createPostCodeMaps() (map[int]pcmodel.PostCodeLocation, map[int]pcmodel.Sta
 	return postCodePostCodeLocationMap, idStateDataMap, idCountyDataMap
 }
 
-func createGasStationIdGasPriceMap(postCodeGasStationsMap *map[string][]gsmodel.GasStation, timeframe TimeFrame) map[string][]gsmodel.GasPrice {
-	gasPrices := findGasPricesByTimeframe(postCodeGasStationsMap, timeframe)
+func createGasStationIdGasPriceMap(gasStations *[]gsmodel.GasStation, timeframe TimeFrame) map[string][]gsmodel.GasPrice {
+	gasPrices := findGasPricesByTimeframe(gasStations, timeframe)
 	//log.Printf("gasPrices: %v", len(gasPrices))
 	gasStationIdGasPriceMap := make(map[string][]gsmodel.GasPrice)
 	for _, myGasPrice := range gasPrices {
@@ -98,8 +98,8 @@ func createGasStationIdGasPriceMap(postCodeGasStationsMap *map[string][]gsmodel.
 	return gasStationIdGasPriceMap
 }
 
-func createGasStationIdGasPriceArrayMap(postCodeGasStationsMap *map[string][]gsmodel.GasStation, timeframe TimeFrame) map[string][]gsmodel.GasPrice {
-	gasPrices := findGasPricesByTimeframe(postCodeGasStationsMap, timeframe)
+func createGasStationIdGasPriceArrayMap(gasStations *[]gsmodel.GasStation, timeframe TimeFrame) map[string][]gsmodel.GasPrice {
+	gasPrices := findGasPricesByTimeframe(gasStations, timeframe)
 	//log.Printf("gasPrices: %v", len(gasPrices))
 	gasStationIdGasPriceMap := make(map[string][]gsmodel.GasPrice)
 	for _, myGasPrice := range gasPrices {
@@ -113,12 +113,10 @@ func createGasStationIdGasPriceArrayMap(postCodeGasStationsMap *map[string][]gsm
 	return gasStationIdGasPriceMap
 }
 
-func findGasPricesByTimeframe(postCodeGasStationsMap *map[string][]gsmodel.GasStation, timeframe TimeFrame) []gsmodel.GasPrice {
+func findGasPricesByTimeframe(gasStations *[]gsmodel.GasStation, timeframe TimeFrame) []gsmodel.GasPrice {
 	var gasStationIds []string
-	for _, myGasStations := range *postCodeGasStationsMap {
-		for _, myGasStation := range myGasStations {
-			gasStationIds = append(gasStationIds, myGasStation.ID)
-		}
+	for _, myGasStation := range *gasStations {
+		gasStationIds = append(gasStationIds, myGasStation.ID)
 	}
 	//log.Printf("gasStationIds: %v", len(gasStationIds))
 	gasPrices := FindPricesByStids(&gasStationIds, 0, timeframe, false)
