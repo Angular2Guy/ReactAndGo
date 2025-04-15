@@ -453,3 +453,18 @@ func FindBySearchLocation(searchLocation gsbody.SearchLocation) []gsmodel.GasSta
 	}
 	return filteredGasStations
 }
+
+func CleanupOldPrices() {
+	log.Printf("CleanupOldPrices started.")
+	myStart := time.Now()
+
+	database.DB.Transaction(func(tx *gorm.DB) error {
+		myTimeFrame := time.Now().Add(time.Hour * -1080)
+		dateStr := fmt.Sprintf("%04d-%02d-%02d", myTimeFrame.Year(), myTimeFrame.Month(), myTimeFrame.Day())
+		tx.Where("date < date(?) ", dateStr).Delete(&gsmodel.GasPrice{})
+		return nil
+	})
+
+	myDuration := time.Since(myStart)
+	log.Printf("CleanupOldPrices finished in %v.", myDuration)
+}

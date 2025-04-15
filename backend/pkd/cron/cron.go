@@ -121,6 +121,8 @@ func Start() {
 
 	scheduler.Every(1).Day().At("02:05").Tag("averages").Do(gasstation.ReCalcCountyStatePrices)
 
+	scheduler.Every(1).Day().At("03:08").Tag("cleanupOldPrices").Do(gasstation.CleanupOldPrices)
+
 	msgFileStr := os.Getenv("MSG_MESSAGES")
 	if len(strings.TrimSpace(msgFileStr)) > 3 {
 		msgFiles := strings.Split(msgFileStr, ";")
