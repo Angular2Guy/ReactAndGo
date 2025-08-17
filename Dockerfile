@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu:noble
 VOLUME /tmp
 ENV GIN_MODE=release
 ARG APP_FILE
