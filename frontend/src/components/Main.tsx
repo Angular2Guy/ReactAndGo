@@ -18,6 +18,7 @@ import { useRecoilRefresher_UNSTABLE, useRecoilValue } from 'recoil';
 import GlobalState from '../GlobalState';
 //import styles from './main.module.scss';
 import Chart, {TimeSlot} from './Chart';
+import { useNavigate } from 'react-router';
 
 
 
@@ -96,6 +97,7 @@ interface TimeSlotResponse {
 }
 
 export default function Main() {  
+  const navigate = useNavigate();
   const [controller, setController] = useState(null as AbortController | null);
   const [timer, setTimer] = useState(undefined as undefined | NodeJS.Timer);
   const [value, setValue] = useState(0);
@@ -120,7 +122,8 @@ export default function Main() {
   }
 
   const getData = (newValue: number) => {
-    if (globalJwtTokenState?.length < 10 || globalUserUuidState?.length < 10) {
+    if (globalJwtTokenState?.length < 10 || globalUserUuidState?.length < 10) {      
+      navigate('/');
       return;
     }    
     //console.log(newValue); 

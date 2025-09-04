@@ -15,13 +15,21 @@ import ReactDOM from 'react-dom/client';
 import './index.scss';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { RecoilRoot } from 'recoil';
+import { BrowserRouter, Route } from 'react-router';
+import { Login } from '@mui/icons-material';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <RecoilRoot>
+      <BrowserRouter>
+        <Route path="/" element={<Login />} />
+        <Route path="/app" element={<App />} />
+      </BrowserRouter>
+    </RecoilRoot>
   </React.StrictMode>
 );
 

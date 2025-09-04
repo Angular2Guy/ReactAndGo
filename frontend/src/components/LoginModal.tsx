@@ -16,6 +16,7 @@ import GlobalState from "../GlobalState";
 import { UserDataState } from "../GlobalState";
 import { useState, ChangeEventHandler, FormEvent, BaseSyntheticEvent } from "react";
 import { Box, TextField, Button, Tab, Tabs, Dialog, DialogContent } from '@mui/material';
+import { useNavigate } from "react-router";
 //import { Token } from "@mui/icons-material";
 
 export interface UserRequest {
@@ -74,6 +75,7 @@ function TabPanel(props: TabPanelProps) {
 
 const LoginModal = () => {
   let controller: AbortController | null = null;
+  const navigate = useNavigate();
   const setGlobalUserName = useSetRecoilState(GlobalState.userNameState);
   const setGlobalUuid = useSetRecoilState(GlobalState.userUuidState);
   const setGlobalJwtToken = useSetRecoilState(GlobalState.jwtTokenState);
@@ -126,6 +128,7 @@ const LoginModal = () => {
       setUserName('');
       setPassword1('');
       setPassword2('');
+      navigate('/app');
     } else if (!!userResponse?.Message) {
       setResponseMsg(userResponse.Message);
     }
