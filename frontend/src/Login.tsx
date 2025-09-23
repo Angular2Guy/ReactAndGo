@@ -10,15 +10,16 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import './components/login.module.scss';
 import LoginModal from "./components/LoginModal";
 
-function Login() {
+export function Login() {
   //const [todo, setTodo] = useState('');
   //const [todoList, setTodoList] = useState([] as TodoItem1[]);
   return (      
-    <div>
+    <div>      
       <LoginModal />
 </div>
     );
 }
+
+export default Login;

@@ -17,7 +17,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { RecoilRoot } from 'recoil';
 import { BrowserRouter, Route, Routes } from 'react-router';
-import { Login } from '@mui/icons-material';
+import Login from './Login';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -26,9 +26,10 @@ root.render(
   <React.StrictMode>
     <RecoilRoot>
       <BrowserRouter>
-        <Routes>
+        <Routes>          
           <Route path="/" element={<Login />} />
-          <Route path="/app" element={<App />} />          
+          <Route path="/app" element={<App />} />   
+          <Route path='*' element={<Login />} />       
         </Routes>
       </BrowserRouter>
     </RecoilRoot>
