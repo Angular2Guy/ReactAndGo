@@ -16,6 +16,10 @@ import LoginModal from './components/LoginModal';
 import LocationModal from './components/LocationModal';
 import TargetPriceModal from './components/TargetPriceModal';
 import Main from './components/Main';
+import { useRecoilValue } from 'recoil';
+import GlobalState from './GlobalState';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router';
 
 export interface TodoItem1 {
   name: string;
@@ -23,6 +27,16 @@ export interface TodoItem1 {
 }
 
 function App() {
+  const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
+  const globalUserUuidState = useRecoilValue(GlobalState.userUuidState);
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if((!globalJwtTokenState || !globalUserUuidState || globalJwtTokenState.length < 10 || globalUserUuidState.length < 10)) {
+      navigate('/');
+    }
+  });
+
   return (
     <div className="App">      
       <Header/>
