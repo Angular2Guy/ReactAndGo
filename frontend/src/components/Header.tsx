@@ -15,6 +15,7 @@ import {Button} from '@mui/material';
 import {FormEvent} from 'react';
 import { useSetRecoilState,useRecoilState } from "recoil";
 import GlobalState from "../GlobalState";
+import { useNavigate } from "react-router";
 
 const Header = () => {
     const setLocationModalState = useSetRecoilState(GlobalState.locationModalState);
@@ -22,6 +23,7 @@ const Header = () => {
     const setJwtTokenState = useSetRecoilState(GlobalState.jwtTokenState);   
     const setGlobalLoginModal = useSetRecoilState(GlobalState.loginModalState);
     const [globalWebWorkerRefState, setGlobalWebWorkerRefState] = useRecoilState(GlobalState.webWorkerRefState); 
+    const navigate = useNavigate();
 
     const logout = (event: FormEvent) => {
         console.log("Logout ",event);
@@ -29,6 +31,7 @@ const Header = () => {
         globalWebWorkerRefState?.postMessage({jwtToken: '', newNotificationUrl: ''});
         setGlobalWebWorkerRefState(null);
         setGlobalLoginModal(true);
+        navigate('/');
     }
     const location = (event: FormEvent) => {
         //console.log("Location ",event);
