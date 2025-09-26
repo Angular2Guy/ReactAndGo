@@ -18,18 +18,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import GlobalState, { FuelType } from '../GlobalState';
 import { useRecoilState } from 'recoil';
-
-export interface GsPoint {
-  timestamp: string;
-  price: number;
-}
-
-export interface TimeSlot {
-  x: string;
-  e5: number;
-  e10: number;
-  diesel: number;
-}
+import { GsPoint, TimeSlot } from '../service/dtos';
 
 export interface ChartProps {
   timeSlots: TimeSlot[];

@@ -23,21 +23,7 @@ import myStyle from './gsmap.module.scss';
 import { Icon, Style } from 'ol/style.js';
 import { useEffect } from 'react';
 import { nanoid } from 'nanoid';
-
-export interface GsValue {
-  location: string;
-  e5: number;
-  e10: number;
-  diesel: number;
-  date: Date;
-  longitude: number;
-  latitude: number;
-}
-
-export interface CenterLocation {
-  Longitude: number;
-  Latitude: number;
-}
+import { CenterLocation, GsValue } from '../service/dtos';
 
 interface InputProps {
   center: CenterLocation;
