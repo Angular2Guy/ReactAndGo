@@ -114,3 +114,28 @@ export interface TimeSlot {
   e10: number;
   diesel: number;
 }
+
+export interface UserRequest {
+  Username: string;
+  Password: string;
+  Latitude?: number;
+  Longitude?: number;
+  SearchRadius?: number;
+  PostCode?: number;
+  TargetDiesel?: string;
+  TargetE10?: string;
+  TargetE5?: string;
+}
+
+export interface UserResponse {
+  Token?: string;
+  Message?: string;
+  PostCode?: number;
+  Uuid?: string;
+  Longitude?: number;
+  Latitude?: number;
+  SearchRadius?: number;
+  TargetDiesel?: number;
+  TargetE5?: number;
+  TargetE10?: number;
+}

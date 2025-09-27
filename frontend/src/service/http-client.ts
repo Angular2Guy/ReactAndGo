@@ -1,5 +1,5 @@
 import { UserDataState } from "../GlobalState";
-import { GasPriceAvgs, GasStation, Notification, TimeSlotResponse } from "./dtos";
+import { GasPriceAvgs, GasStation, Notification, TimeSlotResponse, UserRequest, UserResponse } from "./dtos";
 
 const fetchGasStations = async function(jwtToken: string, controller: AbortController | null, globalUserDataState: UserDataState): Promise<GasStation[]> {
   const requestOptions2 = {
@@ -44,7 +44,30 @@ const requestOptions2 = {
       return myResult;
     }
 
+const postLogin = async function(userName: string, password1: string, controller: AbortController | null): Promise<UserResponse> {
+  const requestOptions = loginSigninOptions(userName, password1, controller);    
+      const result = await fetch('/appuser/login', requestOptions);
+      return result.json() as Promise<UserResponse>;
+}
+
+const postSignin = async function(userName: string, password1: string, controller: AbortController | null): Promise<UserResponse> {
+      const requestOptions = loginSigninOptions(userName, password1, controller);      
+      const result = await fetch('/appuser/signin', requestOptions);
+      return result.json() as Promise<UserResponse>;
+}
+
+const loginSigninOptions = (userName: string, password1: string, controller: AbortController | null) => {
+      return {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Username: userName, Password: password1 } as UserRequest),
+        signal: controller?.signal
+      };
+};
+
 export { fetchGasStations };
 export { fetchPriceAvgs };
 export { fetchUserNotifications };
 export { fetchTimeSlots };
+export { postLogin };
+export { postSignin };

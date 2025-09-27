@@ -15,8 +15,8 @@ import GlobalState from "../GlobalState";
 import {UserDataState} from "../GlobalState";
 import { useMemo,useEffect,useState,FormEvent,ChangeEvent,SyntheticEvent } from "react";
 import {Box,TextField,Button,Dialog,DialogContent, Autocomplete} from '@mui/material';
-import {UserRequest, UserResponse} from "./LoginModal";
 import styles from './modal.module.scss';
+import { UserRequest, UserResponse } from "../service/dtos";
 
 interface PostCodeLocation {
     Message: string;

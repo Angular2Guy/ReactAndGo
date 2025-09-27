@@ -17,32 +17,8 @@ import { UserDataState } from "../GlobalState";
 import { useState, ChangeEventHandler, FormEvent, BaseSyntheticEvent } from "react";
 import { Box, TextField, Button, Tab, Tabs, Dialog, DialogContent } from '@mui/material';
 import { useNavigate } from "react-router";
-//import { Token } from "@mui/icons-material";
-
-export interface UserRequest {
-  Username: string;
-  Password: string;
-  Latitude?: number;
-  Longitude?: number;
-  SearchRadius?: number;
-  PostCode?: number;
-  TargetDiesel?: string;
-  TargetE10?: string;
-  TargetE5?: string;
-}
-
-export interface UserResponse {
-  Token?: string;
-  Message?: string;
-  PostCode?: number;
-  Uuid?: string;
-  Longitude?: number;
-  Latitude?: number;
-  SearchRadius?: number;
-  TargetDiesel?: number;
-  TargetE5?: number;
-  TargetE10?: number;
-}
+import { UserRequest, UserResponse } from "../service/dtos";
+import { postLogin, postSignin } from "../service/http-client";
 
 interface MsgData {
   jwtToken?: string;
@@ -111,8 +87,7 @@ const LoginModal = () => {
     };
     setResponseMsg('');
     controller = new AbortController();
-    const httpResponse = activeTab === 0 ? await fetch('/appuser/login', requestOptions) : await fetch('/appuser/signin', requestOptions);
-    const userResponse = await httpResponse.json() as UserResponse;
+    const userResponse = activeTab === 0 ? await postLogin(userName, password1, controller) : await postSignin(userName, password1, controller);    
     controller = null;
     //console.log(userResponse);
     if (!userResponse?.Message && !!userResponse?.Token && userResponse.Token?.length > 10 && !!userResponse?.Uuid && userResponse.Uuid?.length > 10) {
