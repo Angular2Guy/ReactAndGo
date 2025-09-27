@@ -80,11 +80,6 @@ const LoginModal = () => {
     if(!!controller) {
       controller.abort();
     }
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ Username: userName, Password: password1 } as UserRequest)
-    };
     setResponseMsg('');
     controller = new AbortController();
     const userResponse = activeTab === 0 ? await postLogin(userName, password1, controller) : await postSignin(userName, password1, controller);    

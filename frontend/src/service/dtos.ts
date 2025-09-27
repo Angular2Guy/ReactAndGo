@@ -139,3 +139,13 @@ export interface UserResponse {
   TargetE5?: number;
   TargetE10?: number;
 }
+
+export interface PostCodeLocation {
+    Message: string;
+  Longitude:  number;
+  Latitude:  number;
+  Label:      string;
+  PostCode:   number
+  SquareKM:   number;
+    Population: number;
+}

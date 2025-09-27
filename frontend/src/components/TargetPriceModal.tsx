@@ -14,7 +14,8 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import GlobalState from "../GlobalState";
 import { Box, TextField, Button, Dialog, DialogContent } from '@mui/material';
 import { useState, useMemo, ChangeEventHandler, FormEvent } from "react";
-import { UserRequest, UserResponse } from "./LoginModal";
+import { UserRequest, UserResponse } from "../service/dtos";
+
 
 const TargetPriceModal = () => {
     let controller: AbortController | null = null;

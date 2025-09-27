@@ -1,5 +1,5 @@
 import { UserDataState } from "../GlobalState";
-import { GasPriceAvgs, GasStation, Notification, TimeSlotResponse, UserRequest, UserResponse } from "./dtos";
+import { GasPriceAvgs, GasStation, Notification, PostCodeLocation, TimeSlotResponse, UserRequest, UserResponse } from "./dtos";
 
 const fetchGasStations = async function(jwtToken: string, controller: AbortController | null, globalUserDataState: UserDataState): Promise<GasStation[]> {
   const requestOptions2 = {
@@ -65,9 +65,34 @@ const loginSigninOptions = (userName: string, password1: string, controller: Abo
       };
 };
 
+const postLocationRadius = async function(jwtToken: string, controller: AbortController | null, requestString: string): Promise<UserResponse> {
+          const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}`},
+            body: requestString,
+            signal: controller?.signal
+        };
+        const response = await fetch('/appuser/locationradius', requestOptions);
+        const userResponse = response.json() as UserResponse;
+        return userResponse;
+}
+
+const fetchLocation = async function(jwtToken: string, controller: AbortController | null, location: string): Promise<PostCodeLocation[]> {
+  const requestOptions = {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
+              signal: controller?.signal
+          };
+          const response = await fetch(`/appuser/location?location=${location}`, requestOptions);
+          const locations = response.json() as Promise<PostCodeLocation[]>;
+          return locations;
+}
+
 export { fetchGasStations };
 export { fetchPriceAvgs };
 export { fetchUserNotifications };
 export { fetchTimeSlots };
 export { postLogin };
 export { postSignin };
+export { postLocationRadius };
+export { fetchLocation };

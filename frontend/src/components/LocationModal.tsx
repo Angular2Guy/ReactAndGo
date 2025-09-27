@@ -16,17 +16,8 @@ import {UserDataState} from "../GlobalState";
 import { useMemo,useEffect,useState,FormEvent,ChangeEvent,SyntheticEvent } from "react";
 import {Box,TextField,Button,Dialog,DialogContent, Autocomplete} from '@mui/material';
 import styles from './modal.module.scss';
-import { UserRequest, UserResponse } from "../service/dtos";
-
-interface PostCodeLocation {
-    Message: string;
-	Longitude:  number;
-	Latitude:  number;
-	Label:      string;
-	PostCode:   number
-	SquareKM:   number;
-    Population: number;
-}
+import { PostCodeLocation, UserRequest, UserResponse } from "../service/dtos";
+import { fetchLocation, postLocationRadius } from "../service/http-client";
 
 const LocationModal = () => {
     let controller: AbortController | null = null;
@@ -53,14 +44,10 @@ const LocationModal = () => {
         if(!!controller) {
             controller.abort();
         }
+        controller = new AbortController();
         //console.log("Submit: ",event);
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}`},
-            body: JSON.stringify({Username: globalUserNameState, Password: '', Latitude: latitude, Longitude: longitude, SearchRadius: searchRadius, PostCode: parseInt(postCode)} as UserRequest)             
-        };
-        const response = await fetch('/appuser/locationradius', requestOptions);
-        const userResponse = response.json() as UserResponse;
+        const requestString = JSON.stringify({Username: globalUserNameState, Password: '', Latitude: latitude, Longitude: longitude, SearchRadius: searchRadius, PostCode: parseInt(postCode)} as UserRequest);
+        const userResponse = await postLocationRadius(globalJwtTokenState, controller, requestString);
         controller = null;
         setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius, PostCode: postCode.toString() || 0,
             TargetDiesel: globalUserDataState.TargetDiesel, TargetE10: globalUserDataState.TargetE10, TargetE5: globalUserDataState.TargetE5} as UserDataState);
@@ -76,14 +63,14 @@ const LocationModal = () => {
         if(!event?.currentTarget?.value) {
             setOptions([]);
             return;
-        }
-        const requestOptions = {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` }            
-        };
-        const response = await fetch(`/appuser/location?location=${event.currentTarget.value}`, requestOptions);
-        const locations = await response.json() as PostCodeLocation[];        
+        }       
+                if(!!controller) {
+            controller.abort();
+        } 
+        controller = new AbortController();
+        const locations = await fetchLocation(globalJwtTokenState, controller, event.currentTarget.value);
         setOptions(!locations ? [] : locations);
+        controller = null;
         //console.log(locations);
     }
 
