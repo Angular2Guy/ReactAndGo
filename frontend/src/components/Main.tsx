@@ -15,11 +15,11 @@ import { useEffect, useState, SyntheticEvent } from 'react';
 import DataTable, { TableDataRow } from './DataTable';
 import GsMap from './GsMap';
 import { useRecoilRefresher_UNSTABLE, useRecoilValue } from 'recoil';
-import GlobalState, { UserDataState } from '../GlobalState';
+import GlobalState from '../GlobalState';
 //import styles from './main.module.scss';
 import Chart from './Chart';
 import { useNavigate } from 'react-router';
-import { GasPriceAvgs, GasStation, Notification, MyDataJson, TimeSlotResponse, GsValue, TimeSlot } from '../service/dtos';
+import { MyDataJson, GsValue, TimeSlot } from '../service/dtos';
 import { fetchGasStations, fetchPriceAvgs, fetchTimeSlots, fetchUserNotifications } from '../service/http-client';
 
 
@@ -91,10 +91,7 @@ export default function Main() {
   }
 
   const fetchLastMatches = async (jwtToken: string) => {
-    const result = await fetchUserNotifications(jwtToken, controller, globalUserUuidState);
-    const myResult = result.map(value => {
-      return JSON.parse(value?.DataJson);
-    });
+    const myResult = await fetchUserNotifications(jwtToken, controller, globalUserUuidState);    
     //console.log(myJson);
     const result2 = myResult?.map(value => {
       //console.log(JSON.parse(value?.DataJson));
@@ -107,12 +104,7 @@ export default function Main() {
       });
     })?.flat() || [];
     setRows(result2);
-    //const result 
-    const requestOptions2 = {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
-      signal: controller?.signal
-    }
+    //const result     
     const myPostcode = formatPostCode(globalUserDataState.PostCode);
     const myJson1 = await fetchTimeSlots(jwtToken, controller, myPostcode);
     const timeSlots = [] as TimeSlot[];

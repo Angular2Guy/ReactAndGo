@@ -84,10 +84,6 @@ export interface TimeSlot {
   diesel: number;
 }
 
-export interface ChartProps {
-  timeSlots: TimeSlot[];
-}
-
 export interface GsValue {
   location: string;
   e5: number;

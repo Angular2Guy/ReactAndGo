@@ -16,7 +16,7 @@ import {UserDataState} from "../GlobalState";
 import { useMemo,useEffect,useState,FormEvent,ChangeEvent,SyntheticEvent } from "react";
 import {Box,TextField,Button,Dialog,DialogContent, Autocomplete} from '@mui/material';
 import styles from './modal.module.scss';
-import { PostCodeLocation, UserRequest, UserResponse } from "../service/dtos";
+import { PostCodeLocation, UserRequest } from "../service/dtos";
 import { fetchLocation, postLocationRadius } from "../service/http-client";
 
 const LocationModal = () => {
@@ -31,7 +31,6 @@ const LocationModal = () => {
     const globalJwtTokenState = useRecoilValue(GlobalState.jwtTokenState);
     const [globalUserDataState, setGlobalUserDataState] = useRecoilState(GlobalState.userDataState);
     const globalUserNameState = useRecoilValue(GlobalState.userNameState);
-    
     
     useEffect(() => {
         if (!open) {

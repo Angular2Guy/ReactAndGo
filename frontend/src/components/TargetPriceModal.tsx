@@ -14,7 +14,8 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import GlobalState from "../GlobalState";
 import { Box, TextField, Button, Dialog, DialogContent } from '@mui/material';
 import { useState, useMemo, ChangeEventHandler, FormEvent } from "react";
-import { UserRequest, UserResponse } from "../service/dtos";
+import { UserRequest } from "../service/dtos";
+import { postTargetPrices } from "../service/http-client";
 
 
 const TargetPriceModal = () => {
@@ -59,20 +60,15 @@ const TargetPriceModal = () => {
 
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
-        if(!!controller) {
+        if (!!controller) {
             controller.abort();
         }
         const myDiesel = updatePrice(targetDiesel);
         const myE5 = updatePrice(targetE5);
         const myE10 = updatePrice(targetE10);
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${globalJwtTokenState}` },
-            body: JSON.stringify({ Username: globalUserNameState, Password: '', TargetDiesel: myDiesel, TargetE10: myE10, TargetE5: myE5 } as UserRequest)
-        };
         controller = new AbortController();
-        const response = await fetch('/appuser/targetprices', requestOptions);
-        const result = await response.json() as UserResponse;
+        const requestString = JSON.stringify({ Username: globalUserNameState, Password: '', TargetDiesel: myDiesel, TargetE10: myE10, TargetE5: myE5 } as UserRequest);
+        const result = await postTargetPrices(globalJwtTokenState, controller, requestString);
         controller = null;
         setGlobalUserDataState({
             Latitude: globalUserDataState.Latitude, Longitude: globalUserDataState.Longitude, SearchRadius: globalUserDataState.SearchRadius, PostCode: globalUserDataState.PostCode,
