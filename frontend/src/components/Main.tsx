@@ -19,9 +19,10 @@ import GlobalState from '../GlobalState';
 //import styles from './main.module.scss';
 import Chart from './Chart';
 import { useNavigate } from 'react-router';
-import { MyDataJson, GsValue, TimeSlot } from '../service/dtos';
 import { fetchGasStations, fetchPriceAvgs, fetchTimeSlots, fetchUserNotifications } from '../service/http-client';
-
+import { TimeSlot } from '../model/time-slot-response';
+import { GsValue } from '../model/gs-point';
+import { MyDataJson } from '../model/my-data-json';
 
 export default function Main() {
   const navigate = useNavigate();

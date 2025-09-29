@@ -17,8 +17,8 @@ import { UserDataState } from "../GlobalState";
 import { useState, ChangeEventHandler, FormEvent, BaseSyntheticEvent } from "react";
 import { Box, TextField, Button, Tab, Tabs, Dialog, DialogContent } from '@mui/material';
 import { useNavigate } from "react-router";
-import { UserResponse } from "../service/dtos";
 import { postLogin, postSignin } from "../service/http-client";
+import { UserResponse } from "../model/user";
 
 interface MsgData {
   jwtToken?: string;

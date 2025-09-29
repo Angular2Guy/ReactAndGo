@@ -1,5 +1,10 @@
 import { UserDataState } from "../GlobalState";
-import { GasPriceAvgs, GasStation, Notification, PostCodeLocation, TimeSlotResponse, UserRequest, UserResponse } from "./dtos";
+import { GasPriceAvgs } from "../model/gas-price-avg";
+import { GasStation } from "../model/gas-station";
+import { PostCodeLocation } from "../model/location";
+import { TimeSlotResponse } from "../model/time-slot-response";
+import { UserRequest, UserResponse } from "../model/user";
+import { Notification } from "../model/notification";
 
 const fetchGasStations = async function (jwtToken: string, controller: AbortController | null, globalUserDataState: UserDataState): Promise<GasStation[]> {
   const requestOptions2 = {

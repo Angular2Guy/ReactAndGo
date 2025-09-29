@@ -23,7 +23,8 @@ import myStyle from './gsmap.module.scss';
 import { Icon, Style } from 'ol/style.js';
 import { useEffect } from 'react';
 import { nanoid } from 'nanoid';
-import { CenterLocation, GsValue } from '../service/dtos';
+import { CenterLocation } from '../model/location';
+import { GsValue } from '../model/gs-point';
 
 interface InputProps {
   center: CenterLocation;

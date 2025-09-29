@@ -16,8 +16,9 @@ import {UserDataState} from "../GlobalState";
 import { useMemo,useEffect,useState,FormEvent,ChangeEvent,SyntheticEvent } from "react";
 import {Box,TextField,Button,Dialog,DialogContent, Autocomplete} from '@mui/material';
 import styles from './modal.module.scss';
-import { PostCodeLocation, UserRequest } from "../service/dtos";
 import { fetchLocation, postLocationRadius } from "../service/http-client";
+import { PostCodeLocation } from "../model/location";
+import { UserRequest } from "../model/user";
 
 const LocationModal = () => {
     let controller: AbortController | null = null;

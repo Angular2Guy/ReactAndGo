@@ -14,8 +14,8 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import GlobalState from "../GlobalState";
 import { Box, TextField, Button, Dialog, DialogContent } from '@mui/material';
 import { useState, useMemo, ChangeEventHandler, FormEvent } from "react";
-import { UserRequest } from "../service/dtos";
 import { postTargetPrices } from "../service/http-client";
+import { UserRequest } from "../model/user";
 
 
 const TargetPriceModal = () => {
