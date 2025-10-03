@@ -12,13 +12,13 @@
 */
 import { useRecoilState,useRecoilValue } from "recoil";
 import GlobalState from "../GlobalState";
-import {UserDataState} from "../GlobalState";
-import { useMemo,useEffect,useState,FormEvent,ChangeEvent,SyntheticEvent } from "react";
+import { type UserDataState} from "../GlobalState";
+import { useMemo,useEffect,useState,type FormEvent, type ChangeEvent,type SyntheticEvent } from "react";
 import {Box,TextField,Button,Dialog,DialogContent, Autocomplete} from '@mui/material';
 import styles from './modal.module.scss';
 import { fetchLocation, postLocationRadius } from "../service/http-client";
-import { PostCodeLocation } from "../model/location";
-import { UserRequest } from "../model/user";
+import { type PostCodeLocation } from "../model/location";
+import { type UserRequest } from "../model/user";
 
 const LocationModal = () => {
     let controller: AbortController | null = null;

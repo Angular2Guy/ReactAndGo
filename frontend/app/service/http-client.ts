@@ -1,10 +1,10 @@
-import { UserDataState } from "../GlobalState";
-import { GasPriceAvgs } from "../model/gas-price-avg";
-import { GasStation } from "../model/gas-station";
-import { PostCodeLocation } from "../model/location";
-import { TimeSlotResponse } from "../model/time-slot-response";
-import { UserRequest, UserResponse } from "../model/user";
-import { Notification } from "../model/notification";
+import { type UserDataState } from "../GlobalState";
+import { type GasPriceAvgs } from "../model/gas-price-avg";
+import { type GasStation } from "../model/gas-station";
+import { type PostCodeLocation } from "../model/location";
+import { type TimeSlotResponse } from "../model/time-slot-response";
+import { type UserRequest, type UserResponse } from "../model/user";
+import { type Notification } from "../model/notification";
 
 const fetchGasStations = async function (jwtToken: string, controller: AbortController | null, globalUserDataState: UserDataState): Promise<GasStation[]> {
   const requestOptions2 = {

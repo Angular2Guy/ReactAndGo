@@ -13,12 +13,12 @@
 import { useSetRecoilState, useRecoilState } from "recoil";
 import styles from './modal.module.scss';
 import GlobalState from "../GlobalState";
-import { UserDataState } from "../GlobalState";
-import { useState, ChangeEventHandler, FormEvent, BaseSyntheticEvent } from "react";
+import { type UserDataState } from "../GlobalState";
+import { useState, type ChangeEventHandler, type FormEvent, type BaseSyntheticEvent } from "react";
 import { Box, TextField, Button, Tab, Tabs, Dialog, DialogContent } from '@mui/material';
 import { useNavigate } from "react-router";
 import { postLogin, postSignin } from "../service/http-client";
-import { UserResponse } from "../model/user";
+import { type UserResponse } from "../model/user";
 
 interface MsgData {
   jwtToken?: string;

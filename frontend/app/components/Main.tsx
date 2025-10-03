@@ -11,8 +11,8 @@
     limitations under the License.
 */
 import { Box, Tab, Tabs } from '@mui/material';
-import { useEffect, useState, SyntheticEvent } from 'react';
-import DataTable, { TableDataRow } from './DataTable';
+import { useEffect, useState, type SyntheticEvent } from 'react';
+import DataTable, { type TableDataRow } from './DataTable';
 import GsMap from './GsMap';
 import { useRecoilRefresher_UNSTABLE, useRecoilValue } from 'recoil';
 import GlobalState from '../GlobalState';
@@ -20,9 +20,9 @@ import GlobalState from '../GlobalState';
 import Chart from './Chart';
 import { useNavigate } from 'react-router';
 import { fetchGasStations, fetchPriceAvgs, fetchTimeSlots, fetchUserNotifications } from '../service/http-client';
-import { TimeSlot } from '../model/time-slot-response';
-import { GsValue } from '../model/gs-point';
-import { MyDataJson } from '../model/my-data-json';
+import { type TimeSlot } from '../model/time-slot-response';
+import { type GsValue } from '../model/gs-point';
+import { type MyDataJson } from '../model/my-data-json';
 
 export default function Main() {
   const navigate = useNavigate();
