@@ -27,7 +27,7 @@ import { type MyDataJson } from '../model/my-data-json';
 export default function Main() {
   const navigate = useNavigate();
   const [controller, setController] = useState(null as AbortController | null);
-  const [timer, setTimer] = useState(undefined as undefined | NodeJS.Timer);
+  const [timer, setTimer] = useState(undefined as undefined | NodeJS.Timeout);
   const [value, setValue] = useState(0);
   const [first, setFirst] = useState(true);
   const [rows, setRows] = useState([] as TableDataRow[]);
