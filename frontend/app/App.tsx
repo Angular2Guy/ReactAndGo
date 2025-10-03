@@ -39,8 +39,7 @@ function App() {
 
   return (
     <div className="App">      
-      <Header/>
-      <LoginModal/>
+      <Header/>      
       <LocationModal/>
       <TargetPriceModal/>
       <Main/>      
