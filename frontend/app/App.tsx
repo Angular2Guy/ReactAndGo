@@ -12,7 +12,6 @@
 */
 import './App.scss';
 import Header from './components/Header';
-import LoginModal from './components/LoginModal';
 import LocationModal from './components/LocationModal';
 import TargetPriceModal from './components/TargetPriceModal';
 import Main from './components/Main';

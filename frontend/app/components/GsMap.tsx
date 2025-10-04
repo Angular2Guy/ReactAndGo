@@ -107,7 +107,7 @@ export default function GsMap(inputProps: InputProps) {
   }
 
   function addClickListener(myOverlays: Overlay[]) {
-    map.on('click', (event: MapBrowserEvent<UIEvent>) => {
+    map.on('click', (event: MapBrowserEvent<any>) => {
       const feature = map.forEachFeatureAtPixel(event.pixel, (feature) => {
         return feature;
       });
