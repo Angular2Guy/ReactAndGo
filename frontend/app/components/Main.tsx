@@ -24,6 +24,7 @@ import { type TimeSlot } from '../model/time-slot-response';
 import { type GsValue } from '../model/gs-point';
 import { type MyDataJson } from '../model/my-data-json';
 
+
 export default function Main() {
   const navigate = useNavigate();
   const [controller, setController] = useState(null as AbortController | null);

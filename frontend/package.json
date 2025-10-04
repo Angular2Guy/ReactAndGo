@@ -59,6 +59,9 @@
       "last 1 safari version"
     ]
   },
+  "resolutions": {
+  "@mui/styled-engine": "npm:@mui/styled-engine-sc"
+},
   "proxy": "http://localhost:3000",
   "devDependencies": {    
     "@react-router/dev": "^7.9.2",
