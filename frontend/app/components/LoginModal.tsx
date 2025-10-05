@@ -15,7 +15,7 @@ import styles from './modal.module.scss';
 import GlobalState from "../GlobalState";
 import { type UserDataState } from "../GlobalState";
 import { useState, type ChangeEventHandler, type FormEvent, type BaseSyntheticEvent } from "react";
-import { Box, TextField, Button, Tab, Tabs, Dialog, DialogContent } from '@mui/material';
+import { TextField, Button, Tab, Tabs, Dialog, DialogContent, styled, Box } from '@mui/material';
 import { useNavigate } from "react-router";
 import { postLogin, postSignin } from "../service/http-client";
 import { type UserResponse } from "../model/user";
