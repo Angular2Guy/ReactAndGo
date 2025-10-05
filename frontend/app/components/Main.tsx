@@ -23,6 +23,7 @@ import { fetchGasStations, fetchPriceAvgs, fetchTimeSlots, fetchUserNotification
 import { type TimeSlot } from '../model/time-slot-response';
 import { type GsValue } from '../model/gs-point';
 import { type MyDataJson } from '../model/my-data-json';
+import { styled } from '@mui/material/styles';
 
 
 export default function Main() {

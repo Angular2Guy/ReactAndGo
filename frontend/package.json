@@ -2,12 +2,12 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
+  "type": "module",
+  "dependencies": {    
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@fontsource/roboto": "^5.0.0",
     "@mui/icons-material": "^7.0.0",
-    "@mui/styled-engine-sc": "^7.3.3",
     "@mui/material": "^7.0.0",
     "@react-router/node": "^7.9.2",
     "@react-router/serve": "^7.9.2",
@@ -23,7 +23,6 @@
     "react-dom": "^19.0.0",
     "react-i18next": "^16.0.0",
     "react-router": "^7.9.0",
-    "styled-components": "^6.1.19",
     "recharts": "^3.0.0",
     "recoil": "^0.7.6",
     "sass": "^1.90.0",
@@ -59,10 +58,7 @@
       "last 1 safari version"
     ]
   },
-  "resolutions": {
-  "@mui/styled-engine": "npm:@mui/styled-engine-sc"
-},
-  "proxy": "http://localhost:3000",
+  "proxy": "http://localhost:3001",
   "devDependencies": {    
     "@react-router/dev": "^7.9.2",
     "@tailwindcss/vite": "^4.1.13",
