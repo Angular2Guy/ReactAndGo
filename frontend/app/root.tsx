@@ -9,6 +9,7 @@ import {
 
 import type { Route } from "./+types/root";
 import "./root.css";
+import { RecoilRoot } from "recoil";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -23,8 +24,9 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout({ children }: { children: React.ReactNode }) {  
   return (
+    <RecoilRoot>
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
@@ -32,12 +34,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
+      <body>        
+          {children}
+          <ScrollRestoration />
+          <Scripts />        
       </body>
     </html>
+    </RecoilRoot>
   );
 }
 
