@@ -13,10 +13,54 @@
 import { useNavigate } from "react-router";
 import Button from '@mui/material/Button';
 import * as React from 'react';
+import GlobalState from "~/GlobalState";
+import styles from './login.module.css';
+import { useAtom } from "jotai";
+
+interface MsgData {
+  jwtToken?: string;
+  newNotificationUrl?: string;
+}
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <>{children}</>
+      )}
+    </div>
+  );
+}
 
 export function Login() {
   const navigate = useNavigate();
-  
+  let controller: AbortController | null = null;  
+  const [globalUserName,setGlobalUserName] = useAtom(GlobalState.userNameState);
+  const [globalUuid,setGlobalUuid] = useAtom(GlobalState.userUuidState);
+  const [globalJwtToken,setGlobalJwtToken] = useAtom(GlobalState.jwtTokenState);
+  const [globalUserDataState,setGlobalUserDataState] = useAtom(GlobalState.userDataState);
+  const [globalWebWorkerRefState, setGlobalWebWorkerRefState] = useAtom(GlobalState.webWorkerRefState);
+  const [globalLoginModal, setGlobalLoginModal] = useAtom(GlobalState.loginModalState);
+  const [userName, setUserName] = React.useState('');
+  const [password1, setPassword1] = React.useState('');
+  const [password2, setPassword2] = React.useState('');
+  const [responseMsg, setResponseMsg] = React.useState('');
+  const [activeTab, setActiveTab] = React.useState(0);
+
   const navToApp = () => {
     navigate("/app/app");
   }

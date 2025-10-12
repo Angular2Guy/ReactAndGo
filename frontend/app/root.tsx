@@ -21,7 +21,7 @@ import {
 
 import type { Route } from "./+types/root";
 import "./root.css";
-import { RecoilRoot } from "recoil";
+import { Provider } from "jotai";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -37,8 +37,8 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {  
-  return (
-    <RecoilRoot>
+  return (    
+    <Provider>
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
@@ -52,7 +52,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <Scripts />        
       </body>
     </html>
-    </RecoilRoot>
+    </Provider>
   );
 }
 
