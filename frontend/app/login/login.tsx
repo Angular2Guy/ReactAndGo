@@ -250,6 +250,7 @@ export function Login() {
           </div>
         </Box>
       </TabPanel>
+      <Button onClick={navToApp}>Test</Button>
     </DialogContent>
   </Dialog>);
 }

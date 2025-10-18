@@ -10,17 +10,24 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import Main from "~/main/main";
-import type { Route } from "./+types/app";
-import { Welcome } from "~/welcome/welcome";
-
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
-  ];
+.myText {
+    color: #000000;
 }
 
-export default function Home() {
-  return <Main />;
+.headerTabs {
+  display: flex;
+  justify-content: space-around;
+}
+
+.headerTab {
+  width: fit-content;
+  line-height: 2rem;  
+}
+
+.linkText {
+  color: rgb(25, 118, 210);
+  --Link-underlineColor: rgba(25, 118, 210, 0.4);
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 400;
+  text-decoration-color: var(--Link-underlineColor);
 }
