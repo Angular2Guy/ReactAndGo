@@ -10,17 +10,15 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import type { Route } from "./+types/app";
-import { Welcome } from "~/welcome/welcome";
-import MainContainer from "~/main-container/main-container";
-
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
-  ];
+.headerBase {
+    background-color: #0384fc;
+    color: #ffffff;
+    font-size: 24px;
+    margin: auto;
+    padding: 10px 0 10px 0;
 }
 
-export default function Home() {
-  return <MainContainer />;
+.headerButton {
+    float: right;
+    color: #ffffff !important;
 }
