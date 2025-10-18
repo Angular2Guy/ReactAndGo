@@ -13,10 +13,10 @@
 import * as React from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
 import { useEffect, useState, type SyntheticEvent } from 'react';
-//import DataTable, { type TableDataRow } from './DataTable';
+import DataTable, { type TableDataRow } from '../data-table/data-table';
 //import GsMap from './GsMap';
 import GlobalState from '../GlobalState';
-//import styles from './main.module.scss';
+//import styles from './main.module.css';
 //import Chart from './Chart';
 import { useNavigate } from 'react-router';
 import { fetchGasStations, fetchPriceAvgs, fetchTimeSlots, fetchUserNotifications } from '../service/http-client';
@@ -24,21 +24,6 @@ import { type TimeSlot } from '../model/time-slot-response';
 import { type GsValue } from '../model/gs-point';
 import { type MyDataJson } from '../model/my-data-json';
 import { useAtom } from "jotai";
-
-
-//TODO use interface of DataTable component after migration
-interface TableDataRow {
-    location: string;
-    e5: number;
-    e10: number;
-    diesel: number;
-    date: Date;
-    longitude: number;
-    latitude: number;
-    e5Class: string;
-    e10Class: string;
-    dieselClass: string;
-}
 
 export default function Main() {
   const navigate = useNavigate();
@@ -150,10 +135,10 @@ export default function Main() {
       <Tab label="Current Prices" />
       <Tab label="Last Price matches" />
       <Tab label="Current Prices Map" />
-    </Tabs>
-    {/*
+    </Tabs>    
     {value === 0 &&
        <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>}
+    {/*
     {value === 1 &&
       <Chart timeSlots={avgTimeSlots}></Chart>}
     {value === 1 &&
