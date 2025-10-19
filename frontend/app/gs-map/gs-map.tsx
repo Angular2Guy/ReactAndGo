@@ -10,6 +10,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+import * as React from 'react';
 import Map from 'ol/Map';
 import OSM from 'ol/source/OSM';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
