@@ -14,7 +14,7 @@ import * as React from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
 import { useEffect, useState, type SyntheticEvent } from 'react';
 import DataTable, { type TableDataRow } from '../data-table/data-table';
-//import GsMap from './GsMap';
+import GsMap from '../gs-map/gs-map';
 import GlobalState from '../GlobalState';
 //import styles from './main.module.css';
 //import Chart from './Chart';
@@ -143,8 +143,8 @@ export default function Main() {
       <Chart timeSlots={avgTimeSlots}></Chart>}
     {value === 1 &&
       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>}
-    {value === 2 &&
-      <GsMap gsValues={gsValues} center={globalUserDataState}></GsMap>}
       */}
+    {value === 2 &&
+      <GsMap gsValues={gsValues} center={globalUserDataState}></GsMap>}      
   </Box>);
 }
