@@ -17,7 +17,7 @@ import DataTable, { type TableDataRow } from '../data-table/data-table';
 import GsMap from '../gs-map/gs-map';
 import GlobalState from '../GlobalState';
 //import styles from './main.module.css';
-//import Chart from './Chart';
+import Chart from '../chart/chart';
 import { useNavigate } from 'react-router';
 import { fetchGasStations, fetchPriceAvgs, fetchTimeSlots, fetchUserNotifications } from '../service/http-client';
 import { type TimeSlot } from '../model/time-slot-response';
@@ -137,13 +137,11 @@ export default function Main() {
       <Tab label="Current Prices Map" />
     </Tabs>    
     {value === 0 &&
-       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>}
-    {/*
+       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>}    
     {value === 1 &&
-      <Chart timeSlots={avgTimeSlots}></Chart>}
+      <Chart timeSlots={avgTimeSlots}></Chart>}      
     {value === 1 &&
-      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>}
-      */}
+      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>}      
     {value === 2 &&
       <GsMap gsValues={gsValues} center={globalUserDataState}></GsMap>}      
   </Box>);

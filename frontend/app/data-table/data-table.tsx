@@ -10,6 +10,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+import * as React from 'react';
 import {TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody} from '@mui/material';
 import { nanoid } from 'nanoid';
 import { useMemo } from 'react';
