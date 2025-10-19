@@ -13,13 +13,13 @@
 import * as React from 'react';
 import styles from './main-container.module.css';
 import Header from '../header/header';
-//import LocationModal from './components/LocationModal';
-//import TargetPriceModal from './components/TargetPriceModal';
 import Main from '../main/main';
 import { useAtom } from "jotai";
 import GlobalState from '../GlobalState';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import LocationModal from '../location-modal/location-modal';
+import TargetPriceModal from '../target-price-modal/target-price-modal';
 
 export interface TodoItem1 {
   name: string;
@@ -40,8 +40,8 @@ function MainContainer() {
   return (
     <div className="App">      
       <Header/>      
-      {/* <LocationModal/> */}
-      {/* <TargetPriceModal/> */}
+      <LocationModal/>
+      <TargetPriceModal/>
       <Main/>      
     </div>
   );
