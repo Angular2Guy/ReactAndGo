@@ -5,7 +5,11 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "prebuild": "rimraf ./build && mkdirp ./build",
+    "postbuild": "npm run deploy",
+    "predeploy": "rimraf ../backend/public/**",
+    "deploy": "cpy './build/client/**' ../backend/public/"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -32,6 +36,9 @@
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "tailwindcss": "^4.1.13",
+    "cpy-cli": "^5.0.0",
+    "mkdirp": "^3.0.0",
+    "rimraf": "^5.0.0",
     "typescript": "^5.9.2",
     "vite": "^7.1.7",
     "vite-tsconfig-paths": "^5.1.4"
