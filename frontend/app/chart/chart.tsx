@@ -21,6 +21,7 @@ import GlobalState, { FuelType } from '../GlobalState';
 import { type TimeSlot } from '../model/time-slot-response';
 import { type GsPoint } from '../model/gs-point';
 import { useAtom } from "jotai";
+import styles from "./chart.module.css";
 
 export interface ChartProps {
   timeSlots: TimeSlot[];
@@ -76,6 +77,7 @@ export default function Chart(props: ChartProps) {
         <Line name={'AvgPrice: '+(Math.round(avgValue*1000)/1000)} type="monotone" dataKey="price" stroke={lineColor} />
       </LineChart>
     </ResponsiveContainer>
+    <div className={styles['center-content']}>
     <FormControl>
       <RadioGroup
         row
@@ -89,6 +91,7 @@ export default function Chart(props: ChartProps) {
         <FormControlLabel value={FuelType.Diesel} control={<Radio />} label="Diesel" />
       </RadioGroup>
     </FormControl>
+    </div>
   </div>
   );
 }
