@@ -103,7 +103,7 @@ export function Login() {
       setUserName('');
       setPassword1('');
       setPassword2('');
-      navigate('/app');
+      navigate('app/app');
     } else if (!!userResponse?.Message) {
       setResponseMsg(userResponse.Message);
     }
