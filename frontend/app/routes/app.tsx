@@ -11,7 +11,6 @@
     limitations under the License.
 */
 import type { Route } from "./+types/app";
-import { Welcome } from "~/welcome/welcome";
 import MainContainer from "~/main-container/main-container";
 
 export function meta({}: Route.MetaArgs) {
@@ -21,6 +20,6 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Home() {
+export default function App() {
   return <MainContainer />;
 }

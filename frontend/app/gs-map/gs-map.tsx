@@ -93,7 +93,7 @@ export default function GsMap(inputProps: InputProps) {
         anchor: [20, 20],
         anchorXUnits: 'pixels',
         anchorYUnits: 'pixels',
-        src: '/public/assets/map-pin.png',
+        src: '/public/map-pin.png',
       }),
     });
     iconFeature.setStyle(iconStyle);
