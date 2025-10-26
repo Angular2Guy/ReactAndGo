@@ -17,6 +17,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  base: "/public/",
    server: {
     proxy: {
       // Proxy all requests starting with /api to http://localhost:3000
