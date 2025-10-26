@@ -18,6 +18,8 @@ import { type TimeSlotResponse } from "../model/time-slot-response";
 import { type UserRequest, type UserResponse } from "../model/user";
 import { type Notification } from "../model/notification";
 
+const apiPrefix = '/api';
+
 const fetchGasStations = async function (jwtToken: string, controller: AbortController | null, globalUserDataState: UserDataState): Promise<GasStation[]> {
   const requestOptions2 = {
     method: 'POST',
@@ -25,7 +27,7 @@ const fetchGasStations = async function (jwtToken: string, controller: AbortCont
     body: JSON.stringify({ Longitude: globalUserDataState.Longitude, Latitude: globalUserDataState.Latitude, Radius: globalUserDataState.SearchRadius }),
     signal: controller?.signal
   }
-  const result = await fetch('/api/gasstation/search/location', requestOptions2);
+  const result = await fetch(`${apiPrefix}/gasstation/search/location`, requestOptions2);
   const myResult = result.json() as Promise<GasStation[]>;
   return myResult;
 };
@@ -36,7 +38,7 @@ const fetchPriceAvgs = async function (jwtToken: string, controller: AbortContro
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
     signal: controller?.signal
   }
-  const result = await fetch(`/api/gasprice/avgs/${myPostcode}`, requestOptions3);
+  const result = await fetch(`${apiPrefix}/gasprice/avgs/${myPostcode}`, requestOptions3);
   return result.json() as Promise<GasPriceAvgs>;
 }
 
@@ -46,7 +48,7 @@ const fetchUserNotifications = async function (jwtToken: string, controller: Abo
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
     signal: controller?.signal
   }
-  const result = await fetch(`/api/usernotification/current/${globalUserUuidState}`, requestOptions1);
+  const result = await fetch(`${apiPrefix}/usernotification/current/${globalUserUuidState}`, requestOptions1);
   return result.json() as Promise<Notification[]>;
 }
 
@@ -56,20 +58,20 @@ const fetchTimeSlots = async function (jwtToken: string, controller: AbortContro
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
     signal: controller?.signal
   }
-  const result = await fetch(`/api/postcode/countytimeslots/${myPostcode}`, requestOptions2);
+  const result = await fetch(`${apiPrefix}/postcode/countytimeslots/${myPostcode}`, requestOptions2);
   const myResult = result.json() as Promise<TimeSlotResponse[]>;
   return myResult;
 }
 
 const postLogin = async function (userName: string, password1: string, controller: AbortController | null): Promise<UserResponse> {
   const requestOptions = loginSigninOptions(userName, password1, controller);
-  const result = await fetch('/api/appuser/login', requestOptions);
+  const result = await fetch(`${apiPrefix}/appuser/login`, requestOptions);
   return result.json() as Promise<UserResponse>;
 }
 
 const postSignin = async function (userName: string, password1: string, controller: AbortController | null): Promise<UserResponse> {
   const requestOptions = loginSigninOptions(userName, password1, controller);
-  const result = await fetch('/api/appuser/signin', requestOptions);
+  const result = await fetch(`${apiPrefix}/appuser/signin`, requestOptions);
   return result.json() as Promise<UserResponse>;
 }
 
@@ -89,7 +91,7 @@ const postLocationRadius = async function (jwtToken: string, controller: AbortCo
     body: requestString,
     signal: controller?.signal
   };
-  const response = await fetch('/api/appuser/locationradius', requestOptions);
+  const response = await fetch(`${apiPrefix}/appuser/locationradius`, requestOptions);
   const userResponse = response.json() as UserResponse;
   return userResponse;
 }
@@ -100,7 +102,7 @@ const fetchLocation = async function (jwtToken: string, controller: AbortControl
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
     signal: controller?.signal
   };
-  const response = await fetch(`/api/appuser/location?location=${location}`, requestOptions);
+  const response = await fetch(`${apiPrefix}/appuser/location?location=${location}`, requestOptions);
   const locations = response.json() as Promise<PostCodeLocation[]>;
   return locations;
 }
@@ -112,7 +114,7 @@ const postTargetPrices = async function (jwtToken: string, controller: AbortCont
     body: requestString,
     signal: controller?.signal
   };
-  const response = await fetch('/api/appuser/targetprices', requestOptions);
+  const response = await fetch(`${apiPrefix}/appuser/targetprices`, requestOptions);
   const result = response.json() as Promise<UserResponse>;
   return result;
 }

@@ -38,7 +38,7 @@ const refreshToken = (myToken: string) => {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}` },
       };
-      fetch('/appuser/refreshtoken', requestOptions).then(response => response.json() as UserResponse).then(result => {
+      fetch('/api/appuser/refreshtoken', requestOptions).then(response => response.json() as UserResponse).then(result => {
         if ((!result.Message && !!result.Token && result.Token.length > 10)) {
           //console.log('Token refreshed.');
           jwtToken = result.Token;

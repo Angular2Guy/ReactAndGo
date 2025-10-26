@@ -64,10 +64,6 @@ export function Login() {
   const [password2, setPassword2] = useState('');
   const [responseMsg, setResponseMsg] = useState('');
   const [activeTab, setActiveTab] = useState(0);
-
-  const navToApp = () => {
-    navigate("/app/app");
-  }
   
   const handleChangeUsername: ChangeEventHandler<HTMLInputElement> = (event) => {
     setUserName(event.currentTarget.value as string);
@@ -249,8 +245,7 @@ export function Login() {
             )}
           </div>
         </Box>
-      </TabPanel>
-      <Button onClick={navToApp}>Test</Button>
+      </TabPanel>      
     </DialogContent>
   </Dialog>);
 }
