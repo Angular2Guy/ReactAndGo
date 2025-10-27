@@ -68,13 +68,16 @@ export default function GsMap(inputProps: InputProps) {
         element: element,
         offset: [-5, 0],
         positioning: 'bottom-center',
-        className: 'ol-tooltip-measure ol-tooltip .ol-tooltip-static'
+        className: 'ol-tooltip-measure ol-tooltip ol-tooltip-static'
       });
       overlay.setPosition(fromLonLat([gsValue.longitude, gsValue.latitude]));
-      const myStyle = element?.style;
-      if (!!myStyle) {
-        myStyle.display = 'block';
-      }
+      const myStyle1 = element?.style;
+      if (!!myStyle1) {
+        myStyle1.display = 'block';
+      }           
+      if(element?.classList) {
+        element.classList.add(myStyle['gsTooltip']);
+      }       
       //map.addOverlay(overlay);                 
       addPins(gsValue, element, index);
       return overlay;
