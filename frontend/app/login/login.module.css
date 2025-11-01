@@ -17,3 +17,7 @@
 .toright {
     float: right;
 }
+
+.content {
+    width: 450px;
+}

@@ -11,7 +11,7 @@
     limitations under the License.
 */
 import { useNavigate } from "react-router";
-import { Dialog, DialogContent, Button, Tabs, Tab, Box, TextField } from '@mui/material';
+import { Dialog, DialogContent, Button, Tabs, Tab, Box, TextField, type SelectChangeEvent, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import * as React from 'react';
 import {useState} from 'react';
 import GlobalState, { type UserDataState } from "~/GlobalState";
@@ -152,8 +152,13 @@ export function Login() {
     };
   }
 
+  const [language, setLanguage] = React.useState('en');
+  const handleLanguageChange = (event: SelectChangeEvent) => {
+    setLanguage(event.target.value);
+  };
+
    return (<Dialog open={globalLoginModal} onClose={handleClose} className="backDrop">
-    <DialogContent>
+    <DialogContent className={styles.content}>
       <Tabs value={activeTab} onChange={handleTabChange} aria-label="basic tabs example">
         <Tab label={t('login.login')} {...a11yProps(0)} />
         <Tab label={t('login.signin')} {...a11yProps(1)} />
@@ -187,10 +192,25 @@ export function Login() {
             fullWidth
             variant="standard"
           />
-          <div>
+          <div className="flex justify-between items-center mt-4">
+            <div>
             <Button type="submit">{t('common.ok')}</Button>
             <Button onClick={handleCancel}>{t('common.cancel')}</Button>
-          </div>
+            </div>
+            <FormControl sx={{ minWidth: 120 }} size="small">
+      <InputLabel id="demo-select-small-label">{t('common.language')}</InputLabel>
+      <Select
+        labelId="demo-select-small-label"
+        id="demo-select-small"
+        value={language}
+        label={t('common.language')}
+        onChange={handleLanguageChange}
+      >
+        <MenuItem value={'en'}>{t('common.english')}</MenuItem>
+        <MenuItem value={'de'}>{t('common.german')}</MenuItem>
+      </Select>
+    </FormControl>
+          </div>          
           <div className={styles.responseMsg}>
             {[responseMsg].filter(value => !!value).map((value, index) =>
               <span key={index}>{t('common.message')}: {value}</span>
@@ -238,9 +258,25 @@ export function Login() {
             fullWidth
             variant="standard"
           />
-          <div>
+          <div className="flex justify-between items-center mt-4">
+            <div>
             <Button type="submit">{t('common.ok')}</Button>
             <Button onClick={handleCancel}>{t('common.cancel')}</Button>
+            </div>
+            <FormControl sx={{ minWidth: 120 }} size="small">
+      <InputLabel id="demo-select-small-label">{t('common.language')}</InputLabel>
+      <Select
+        labelId="demo-select-small-label"
+        id="demo-select-small"
+        value={language}
+        label={t('common.language')}
+        onChange={handleLanguageChange}
+      >
+        <MenuItem value={'en'}>{t('common.english')}</MenuItem>
+        <MenuItem value={'de'}>{t('common.german')}</MenuItem>
+      </Select>
+    </FormControl>
+
           </div>
           <div className={styles.responseMsg}>
             {[responseMsg].filter(value => !!value).map((value, index) =>
