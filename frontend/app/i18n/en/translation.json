@@ -1,6 +1,13 @@
 {
     "common": {
         "ok": "OK",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "message": "Message"
+    },
+    "login": {     
+        "username": "Username",
+        "password": "Password",
+        "login": "Login",
+        "signin": "Sign In"
     }
 }

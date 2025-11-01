@@ -66,7 +66,7 @@ export function Login() {
   const [password1, setPassword1] = useState('');
   const [password2, setPassword2] = useState('');
   const [responseMsg, setResponseMsg] = useState('');
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(0);  
   
   const handleChangeUsername: ChangeEventHandler<HTMLInputElement> = (event) => {
     setUserName(event.currentTarget.value as string);
@@ -155,8 +155,8 @@ export function Login() {
    return (<Dialog open={globalLoginModal} onClose={handleClose} className="backDrop">
     <DialogContent>
       <Tabs value={activeTab} onChange={handleTabChange} aria-label="basic tabs example">
-        <Tab label="Login" {...a11yProps(0)} />
-        <Tab label="Singin" {...a11yProps(1)} />
+        <Tab label={t('login.login')} {...a11yProps(0)} />
+        <Tab label={t('login.signin')} {...a11yProps(1)} />
       </Tabs>
       <TabPanel value={activeTab} index={0}>
         <Box
@@ -171,7 +171,7 @@ export function Login() {
             value={userName}
             onChange={handleChangeUsername}
             id="userName"
-            label="user name"
+            label={t('login.username')}
             type="string"
             fullWidth
             variant="standard"
@@ -182,7 +182,7 @@ export function Login() {
             value={password1}
             onChange={handleChangePassword1}
             id="password1"
-            label="password"
+            label={t('login.password')}
             type="password"
             fullWidth
             variant="standard"
@@ -193,7 +193,7 @@ export function Login() {
           </div>
           <div className={styles.responseMsg}>
             {[responseMsg].filter(value => !!value).map((value, index) =>
-              <span key={index}>Message: {value}</span>
+              <span key={index}>{t('common.message')}: {value}</span>
             )}
           </div>
         </Box>
@@ -211,7 +211,7 @@ export function Login() {
             value={userName}
             onChange={handleChangeUsername}
             id="userName"
-            label="user name"
+            label={t('login.username')}
             type="string"
             fullWidth
             variant="standard"
@@ -222,7 +222,7 @@ export function Login() {
             value={password1}
             onChange={handleChangePassword1}
             id="password1"
-            label="password"
+            label={t('login.password')}
             type="password"
             fullWidth
             variant="standard"
@@ -233,18 +233,18 @@ export function Login() {
             value={password2}
             onChange={handleChangePassword2}
             id="password2"
-            label="password"
+            label={t('login.password')}
             type="password"
             fullWidth
             variant="standard"
           />
           <div>
-            <Button type="submit">Ok</Button>
-            <Button onClick={handleCancel}>Cancel</Button>
+            <Button type="submit">{t('common.ok')}</Button>
+            <Button onClick={handleCancel}>{t('common.cancel')}</Button>
           </div>
           <div className={styles.responseMsg}>
             {[responseMsg].filter(value => !!value).map((value, index) =>
-              <span key={index}>Message: {value}</span>
+              <span key={index}>{t('common.message')}: {value}</span>
             )}
           </div>
         </Box>
