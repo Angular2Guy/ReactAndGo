@@ -53,7 +53,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export function Login() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   let controller: AbortController | null = null;  
   const [globalUserName,setGlobalUserName] = useAtom(GlobalState.userNameState);
@@ -67,6 +67,7 @@ export function Login() {
   const [password2, setPassword2] = useState('');
   const [responseMsg, setResponseMsg] = useState('');
   const [activeTab, setActiveTab] = useState(0);  
+  const [language, setLanguage] = React.useState('en');
   
   const handleChangeUsername: ChangeEventHandler<HTMLInputElement> = (event) => {
     setUserName(event.currentTarget.value as string);
@@ -152,9 +153,9 @@ export function Login() {
     };
   }
 
-  const [language, setLanguage] = React.useState('en');
   const handleLanguageChange = (event: SelectChangeEvent) => {
     setLanguage(event.target.value);
+    i18n.changeLanguage(event.target.value).then();
   };
 
    return (<Dialog open={globalLoginModal} onClose={handleClose} className="backDrop">
