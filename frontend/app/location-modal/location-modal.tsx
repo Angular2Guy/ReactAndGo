@@ -21,8 +21,10 @@ import { type PostCodeLocation } from "../model/location";
 import { type UserRequest } from "../model/user";
 import { useAtom } from "jotai";
 import { useTranslation } from 'node_modules/react-i18next';
+import { useNavigate } from 'react-router';
 
 const LocationModal = () => {
+    const navigate = useNavigate();
     let controller: AbortController | null = null;
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
@@ -50,7 +52,7 @@ const LocationModal = () => {
         controller = new AbortController();
         //console.log("Submit: ",event);
         const requestString = JSON.stringify({Username: globalUserNameState, Password: '', Latitude: latitude, Longitude: longitude, SearchRadius: searchRadius, PostCode: parseInt(postCode)} as UserRequest);
-        const userResponse = await postLocationRadius(globalJwtTokenState, controller, requestString);
+        const userResponse = await postLocationRadius(navigate, globalJwtTokenState, controller, requestString);
         controller = null;
         setGlobalUserDataState({Latitude: userResponse.Latitude, Longitude: userResponse.Longitude, SearchRadius: userResponse.SearchRadius, PostCode: postCode.toString() || 0,
             TargetDiesel: globalUserDataState.TargetDiesel, TargetE10: globalUserDataState.TargetE10, TargetE5: globalUserDataState.TargetE5} as UserDataState);
@@ -71,7 +73,7 @@ const LocationModal = () => {
             controller.abort();
         } 
         controller = new AbortController();
-        const locations = await fetchLocation(globalJwtTokenState, controller, event.currentTarget.value);
+        const locations = await fetchLocation(navigate, globalJwtTokenState, controller, event.currentTarget.value);
         setOptions(!locations ? [] : locations);
         controller = null;
         //console.log(locations);
