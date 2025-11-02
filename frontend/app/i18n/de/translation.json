@@ -12,5 +12,32 @@
         "password": "Passwort",
         "login": "Login",
         "signin": "Registrieren"
+    },
+    "header": {
+        "title": "Günstiges Benzin",
+        "location": "Standort",
+        "targetPrice": "Zielpreis"
+    },
+    "location": {
+        "setLocation": "Standort festlegen",
+        "searchRadius": "Suchradius (km)",
+        "postalCode": "Postleitzahl",
+        "getLocation": "Standort abrufen"
+    },
+    "targetPrice": {
+        "setTargetPrice": "Zielpreise festlegen",
+        "diesel": "Zielpreis Diesel",
+        "e5": "Zielpreis E5",
+        "e10": "Zielpreis E10"
+    },
+    "table": {
+     "currentPrices": "Aktuelle Preise", 
+     "lastPriceMatches": "Letzte Preistreffer",
+     "currentPriceMap": "Aktuelle Preiskarte",
+     "diesel": "Diesel",
+     "e5": "E5",
+     "e10": "E10",
+     "location": "Standort",
+     "time": "Zeit"
     }
 }

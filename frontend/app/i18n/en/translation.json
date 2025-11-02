@@ -29,6 +29,15 @@
         "diesel": "Target Price Diesel",
         "e5": "Target Price E5",
         "e10": "Target Price E10"
+    },
+    "table": {
+     "currentPrices": "Current Prices", 
+     "lastPriceMatches": "Last Price Matches",
+     "currentPriceMap": "Current Price Map",
+     "diesel": "Diesel",
+     "e5": "E5",
+     "e10": "E10",
+     "location": "Location",
+     "time": "Time"
     }
-
 }

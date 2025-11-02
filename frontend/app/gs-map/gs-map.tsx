@@ -26,6 +26,7 @@ import { useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { type CenterLocation } from '../model/location';
 import { type GsValue } from '../model/gs-point';
+import { useTranslation } from 'node_modules/react-i18next';
 
 interface InputProps {
   center: CenterLocation;
@@ -33,6 +34,7 @@ interface InputProps {
 }
 
 export default function GsMap(inputProps: InputProps) {
+  const { i18n } = useTranslation();
   let map: Map;    
   let currentOverlay: Overlay | null = null;
   useEffect(() => {
@@ -63,7 +65,7 @@ export default function GsMap(inputProps: InputProps) {
     return inputProps.gsValues.map((gsValue, index) => {
       const element = document.createElement('div');
       element.id = nanoid();
-      element.innerHTML = `${gsValue.location}<br/>E5: ${gsValue.e5}<br/>E10: ${gsValue.e10}<br/>Diesel: ${gsValue.diesel}`;
+      element.innerHTML = `${gsValue.location}<br/>${i18n.t('table.e5')}: ${gsValue.e5}<br/>${i18n.t('table.e10')}: ${gsValue.e10}<br/>${i18n.t('table.diesel')}: ${gsValue.diesel}`;
       const overlay = new Overlay({
         element: element,
         offset: [-5, 0],

@@ -24,9 +24,11 @@ import { type TimeSlot } from '../model/time-slot-response';
 import { type GsValue } from '../model/gs-point';
 import { type MyDataJson } from '../model/my-data-json';
 import { useAtom } from "jotai";
+import { useTranslation } from 'node_modules/react-i18next';
 
 export default function Main() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [controller, setController] = useState(null as AbortController | null);
   const [timer, setTimer] = useState(undefined as undefined | NodeJS.Timeout);
   const [value, setValue] = useState(0);
@@ -132,16 +134,16 @@ export default function Main() {
 
   return (<Box sx={{ width: '100%' }}>
     <Tabs value={value} onChange={handleTabChange} centered={true}>
-      <Tab label="Current Prices" />
-      <Tab label="Last Price matches" />
-      <Tab label="Current Prices Map" />
+      <Tab label={t('table.currentPrices')} />
+      <Tab label={t('table.lastPriceMatches')} />
+      <Tab label={t('table.currentPriceMap')} />
     </Tabs>    
     {value === 0 &&
-       <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>}    
+       <DataTable diesel={t('table.diesel')} e10={t('table.e10')} e5={t('table.e5')} location={t('table.location')} showAverages={true} time={t('table.time')} rows={rows}></DataTable>}    
     {value === 1 &&
       <Chart timeSlots={avgTimeSlots}></Chart>}      
     {value === 1 &&
-      <DataTable diesel='Diesel' e10='E10' e5='E5' location='Location' showAverages={true} time='Time' rows={rows}></DataTable>}      
+      <DataTable diesel={t('table.diesel')} e10={t('table.e10')} e5={t('table.e5')} location={t('table.location')} showAverages={true} time={t('table.time')} rows={rows}></DataTable>}      
     {value === 2 &&
       <GsMap gsValues={gsValues} center={globalUserDataState}></GsMap>}      
   </Box>);
