@@ -18,11 +18,13 @@ import { postTargetPrices } from "../service/http-client";
 import { type UserRequest } from "../model/user";
 import { useAtom } from 'jotai';
 import { useTranslation } from 'node_modules/react-i18next';
+import { useNavigate } from 'react-router';
 
 
 const TargetPriceModal = () => {
     let controller: AbortController | null = null;
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [targetDiesel, setTargetDiesel] = useState('0');
     const [targetE5, setTargetE5] = useState('0');
     const [targetE10, setTargetE10] = useState('0');
@@ -71,7 +73,7 @@ const TargetPriceModal = () => {
         const myE10 = updatePrice(targetE10);
         controller = new AbortController();
         const requestString = JSON.stringify({ Username: globalUserNameState, Password: '', TargetDiesel: myDiesel, TargetE10: myE10, TargetE5: myE5 } as UserRequest);
-        const result = await postTargetPrices(globalJwtTokenState, controller, requestString);
+        const result = await postTargetPrices(navigate, globalJwtTokenState, controller, requestString);
         controller = null;
         setGlobalUserDataState({
             Latitude: globalUserDataState.Latitude, Longitude: globalUserDataState.Longitude, SearchRadius: globalUserDataState.SearchRadius, PostCode: globalUserDataState.PostCode,

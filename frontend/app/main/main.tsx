@@ -71,7 +71,7 @@ export default function Main() {
   }
 
   const fetchSearchLocation = async (jwtToken: string) => {
-    const result = await fetchGasStations(jwtToken, controller, globalUserDataState);
+    const result = await fetchGasStations(navigate, jwtToken, controller, globalUserDataState);
     const myResult = result.filter(value => value?.GasPrices?.length > 0).map(value => {
       return value;
     }).map(value => ({
@@ -79,7 +79,7 @@ export default function Main() {
       e10: value.GasPrices[0].E10, diesel: value.GasPrices[0].Diesel, date: new Date(Date.parse(value.GasPrices[0].Date)), longitude: value.Longitude, latitude: value.Latitude
     } as TableDataRow));
     const myPostcode = formatPostCode(globalUserDataState.PostCode);
-    const myJson = await fetchPriceAvgs(jwtToken, controller, myPostcode);
+    const myJson = await fetchPriceAvgs(navigate, jwtToken, controller, myPostcode);
     const rowCounty = ({
       location: myJson.County, e5: Math.round(myJson.CountyAvgE5), e10: Math.round(myJson.CountyAvgE10), diesel: Math.round(myJson.CountyAvgDiesel), date: new Date(), longitude: 0, latitude: 0
     } as TableDataRow);
@@ -93,7 +93,7 @@ export default function Main() {
   }
 
   const fetchLastMatches = async (jwtToken: string) => {
-    const myResult = await fetchUserNotifications(jwtToken, controller, globalUserUuidState);    
+    const myResult = await fetchUserNotifications(navigate, jwtToken, controller, globalUserUuidState);
     //console.log(myJson);
     const result2 = myResult?.map(value => {
       //console.log(JSON.parse(value?.DataJson));
@@ -108,7 +108,7 @@ export default function Main() {
     setRows(result2);
     //const result     
     const myPostcode = formatPostCode(globalUserDataState.PostCode);
-    const myJson1 = await fetchTimeSlots(jwtToken, controller, myPostcode);
+    const myJson1 = await fetchTimeSlots(navigate, jwtToken, controller, myPostcode);
     const timeSlots = [] as TimeSlot[];
     timeSlots.push(...myJson1.filter(myValue => myValue.AvgDiesel > 10).map(myValue => {
       const dieselTimeSlot = { x: '00.00', diesel: 0, e10: 0, e5: 0 } as TimeSlot;
