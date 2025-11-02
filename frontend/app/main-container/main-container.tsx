@@ -31,6 +31,7 @@ function MainContainer() {
   const [globalUserUuidState, setGlobalUserUuidState] = useAtom(GlobalState.userUuidState);
   const navigate = useNavigate();
   
+  
   useEffect(() => {
     if((!globalJwtTokenState || !globalUserUuidState || globalJwtTokenState.length < 10 || globalUserUuidState.length < 10)) {
       navigate('/');

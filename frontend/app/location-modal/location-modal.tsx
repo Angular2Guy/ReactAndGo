@@ -20,9 +20,11 @@ import { fetchLocation, postLocationRadius } from "../service/http-client";
 import { type PostCodeLocation } from "../model/location";
 import { type UserRequest } from "../model/user";
 import { useAtom } from "jotai";
+import { useTranslation } from 'node_modules/react-i18next';
 
 const LocationModal = () => {
     let controller: AbortController | null = null;
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [searchRadius, setSearchRadius] = useState(0);
     const [longitude, setLongitude] = useState(0);
@@ -144,23 +146,23 @@ const LocationModal = () => {
             renderInput={(params) => <TextField {...params} label="Locations" onChange={handleChange} />}
         ></Autocomplete>
         <div>
-            <h3>Longitude: {longitude}</h3>
-            <h3>Latitude: {latitude}</h3>
-            <h3>Postcode: {postCode}</h3>
+            <h3>{t('location.longitude')}: {longitude}</h3>
+            <h3>{t('location.latitude')}: {latitude}</h3>
+            <h3>{t('location.postalCode')}: {postCode}</h3>
         </div>
          <TextField
             autoFocus
             margin="dense"
             value={searchRadius} 
             onChange={handleSearchRadiusChange}            
-            label="Search Radius"
+            label={t('location.searchRadius')}
             type="string"
             fullWidth
             variant="standard"/>      
           <div>
-            <Button type="submit">Ok</Button>
-            <Button onClick={handleCancel}>Cancel</Button>              
-            <Button className={styles.toright} onClick={handleGetLocation}>Get Location</Button>  
+            <Button type="submit">{t('common.ok')}</Button>
+            <Button onClick={handleCancel}>{t('common.cancel')}</Button>              
+            <Button className={styles.toright} onClick={handleGetLocation}>{t('location.getLocation')}</Button>  
           </div>
     </Box>
     </DialogContent>

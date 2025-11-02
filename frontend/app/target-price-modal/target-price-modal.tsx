@@ -17,10 +17,12 @@ import { useState, useMemo, type ChangeEventHandler, type FormEvent } from "reac
 import { postTargetPrices } from "../service/http-client";
 import { type UserRequest } from "../model/user";
 import { useAtom } from 'jotai';
+import { useTranslation } from 'node_modules/react-i18next';
 
 
 const TargetPriceModal = () => {
     let controller: AbortController | null = null;
+    const { t } = useTranslation();
     const [targetDiesel, setTargetDiesel] = useState('0');
     const [targetE5, setTargetE5] = useState('0');
     const [targetE10, setTargetE10] = useState('0');
@@ -100,7 +102,7 @@ const TargetPriceModal = () => {
                         margin="dense"
                         value={targetDiesel}
                         onChange={handleTargetDieselChange}
-                        label="Targetprice Diesel"
+                        label={t('targetPrice.diesel')}
                         type="string"
                         fullWidth
                         variant="standard" />
@@ -109,7 +111,7 @@ const TargetPriceModal = () => {
                         margin="dense"
                         value={targetE5}
                         onChange={handleTargetE5Change}
-                        label="Targetprice E5"
+                        label={t('targetPrice.e5')}
                         type="string"
                         fullWidth
                         variant="standard" />
@@ -118,14 +120,14 @@ const TargetPriceModal = () => {
                         margin="dense"
                         value={targetE10}
                         onChange={handleTargetE10Change}
-                        label="Targetprice E10"
+                        label={t('targetPrice.e10')}
                         type="string"
                         fullWidth
                         variant="standard" />
                 </div>
                 <div>
-                    <Button type="submit">Ok</Button>
-                    <Button onClick={handleCancel}>Cancel</Button>
+                    <Button type="submit">{t('common.ok')}</Button>
+                    <Button onClick={handleCancel}>{t('common.cancel')}</Button>
                 </div>
             </Box>
         </DialogContent>

@@ -18,6 +18,7 @@ import { useAtom } from "jotai";
 
 import GlobalState from "../GlobalState";
 import { useNavigate } from "react-router";
+import { useTranslation } from 'node_modules/react-i18next';
 
 const Header = () => {
     const [locationModalState, setLocationModalState] = useAtom(GlobalState.locationModalState);
@@ -26,9 +27,10 @@ const Header = () => {
     const [globalLoginModal, setGlobalLoginModal] = useAtom(GlobalState.loginModalState);
     const [globalWebWorkerRefState, setGlobalWebWorkerRefState] = useAtom(GlobalState.webWorkerRefState); 
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const logout = (event: FormEvent) => {
-        console.log("Logout ",event);
+        //console.log("Logout ",event);
         setJwtTokenState('');    
         globalWebWorkerRefState?.postMessage({jwtToken: '', newNotificationUrl: ''});
         setGlobalWebWorkerRefState(null);
@@ -44,10 +46,10 @@ const Header = () => {
     }
 
     return <div className={styles.headerBase}>
-        <span>Cheap Gas</span>
-        <Button variant="outlined" onClick={logout} className={styles.headerButton}>Logout</Button>
-        <Button variant="outlined" onClick={location} className={styles.headerButton}>Location</Button>
-        <Button variant="outlined" onClick={targetPrice} className={styles.headerButton}>Target Price</Button>
+        <span>{t('header.title')}</span>
+        <Button variant="outlined" onClick={logout} className={styles.headerButton}>{t('common.logout')}</Button>
+        <Button variant="outlined" onClick={location} className={styles.headerButton}>{t('header.location')}</Button>
+        <Button variant="outlined" onClick={targetPrice} className={styles.headerButton}>{t('header.targetPrice')}</Button>
     </div>
 }
 

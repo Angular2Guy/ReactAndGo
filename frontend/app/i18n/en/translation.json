@@ -12,5 +12,23 @@
         "password": "Password",
         "login": "Login",
         "signin": "Sign In"
+    },
+    "header": {
+        "title": "Cheap Gas",
+        "location": "Location",
+        "targetPrice": "Target Price"
+    },
+    "location": {
+        "setLocation": "Set your location",
+        "searchRadius": "Search Radius (km)",
+        "postalCode": "Postal Code",
+        "getLocation": "Get Location"
+    },
+    "targetPrice": {
+        "setTargetPrice": "Set your target prices",
+        "diesel": "Target Price Diesel",
+        "e5": "Target Price E5",
+        "e10": "Target Price E10"
     }
+
 }
