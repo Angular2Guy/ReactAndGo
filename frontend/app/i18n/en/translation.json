@@ -5,7 +5,8 @@
         "message": "Message",
         "language": "Language",
         "english": "English",
-        "german": "German"
+        "german": "German",
+        "logout": "Logout"
     },
     "login": {     
         "username": "Username",

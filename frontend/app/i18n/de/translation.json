@@ -5,7 +5,8 @@
         "message": "Nachricht",
         "language": "Sprache",
         "english": "Englisch",
-        "german": "Deutsch"
+        "german": "Deutsch",
+        "logout": "Abmelden"
     },
     "login": {     
         "username": "Benutzername",
