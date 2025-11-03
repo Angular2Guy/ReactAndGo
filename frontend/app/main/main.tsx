@@ -19,7 +19,7 @@ import GlobalState from '../GlobalState';
 //import styles from './main.module.css';
 import Chart from '../chart/chart';
 import { useNavigate } from 'react-router';
-import { fetchGasStations, fetchPriceAvgs, fetchTimeSlots, fetchUserNotifications } from '../service/http-client';
+import { fetchGasStations, fetchPriceAvgs, fetchTimeSlots, fetchUserNotifications } from '../api/http-client';
 import { type TimeSlot } from '../model/time-slot-response';
 import { type GsValue } from '../model/gs-point';
 import { type MyDataJson } from '../model/my-data-json';
@@ -39,7 +39,6 @@ export default function Main() {
   const [globalJwtTokenState, setGlobalJwtTokenState] = useAtom(GlobalState.jwtTokenState);
   const [globalUserUuidState, setGlobalUserUuidState] = useAtom(GlobalState.userUuidState);
   const [globalUserDataState, setGlobalUserDataState] = useAtom(GlobalState.userDataState);
-  const [refreshJwtTokenState, setRefreshJwtTokenState] = useAtom(GlobalState.jwtTokenState);
 
   const handleTabChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);

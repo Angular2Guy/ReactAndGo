@@ -16,7 +16,7 @@ import { type UserDataState} from "../GlobalState";
 import { useMemo,useEffect,useState,type FormEvent, type ChangeEvent,type SyntheticEvent } from "react";
 import {Box,TextField,Button,Dialog,DialogContent, Autocomplete} from '@mui/material';
 import styles from './location-modal.module.css';
-import { fetchLocation, postLocationRadius } from "../service/http-client";
+import { fetchLocation, postLocationRadius } from "../api/http-client";
 import { type PostCodeLocation } from "../model/location";
 import { type UserRequest } from "../model/user";
 import { useAtom } from "jotai";

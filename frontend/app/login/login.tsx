@@ -18,7 +18,7 @@ import GlobalState, { type UserDataState } from "~/GlobalState";
 import styles from './login.module.css';
 import { useAtom } from "jotai";
 import type { FormEvent, BaseSyntheticEvent, ChangeEventHandler } from "react";
-import { postLogin, postSignin } from "~/service/http-client";
+import { postLogin, postSignin } from "~/api/http-client";
 import type { UserResponse } from "~/model/user";
 import '../i18n/config';
 import { useTranslation, Trans } from 'react-i18next';

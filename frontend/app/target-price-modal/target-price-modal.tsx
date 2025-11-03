@@ -14,7 +14,7 @@ import * as React from 'react';
 import GlobalState from "../GlobalState";
 import { Box, TextField, Button, Dialog, DialogContent } from '@mui/material';
 import { useState, useMemo, type ChangeEventHandler, type FormEvent } from "react";
-import { postTargetPrices } from "../service/http-client";
+import { postTargetPrices } from "../api/http-client";
 import { type UserRequest } from "../model/user";
 import { useAtom } from 'jotai';
 import { useTranslation } from 'node_modules/react-i18next';
