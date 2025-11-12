@@ -6,6 +6,7 @@ Technologies: Go/Golang, Gin, Gorm, Paho, React, Recoil, Typescript, Recoil, Mui
 [![CodeQL](https://github.com/Angular2Guy/ReactAndGo/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/Angular2Guy/ReactAndGo/actions/workflows/codeql-analysis.yml)
 
 ## Articles
+* [React vs Angular based on 2 Real Applications](https://angular2guy.wordpress.com/2025/11/09/react-vs-angular-based-on-2-real-applications/)
 * [Comparing the efficency of a Spring Boot project as GraalVm native image and on the Jdk to a Go project](https://angular2guy.wordpress.com/2023/10/21/comparing-the-efficiency-of-a-spring-boot-project-as-graalvm-native-image-and-on-the-jdk-to-a-go-project/)
 * [Adding a gas station map to ReactAndGo](https://angular2guy.wordpress.com/2023/06/16/adding-a-gas-station-map-to-reactandgo/)
 * [Cron Jobs and MQTT Messaging in Go](https://angular2guy.wordpress.com/2023/03/27/cron-jobs-and-mqtt-messaging-in-go/)
