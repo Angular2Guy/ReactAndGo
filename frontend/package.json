@@ -41,7 +41,7 @@
     "rimraf": "^5.0.0",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2",
-    "vite": "^7.1.11",
+    "vite": "^7.3.2",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }
