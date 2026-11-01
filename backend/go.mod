@@ -1,6 +1,6 @@
 module react-and-go
 
-go 1.24.0
+go 1.27.3
 
 require (
 	github.com/angular2guy/go-actuator v0.9.6

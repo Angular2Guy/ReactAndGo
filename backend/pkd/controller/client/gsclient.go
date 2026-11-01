@@ -88,7 +88,7 @@ func convertCsvToGasStationImports(rows *[][]string) []gasstation.GasStationImpo
 		lat, _ := strconv.ParseFloat(row[7], 64)
 		lng, _ := strconv.ParseFloat(row[8], 64)
 		//log.Default().Printf("Date: %v", strings.TrimSpace(row[9]))
-		firstActive, _ := time.Parse("2006-02-01 15:04:05-07", strings.TrimSpace(row[9]))
+		firstActive, _ := time.Parse("2006-01-02 15:04:05-07", strings.TrimSpace(row[9]))
 		//log.Default().Printf("GoDate: %v", firstActive.UTC())
 		gsImport := gasstation.GasStationImport{Uuid: row[0],
 			StationName:      row[1],
