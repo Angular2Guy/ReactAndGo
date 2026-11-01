@@ -1,4 +1,4 @@
-FROM ubuntu:noble
+FROM ubuntu:26.04
 VOLUME /tmp
 ENV GIN_MODE=release
 ARG APP_FILE
