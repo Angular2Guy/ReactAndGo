@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-co-op/gocron"
+	"github.com/go-co-op/gocron/v2"
 )
 
 type CircleCenter struct {
@@ -110,25 +110,70 @@ func Start() {
 
 	//gasstation.CalcCountyTimeSlots()
 
-	scheduler := gocron.NewScheduler(time.UTC)
-	scheduler.Every(1).Day().At("01:07").Do(func() {
-		gsclient.UpdateGasStations(nil)
-	})
+	scheduler, err := gocron.NewScheduler(gocron.WithLocation(time.UTC))
+	if err != nil {
+		log.Fatalf("Scheduler not created: %v", err)
+	}
 
-	scheduler.Every(60).Seconds().Tag("messaging").Do(messaging.ConnectionCheck)
+	_, err = scheduler.NewJob(
+		gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(1, 7, 0))),
+		gocron.NewTask(func() {
+			gsclient.UpdateGasStations(nil)
+		}),
+	)
+	if err != nil {
+		log.Fatalf("Job not created: %v", err)
+	}
 
-	scheduler.Every(1).Day().At("00:02").Tag("timeslices").Do(gasstation.CalcCountyTimeSlots)
+	_, err = scheduler.NewJob(
+		gocron.DurationJob(60*time.Second),
+		gocron.NewTask(messaging.ConnectionCheck),
+		gocron.WithTags("messaging"),
+	)
+	if err != nil {
+		log.Fatalf("Job not created: %v", err)
+	}
 
-	scheduler.Every(1).Day().At("02:05").Tag("averages").Do(gasstation.ReCalcCountyStatePrices)
+	_, err = scheduler.NewJob(
+		gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(0, 2, 0))),
+		gocron.NewTask(gasstation.CalcCountyTimeSlots),
+		gocron.WithTags("timeslices"),
+	)
+	if err != nil {
+		log.Fatalf("Job not created: %v", err)
+	}
 
-	scheduler.Every(1).Day().At("03:08").Tag("cleanupOldPrices").Do(gasstation.CleanupOldPrices)
+	_, err = scheduler.NewJob(
+		gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(2, 5, 0))),
+		gocron.NewTask(gasstation.ReCalcCountyStatePrices),
+		gocron.WithTags("averages"),
+	)
+	if err != nil {
+		log.Fatalf("Job not created: %v", err)
+	}
+
+	_, err = scheduler.NewJob(
+		gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(3, 8, 0))),
+		gocron.NewTask(gasstation.CleanupOldPrices),
+		gocron.WithTags("cleanupOldPrices"),
+	)
+	if err != nil {
+		log.Fatalf("Job not created: %v", err)
+	}
 
 	msgFileStr := os.Getenv("MSG_MESSAGES")
 	if len(strings.TrimSpace(msgFileStr)) > 3 {
 		msgFiles := strings.Split(msgFileStr, ";")
-		scheduler.Every(60).Seconds().Tag("prices").Do(sendTestPriceMsgs, msgFiles)
+		_, err = scheduler.NewJob(
+			gocron.DurationJob(60*time.Second),
+			gocron.NewTask(sendTestPriceMsgs, msgFiles),
+			gocron.WithTags("prices"),
+		)
+		if err != nil {
+			log.Fatalf("Job not created: %v", err)
+		}
 	}
-	scheduler.StartAsync()
+	scheduler.Start()
 }
 
 func sendTestPriceMsgs(msgFiles []string) {
