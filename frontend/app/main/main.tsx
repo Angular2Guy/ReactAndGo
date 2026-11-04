@@ -24,7 +24,7 @@ import { type TimeSlot } from '../model/time-slot-response';
 import { type GsValue } from '../model/gs-point';
 import { type MyDataJson } from '../model/my-data-json';
 import { useAtom } from "jotai";
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function Main() {
   const navigate = useNavigate();

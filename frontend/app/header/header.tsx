@@ -18,7 +18,7 @@ import { useAtom } from "jotai";
 
 import GlobalState from "../GlobalState";
 import { useNavigate } from "react-router";
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
     const [locationModalState, setLocationModalState] = useAtom(GlobalState.locationModalState);

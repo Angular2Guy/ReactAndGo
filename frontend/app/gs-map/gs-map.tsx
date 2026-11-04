@@ -26,7 +26,7 @@ import { useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { type CenterLocation } from '../model/location';
 import { type GsValue } from '../model/gs-point';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 
 interface InputProps {
   center: CenterLocation;

@@ -17,7 +17,7 @@ import { useState, useMemo, type ChangeEventHandler, type FormEvent } from "reac
 import { postTargetPrices } from "../api/http-client";
 import { type UserRequest } from "../model/user";
 import { useAtom } from 'jotai';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 
